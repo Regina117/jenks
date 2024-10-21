@@ -7,7 +7,7 @@ package org.geoserver.web.security.oauth2;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.model.Model;
-import org.geoserver.security.oauth2.OpenIdConnectFilterConfig;
+import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
 import org.geoserver.security.web.AbstractSecurityNamedServicePanelTest;
 import org.geoserver.security.web.AbstractSecurityPage;
 import org.geoserver.security.web.SecurityNamedServiceNewPage;
@@ -19,7 +19,8 @@ public class OpenIdConnectAuthProviderPanelTest extends AbstractSecurityNamedSer
 
     @Test
     public void smokeTest() {
-        Model<OpenIdConnectFilterConfig> model = new Model<>(new OpenIdConnectFilterConfig());
+        Model<GeoServerOAuth2LoginFilterConfig> model =
+                new Model<>(new GeoServerOAuth2LoginFilterConfig());
         FormTestPage testPage =
                 new FormTestPage(id -> new OpenIdConnectAuthProviderPanel(id, model));
         tester.startPage(testPage);

@@ -4,22 +4,21 @@
  */
 package org.geoserver.web.security.oauth2;
 
-import org.geoserver.security.oauth2.GeoServerOAuthAuthenticationFilter;
-import org.geoserver.security.oauth2.OpenIdConnectAuthenticationFilter;
-import org.geoserver.security.oauth2.OpenIdConnectFilterConfig;
+import org.geoserver.security.oauth2.GeoServerOAuth2LoginAuthenticationFilter;
+import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
 import org.geoserver.security.web.auth.AuthenticationFilterPanelInfo;
 
 /** Configuration panel extension for {@link GeoServerOAuthAuthenticationFilter}. */
 public class OpenIdConnectAuthProviderPanelInfo
         extends AuthenticationFilterPanelInfo<
-                OpenIdConnectFilterConfig, OpenIdConnectAuthProviderPanel> {
+                GeoServerOAuth2LoginFilterConfig, OpenIdConnectAuthProviderPanel> {
 
     /** serialVersionUID */
     private static final long serialVersionUID = -3891569684560944819L;
 
     public OpenIdConnectAuthProviderPanelInfo() {
         setComponentClass(OpenIdConnectAuthProviderPanel.class);
-        setServiceClass(OpenIdConnectAuthenticationFilter.class);
-        setServiceConfigClass(OpenIdConnectFilterConfig.class);
+        setServiceClass(GeoServerOAuth2LoginAuthenticationFilter.class);
+        setServiceConfigClass(GeoServerOAuth2LoginFilterConfig.class);
     }
 }

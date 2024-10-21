@@ -13,17 +13,21 @@
  */
 package org.geoserver.web.security.oauth2;
 
-import static org.geoserver.security.oauth2.OpenIdConnectFilterConfig.OpenIdRoleSource.AccessToken;
-import static org.geoserver.security.oauth2.OpenIdConnectFilterConfig.OpenIdRoleSource.IdToken;
-import static org.geoserver.security.oauth2.OpenIdConnectFilterConfig.OpenIdRoleSource.MSGraphAPI;
-import static org.geoserver.security.oauth2.OpenIdConnectFilterConfig.OpenIdRoleSource.UserInfo;
+import static org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.AccessToken;
+import static org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.IdToken;
+import static org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.MSGraphAPI;
+import static org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.UserInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.wicket.Component;
+import java.util.function.Supplier;
+import java.util.logging.Logger;
 import org.apache.wicket.ajax.AjaxRequestTarget;
+import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
+import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
+import org.apache.wicket.markup.html.WebMarkupContainer;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -36,14 +40,15 @@ import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
 import org.geoserver.security.config.PreAuthenticatedUserNameFilterConfig.PreAuthenticatedUserNameRoleSource;
 import org.geoserver.security.config.RoleSource;
-import org.geoserver.security.oauth2.DiscoveryClient;
-import org.geoserver.security.oauth2.GeoServerOAuthAuthenticationFilter;
-import org.geoserver.security.oauth2.OpenIdConnectFilterConfig;
-import org.geoserver.security.oauth2.OpenIdConnectFilterConfig.OpenIdRoleSource;
+import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
+import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource;
+import org.geoserver.security.web.auth.PreAuthenticatedUserNameFilterPanel;
 import org.geoserver.security.web.auth.RoleSourceChoiceRenderer;
 import org.geoserver.web.GeoServerBasePage;
+import org.geoserver.web.wicket.GeoServerDialog;
 import org.geoserver.web.wicket.HelpLink;
 import org.geoserver.web.wicket.ParamResourceModel;
+import org.geotools.util.logging.Logging;
 
 /**
  * Configuration panel for {@link GeoServerOAuthAuthenticationFilter}.
@@ -51,7 +56,10 @@ import org.geoserver.web.wicket.ParamResourceModel;
  * @author Alessio Fabiani, GeoSolutions S.A.S.
  */
 public class OpenIdConnectAuthProviderPanel
-        extends GeoServerOAuth2AuthProviderPanel<OpenIdConnectFilterConfig> {
+        extends PreAuthenticatedUserNameFilterPanel<GeoServerOAuth2LoginFilterConfig> {
+
+    /** serialVersionUID */
+    private static final long serialVersionUID = -3025321797363970333L;
 
     /**
      * If they have chosen MSGraphAPI as the RoleProvider, we need to make sure that the userinfo
@@ -124,69 +132,6 @@ public class OpenIdConnectAuthProviderPanel
         }
     }
 
-    @Override
-    protected void onInitialize() {
-        super.onInitialize();
-        getForm().add(new BearerTokenNoIDTokensValidator());
-        getForm().add(new MSGraphRoleProviderOnlyWithMSGraphSystem());
-    }
-
-    public OpenIdConnectAuthProviderPanel(String id, IModel<OpenIdConnectFilterConfig> model) {
-        super(id, model);
-
-        add(new HelpLink("principalKeyHelp", this).setDialog(dialog));
-        add(new TextField<String>("principalKey"));
-
-        add(new HelpLink("jwkURIHelp", this).setDialog(dialog));
-        add(new TextField<String>("jwkURI"));
-        add(new HelpLink("enforceTokenValidationHelp", this).setDialog(dialog));
-        add(new CheckBox("enforceTokenValidation"));
-
-        add(new HelpLink("postLogoutRedirectUriHelp", this).setDialog(dialog));
-        add(new TextField<String>("postLogoutRedirectUri"));
-
-        add(new HelpLink("responseModeHelp", this).setDialog(dialog));
-        add(new TextField<String>("responseMode"));
-        add(new HelpLink("sendClientSecretHelp", this).setDialog(dialog));
-        add(new CheckBox("sendClientSecret"));
-
-        add(new HelpLink("allowUnSecureLoggingHelp", this).setDialog(dialog));
-        add(new CheckBox("allowUnSecureLogging"));
-
-        add(new HelpLink("allowBearerTokensHelp", this).setDialog(dialog));
-        add(new CheckBox("allowBearerTokens"));
-
-        add(new HelpLink("PKCEHelp", this).setDialog(dialog));
-        add(new CheckBox("usePKCE"));
-    }
-
-    @Override
-    protected Panel getRoleSourcePanel(RoleSource model) {
-        if (IdToken.equals(model) || AccessToken.equals(model) || UserInfo.equals(model)) {
-            return new TokenClaimPanel("panel");
-        }
-        return super.getRoleSourcePanel(model);
-    }
-
-    @Override
-    protected DropDownChoice<RoleSource> createRoleSourceDropDown() {
-        List<RoleSource> sources = new ArrayList<>(Arrays.asList(OpenIdRoleSource.values()));
-        sources.addAll(Arrays.asList(PreAuthenticatedUserNameRoleSource.values()));
-        return new DropDownChoice<>("roleSource", sources, new RoleSourceChoiceRenderer());
-    }
-
-    static class TokenClaimPanel extends Panel {
-        public TokenClaimPanel(String id) {
-            super(id, new Model<>());
-            add(new TextField<String>("tokenRolesClaim").setRequired(true));
-        }
-    }
-
-    @Override
-    protected Component getTopPanel(String panelId) {
-        return new DiscoveryPanel(panelId);
-    }
-
     private class DiscoveryPanel extends Panel {
 
         String discoveryURL;
@@ -215,8 +160,8 @@ public class OpenIdConnectAuthProviderPanel
         }
 
         private void discover(String discoveryURL, AjaxRequestTarget target) {
-            OpenIdConnectFilterConfig model =
-                    (OpenIdConnectFilterConfig)
+            GeoServerOAuth2LoginFilterConfig model =
+                    (GeoServerOAuth2LoginFilterConfig)
                             OpenIdConnectAuthProviderPanel.this.getForm().getModelObject();
             try {
                 new DiscoveryClient(discoveryURL).autofill(model);
@@ -227,5 +172,183 @@ public class OpenIdConnectAuthProviderPanel
                 ((GeoServerBasePage) getPage()).addFeedbackPanels(target);
             }
         }
+    }
+
+    static class TokenClaimPanel extends Panel {
+        public TokenClaimPanel(String id) {
+            super(id, new Model<>());
+            add(new TextField<String>("tokenRolesClaim").setRequired(true));
+        }
+    }
+
+    static class ShowHideWebMarkupContainer extends WebMarkupContainer {
+        private static final long serialVersionUID = 1L;
+
+        /** @param pId */
+        public ShowHideWebMarkupContainer(String pId, Supplier<Boolean> pVisibitySupplier) {
+            super(pId);
+            visibleSupplier = pVisibitySupplier;
+        }
+
+        private Supplier<Boolean> visibleSupplier;
+
+        @Override
+        public boolean isVisible() {
+            return visibleSupplier.get();
+        }
+    }
+
+    private static Logger LOGGER = Logging.getLogger(OpenIdConnectAuthProviderPanel.class);
+
+    private GeoServerDialog dialog;
+
+    @SuppressWarnings("serial")
+    public OpenIdConnectAuthProviderPanel(
+            String id, IModel<GeoServerOAuth2LoginFilterConfig> model) {
+        super(id, model);
+
+        this.dialog = (GeoServerDialog) get("dialog");
+
+        add(new HelpLink("userNameAttributeHelp", this).setDialog(dialog));
+
+        add(new HelpLink("geoserverParametersHelp", this).setDialog(dialog));
+        TextField<String> tf = new TextField<String>("baseRedirectUri");
+        tf.add(
+                new AjaxFormComponentUpdatingBehavior("change") {
+
+                    @Override
+                    protected void onUpdate(AjaxRequestTarget pTarget) {
+                        configModel.getObject().calculateredirectUris();
+                        pTarget.add(OpenIdConnectAuthProviderPanel.this);
+                    }
+                });
+
+        add(tf);
+        add(new HelpLink("baseRedirectUriHelp", this).setDialog(dialog));
+
+        AjaxCheckBox cb =
+                new AjaxCheckBox("googleEnabled") {
+                    @Override
+                    protected void onUpdate(AjaxRequestTarget pTarget) {
+                        pTarget.add(OpenIdConnectAuthProviderPanel.this);
+                    }
+                };
+        add(cb);
+
+        ShowHideWebMarkupContainer googleContainer =
+                new ShowHideWebMarkupContainer(
+                        "googleSettings", () -> configModel.getObject().isGoogleEnabled());
+        googleContainer.add(
+                new HelpLink("googleConnectionFromParametersHelp", this).setDialog(dialog));
+        add(googleContainer);
+
+        googleContainer.add(new TextField<String>("googleClientId"));
+        googleContainer.add(new HelpLink("googleClientIdHelp", this).setDialog(dialog));
+        googleContainer.add(new TextField<String>("googleClientSecret"));
+        googleContainer.add(new HelpLink("googleClientSecretHelp", this).setDialog(dialog));
+        googleContainer.add(new TextField<String>("googleUserNameAttribute"));
+        googleContainer.add(new HelpLink("googleUserNameAttributeHelp", this).setDialog(dialog));
+        googleContainer.add(disabledTextField("googleRedirectUri"));
+
+        googleContainer.add(
+                new HelpLink("googleConnectionForParametersHelp", this).setDialog(dialog));
+        googleContainer.add(new HelpLink("googleRedirectUriHelp", this).setDialog(dialog));
+
+        add(new HelpLink("gitHubConnectionParametersHelp", this).setDialog(dialog));
+        add(new CheckBox("gitHubEnabled"));
+        add(new HelpLink("gitHubEnabledHelp", this).setDialog(dialog));
+        add(new TextField<String>("gitHubClientId"));
+        add(new TextField<String>("gitHubClientSecret"));
+        add(new TextField<String>("gitHubUserNameAttribute"));
+        add(disabledTextField("gitHubRedirectUri"));
+        add(new HelpLink("gitHubRedirectUriHelp", this).setDialog(dialog));
+
+        add(new HelpLink("msConnectionParametersHelp", this).setDialog(dialog));
+        add(new CheckBox("msEnabled"));
+        add(new HelpLink("msEnabledHelp", this).setDialog(dialog));
+        add(new TextField<String>("msClientId"));
+        add(new TextField<String>("msClientSecret"));
+        add(new TextField<String>("msUserNameAttribute"));
+        add(disabledTextField("msRedirectUri"));
+        add(new HelpLink("msRedirectUriHelp", this).setDialog(dialog));
+
+        add(new DiscoveryPanel("topPanel"));
+
+        add(new HelpLink("enableRedirectAuthenticationEntryPointHelp", this).setDialog(dialog));
+        add(new HelpLink("connectionParametersHelp", this).setDialog(dialog));
+        add(new HelpLink("accessTokenUriHelp", this).setDialog(dialog));
+        add(new HelpLink("userAuthorizationUriHelp", this).setDialog(dialog));
+        add(new HelpLink("redirectUriHelp", this).setDialog(dialog));
+        add(new HelpLink("checkTokenEndpointUrlHelp", this).setDialog(dialog));
+        add(new HelpLink("logoutUriHelp", this).setDialog(dialog));
+        add(new HelpLink("scopesHelp", this).setDialog(dialog));
+        add(new HelpLink("cliendIdHelp", this).setDialog(dialog));
+        add(new HelpLink("clientSecretHelp", this).setDialog(dialog));
+
+        add(new CheckBox("enabled"));
+        add(new CheckBox("enableRedirectAuthenticationEntryPoint"));
+        add(new CheckBox("forceAccessTokenUriHttps"));
+        add(new CheckBox("forceUserAuthorizationUriHttps"));
+        add(new TextField<String>("accessTokenUri"));
+        add(new TextField<String>("userAuthorizationUri"));
+        add(new TextField<String>("checkTokenEndpointUrl"));
+        add(new TextField<String>("logoutUri"));
+        add(new TextField<String>("scopes"));
+        add(new TextField<String>("cliendId"));
+        add(new TextField<String>("clientSecret"));
+        add(disabledTextField("redirectUri"));
+
+        add(new HelpLink("principalKeyHelp", this).setDialog(dialog));
+        add(new TextField<String>("principalKey"));
+
+        add(new HelpLink("jwkURIHelp", this).setDialog(dialog));
+        add(new TextField<String>("jwkURI"));
+        add(new HelpLink("enforceTokenValidationHelp", this).setDialog(dialog));
+        add(new CheckBox("enforceTokenValidation"));
+
+        add(new HelpLink("postLogoutRedirectUriHelp", this).setDialog(dialog));
+        add(new TextField<String>("postLogoutRedirectUri"));
+
+        add(new HelpLink("responseModeHelp", this).setDialog(dialog));
+        add(new TextField<String>("responseMode"));
+        add(new HelpLink("sendClientSecretHelp", this).setDialog(dialog));
+        add(new CheckBox("sendClientSecret"));
+
+        add(new HelpLink("allowUnSecureLoggingHelp", this).setDialog(dialog));
+        add(new CheckBox("allowUnSecureLogging"));
+
+        add(new HelpLink("allowBearerTokensHelp", this).setDialog(dialog));
+        add(new CheckBox("allowBearerTokens"));
+
+        add(new HelpLink("PKCEHelp", this).setDialog(dialog));
+        add(new CheckBox("usePKCE"));
+    }
+
+    @Override
+    protected void onInitialize() {
+        super.onInitialize();
+        getForm().add(new BearerTokenNoIDTokensValidator());
+        getForm().add(new MSGraphRoleProviderOnlyWithMSGraphSystem());
+    }
+
+    @Override
+    protected Panel getRoleSourcePanel(RoleSource model) {
+        if (IdToken.equals(model) || AccessToken.equals(model) || UserInfo.equals(model)) {
+            return new TokenClaimPanel("panel");
+        }
+        return super.getRoleSourcePanel(model);
+    }
+
+    @Override
+    protected DropDownChoice<RoleSource> createRoleSourceDropDown() {
+        List<RoleSource> sources = new ArrayList<>(Arrays.asList(OpenIdRoleSource.values()));
+        sources.addAll(Arrays.asList(PreAuthenticatedUserNameRoleSource.values()));
+        return new DropDownChoice<>("roleSource", sources, new RoleSourceChoiceRenderer());
+    }
+
+    private TextField<String> disabledTextField(String pName) {
+        TextField<String> lField = new TextField<String>(pName);
+        lField.setEnabled(false);
+        return lField;
     }
 }

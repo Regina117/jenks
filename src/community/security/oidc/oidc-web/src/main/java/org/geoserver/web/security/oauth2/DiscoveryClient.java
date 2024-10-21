@@ -2,13 +2,14 @@
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
  */
-package org.geoserver.security.oauth2;
+package org.geoserver.web.security.oauth2;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.geoserver.ows.util.ResponseUtils;
+import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
 import org.geotools.util.SuppressFBWarnings;
 import org.springframework.web.client.RestTemplate;
 
@@ -44,7 +45,7 @@ public class DiscoveryClient {
     }
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-    public void autofill(OpenIdConnectFilterConfig conf) {
+    public void autofill(GeoServerOAuth2LoginFilterConfig conf) {
         Map response = restTemplate.getForObject(this.location, Map.class);
         Optional.ofNullable(response.get(AUTHORIZATION_ENDPOINT_ATTR_NAME))
                 .ifPresent(uri -> conf.setUserAuthorizationUri((String) uri));

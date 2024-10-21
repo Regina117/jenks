@@ -206,6 +206,9 @@ public class GeoServerSecurityFilterChainProxy
             proxy = new FilterChainProxy(filterChains);
             proxy.setFirewall(new GeoServerHttpFirewall());
             proxy.afterPropertiesSet();
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.fine("Created filterChainProxy: " + proxy);
+            }
             chainsInitialized = true;
         }
     }

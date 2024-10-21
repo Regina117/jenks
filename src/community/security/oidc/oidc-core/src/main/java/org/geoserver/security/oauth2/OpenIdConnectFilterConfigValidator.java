@@ -16,10 +16,11 @@ public class OpenIdConnectFilterConfigValidator extends OAuth2FilterConfigValida
         super(securityManager);
     }
 
-    public void validateOAuth2FilterConfig(OAuth2FilterConfig filterConfig)
+    public void validateOAuth2FilterConfig(GeoServerOAuth2LoginFilterConfig filterConfig)
             throws FilterConfigException {
         super.validateOAuth2FilterConfig(filterConfig);
-        OpenIdConnectFilterConfig oidcFilterConfig = (OpenIdConnectFilterConfig) filterConfig;
+        GeoServerOAuth2LoginFilterConfig oidcFilterConfig =
+                (GeoServerOAuth2LoginFilterConfig) filterConfig;
 
         if (StringUtils.hasLength(oidcFilterConfig.getJwkURI()) != false) {
             try {
@@ -31,9 +32,9 @@ public class OpenIdConnectFilterConfigValidator extends OAuth2FilterConfigValida
         }
     }
     /** Only require checkTokenEndpointUrl if JSON Web Key set URI is empty. */
-    protected void validateCheckTokenEndpointUrl(OAuth2FilterConfig filterConfig)
+    protected void validateCheckTokenEndpointUrl(GeoServerOAuth2LoginFilterConfig filterConfig)
             throws FilterConfigException {
-        var oidcFilterConfig = (OpenIdConnectFilterConfig) filterConfig;
+        var oidcFilterConfig = (GeoServerOAuth2LoginFilterConfig) filterConfig;
         if (StringUtils.hasLength(filterConfig.getCheckTokenEndpointUrl()) == false
                 && StringUtils.hasLength(oidcFilterConfig.getJwkURI()) == false) {
             // One of checkTokenEndpointUrl or jwkURI is required
@@ -52,9 +53,9 @@ public class OpenIdConnectFilterConfigValidator extends OAuth2FilterConfigValida
     }
 
     /** Only require {@code client_secret} when not using PKCE. */
-    protected void validateClientSecret(OAuth2FilterConfig filterConfig)
+    protected void validateClientSecret(GeoServerOAuth2LoginFilterConfig filterConfig)
             throws FilterConfigException {
-        var oidcFilterConfig = (OpenIdConnectFilterConfig) filterConfig;
+        var oidcFilterConfig = (GeoServerOAuth2LoginFilterConfig) filterConfig;
         if (!oidcFilterConfig.isUsePKCE()) {
             super.validateClientSecret(filterConfig);
         }

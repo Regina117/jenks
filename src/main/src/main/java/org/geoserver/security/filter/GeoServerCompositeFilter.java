@@ -99,4 +99,9 @@ public class GeoServerCompositeFilter extends GeoServerSecurityFilter {
     public void setNestedFilters(List<Filter> nestedFilters) {
         this.nestedFilters = nestedFilters;
     }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + " [NestedFilters=" + this.nestedFilters + "]";
+    }
 }

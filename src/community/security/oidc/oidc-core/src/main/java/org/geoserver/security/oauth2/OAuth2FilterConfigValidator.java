@@ -22,18 +22,57 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
         super(securityManager);
     }
 
+    /** Only require checkTokenEndpointUrl if JSON Web Key set URI is empty. */
+    protected void validateCheckTokenEndpointUrl(GeoServerOAuth2LoginFilterConfig filterConfig)
+            throws FilterConfigException {
+        var oidcFilterConfig = (GeoServerOAuth2LoginFilterConfig) filterConfig;
+        if (StringUtils.hasLength(filterConfig.getCheckTokenEndpointUrl()) == false
+                && StringUtils.hasLength(oidcFilterConfig.getJwkURI()) == false) {
+            // One of checkTokenEndpointUrl or jwkURI is required
+            throw new OpenIdConnectFilterConfigException(
+                    OpenIdConnectFilterConfigException
+                            .OAUTH2_CHECKTOKEN_OR_WKTS_ENDPOINT_URL_REQUIRED);
+        }
+        if (StringUtils.hasLength(filterConfig.getCheckTokenEndpointUrl()) != false) {
+            try {
+                new URL(filterConfig.getCheckTokenEndpointUrl());
+            } catch (MalformedURLException ex) {
+                throw createFilterException(
+                        OAuth2FilterConfigException.OAUTH2_CHECKTOKENENDPOINT_URL_MALFORMED);
+            }
+        }
+    }
+
+    /**
+     * Validate {@code client_secret} if required.
+     *
+     * <p>Default implementation requires {@code client_secret} to be provided. Subclasses can
+     * override if working with a public client that cannot keep a secret.
+     */
+    protected void validateClientSecret(GeoServerOAuth2LoginFilterConfig filterConfig)
+            throws FilterConfigException {
+
+        if (filterConfig.isUsePKCE()) {
+            return;
+        }
+
+        if (!StringUtils.hasLength(filterConfig.getClientSecret())) {
+            throw createFilterException(OAuth2FilterConfigException.OAUTH2_CLIENT_SECRET_REQUIRED);
+        }
+    }
+
     @Override
     public void validateFilterConfig(SecurityNamedServiceConfig config)
             throws FilterConfigException {
 
-        if (config instanceof OAuth2FilterConfig) {
-            validateOAuth2FilterConfig((OAuth2FilterConfig) config);
+        if (config instanceof GeoServerOAuth2LoginFilterConfig) {
+            validateOAuth2FilterConfig((GeoServerOAuth2LoginFilterConfig) config);
         } else {
             super.validateFilterConfig(config);
         }
     }
 
-    public void validateOAuth2FilterConfig(OAuth2FilterConfig filterConfig)
+    public void validateOAuth2FilterConfig(GeoServerOAuth2LoginFilterConfig filterConfig)
             throws FilterConfigException {
         if (StringUtils.hasLength(filterConfig.getLogoutUri())) {
             try {
@@ -93,38 +132,14 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
         if (!StringUtils.hasLength(filterConfig.getScopes())) {
             throw createFilterException(OAuth2FilterConfigException.OAUTH2_SCOPE_REQUIRED);
         }
-    }
 
-    /**
-     * Check OAuth2FilterConfig#getCheckTokenEndpointUrl value.
-     *
-     * <p>The default implementation requires checkTokenEndpointUrl to be provided. Subclasses can
-     * override (to allow alternatives such as WTKS).
-     */
-    protected void validateCheckTokenEndpointUrl(OAuth2FilterConfig filterConfig)
-            throws FilterConfigException {
-        if (StringUtils.hasLength(filterConfig.getCheckTokenEndpointUrl()) == false)
-            throw createFilterException(
-                    OAuth2FilterConfigException.OAUTH2_CHECKTOKENENDPOINT_URL_REQUIRED);
-
-        try {
-            new URL(filterConfig.getCheckTokenEndpointUrl());
-        } catch (MalformedURLException ex) {
-            throw createFilterException(
-                    OAuth2FilterConfigException.OAUTH2_CHECKTOKENENDPOINT_URL_MALFORMED);
-        }
-    }
-
-    /**
-     * Validate {@code client_secret} if required.
-     *
-     * <p>Default implementation requires {@code client_secret} to be provided. Subclasses can
-     * override if working with a public client that cannot keep a secret.
-     */
-    protected void validateClientSecret(OAuth2FilterConfig filterConfig)
-            throws FilterConfigException {
-        if (!StringUtils.hasLength(filterConfig.getClientSecret())) {
-            throw createFilterException(OAuth2FilterConfigException.OAUTH2_CLIENT_SECRET_REQUIRED);
+        if (StringUtils.hasLength(filterConfig.getJwkURI()) != false) {
+            try {
+                new URL(filterConfig.getJwkURI());
+            } catch (MalformedURLException ex) {
+                throw new OpenIdConnectFilterConfigException(
+                        OpenIdConnectFilterConfigException.OAUTH2_WKTS_URL_MALFORMED);
+            }
         }
     }
 

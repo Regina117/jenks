@@ -8,8 +8,8 @@ import org.geoserver.security.GeoServerSecurityFilterChain;
 import org.geoserver.security.GeoServerSecurityManager;
 import org.geoserver.security.RequestFilterChain;
 import org.geoserver.security.config.SecurityManagerConfig;
-import org.geoserver.security.oauth2.OpenIdConnectAuthenticationFilter;
-import org.geoserver.security.oauth2.OpenIdConnectFilterConfig;
+import org.geoserver.security.oauth2.GeoServerOAuth2LoginAuthenticationFilter;
+import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
 import org.geoserver.web.GeoServerHomePage;
 import org.geoserver.web.GeoServerWicketTestSupport;
 import org.junit.Test;
@@ -26,9 +26,9 @@ public class OpenIdConnectLoginButtonTest extends GeoServerWicketTestSupport {
         super.onSetUp(testData);
 
         GeoServerSecurityManager manager = getSecurityManager();
-        OpenIdConnectFilterConfig filterConfig = new OpenIdConnectFilterConfig();
+        GeoServerOAuth2LoginFilterConfig filterConfig = new GeoServerOAuth2LoginFilterConfig();
         filterConfig.setName("openidconnect");
-        filterConfig.setClassName(OpenIdConnectAuthenticationFilter.class.getName());
+        filterConfig.setClassName(GeoServerOAuth2LoginAuthenticationFilter.class.getName());
         filterConfig.setCliendId("foo");
         filterConfig.setClientSecret("bar");
         filterConfig.setAccessTokenUri("https://www.connectid/fake/test");

@@ -20,6 +20,8 @@ public class LoginFormInfo extends ComponentInfo<GeoServerBasePage>
     private Class<GeoServerSecurityProvider> filterClass;
     private String include;
     private String loginPath;
+    private String method = "post";
+    private boolean enabled = true;
 
     /** Name of the login extension; it will determine also the order displayed for the icons */
     public void setName(String name) {
@@ -101,9 +103,29 @@ public class LoginFormInfo extends ComponentInfo<GeoServerBasePage>
         this.loginPath = loginPath;
     }
 
+    /** @return the method */
+    public String getMethod() {
+        return method;
+    }
+
+    /** @param pMethod the method to set */
+    public void setMethod(String pMethod) {
+        method = pMethod;
+    }
+
     /** Sorts by name the Login extensions */
     @Override
     public int compareTo(LoginFormInfo other) {
         return getName().compareTo(other.getName());
+    }
+
+    /** @return the enabled */
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    /** @param pEnabled the enabled to set */
+    public void setEnabled(boolean pEnabled) {
+        enabled = pEnabled;
     }
 }

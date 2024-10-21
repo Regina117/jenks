@@ -16,11 +16,29 @@
     </Appenders>
     <Loggers>
 
+
+        <Logger name="org.springframework" level="info" additivity="false">
+            <AppenderRef ref="stdout"/>
+            <AppenderRef ref="geoserverlogfile"/>
+        </Logger>
+        <Logger name="org.springframework.security" level="debug" additivity="false">
+            <AppenderRef ref="stdout"/>
+            <AppenderRef ref="geoserverlogfile"/>
+        </Logger>
+        <Logger name="org.springframework.security.oauth2" level="debug" additivity="false">
+            <AppenderRef ref="stdout"/>
+            <AppenderRef ref="geoserverlogfile"/>
+        </Logger>        
+
+        <Logger name="org.geotools.factory" level="warn" additivity="false">
+            <AppenderRef ref="stdout"/>
+            <AppenderRef ref="geoserverlogfile"/>
+        </Logger>
         <Logger name="org.geotools" level="warn" additivity="false">
             <AppenderRef ref="stdout"/>
             <AppenderRef ref="geoserverlogfile"/>
         </Logger>
-        <Logger name="org.geotools.factory" level="warn" additivity="false">
+        <Logger name="org.geowebcache" level="error" additivity="false">
             <AppenderRef ref="stdout"/>
             <AppenderRef ref="geoserverlogfile"/>
         </Logger>
@@ -33,27 +51,15 @@
             <AppenderRef ref="stdout"/>
             <AppenderRef ref="geoserverlogfile"/>
         </Logger>
-
-        <Logger name="org.springframework" level="warn" additivity="false">
+        <Logger name="org.geoserver.catalog" level="debug" additivity="false">
             <AppenderRef ref="stdout"/>
             <AppenderRef ref="geoserverlogfile"/>
         </Logger>
 
-        <Logger name="org.geowebcache" level="error" additivity="false">
+        <Logger name="org.geoserver.security" level="debug" additivity="false">
             <AppenderRef ref="stdout"/>
             <AppenderRef ref="geoserverlogfile"/>
         </Logger>
-
-        <Logger name="org.geoserver.catalog" level="config" additivity="false">
-            <AppenderRef ref="stdout"/>
-            <AppenderRef ref="geoserverlogfile"/>
-        </Logger>
-
-        <Logger name="org.geoserver.security" level="config" additivity="false">
-            <AppenderRef ref="stdout"/>
-            <AppenderRef ref="geoserverlogfile"/>
-        </Logger>
-
         <Logger name="org.geoserver.security.oauth2" level="trace" additivity="false">
             <AppenderRef ref="stdout"/>
             <AppenderRef ref="geoserverlogfile"/>
