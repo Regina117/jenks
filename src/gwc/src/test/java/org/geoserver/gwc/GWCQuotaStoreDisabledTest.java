@@ -38,8 +38,7 @@ public class GWCQuotaStoreDisabledTest extends GeoServerSystemTestSupport {
     @Test
     public void testQuotaDisabled() throws Exception {
         // the provider returns no quota store
-        ConfigurableQuotaStoreProvider provider =
-                GeoServerExtensions.bean(ConfigurableQuotaStoreProvider.class);
+        ConfigurableQuotaStoreProvider provider = GeoServerExtensions.bean(ConfigurableQuotaStoreProvider.class);
         assertNull(provider.getQuotaStore());
 
         // check there is no quota database
@@ -49,8 +48,7 @@ public class GWCQuotaStoreDisabledTest extends GeoServerSystemTestSupport {
 
     @Test
     public void testQuotaDisabledOnDestroy() throws Exception {
-        ConfigurableQuotaStoreProvider provider =
-                GeoServerExtensions.bean(ConfigurableQuotaStoreProvider.class);
+        ConfigurableQuotaStoreProvider provider = GeoServerExtensions.bean(ConfigurableQuotaStoreProvider.class);
 
         // check that no NPE is thrown on destroy() (because the store is null)
         try {

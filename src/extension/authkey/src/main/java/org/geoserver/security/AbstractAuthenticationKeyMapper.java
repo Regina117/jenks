@@ -22,8 +22,7 @@ import org.springframework.util.StringUtils;
  */
 public abstract class AbstractAuthenticationKeyMapper implements AuthenticationKeyMapper {
 
-    protected static Logger LOGGER =
-            org.geotools.util.logging.Logging.getLogger("org.geoserver.security");
+    protected static Logger LOGGER = org.geotools.util.logging.Logging.getLogger("org.geoserver.security");
 
     private String beanName;
     private String userGroupServiceName;
@@ -68,8 +67,7 @@ public abstract class AbstractAuthenticationKeyMapper implements AuthenticationK
     }
 
     protected GeoServerUserGroupService getUserGroupService() throws IOException {
-        GeoServerUserGroupService service =
-                getSecurityManager().loadUserGroupService(getUserGroupServiceName());
+        GeoServerUserGroupService service = getSecurityManager().loadUserGroupService(getUserGroupServiceName());
         if (service == null) {
             throw new IOException("Unkown user/group service: " + getUserGroupServiceName());
         }
@@ -133,8 +131,7 @@ public abstract class AbstractAuthenticationKeyMapper implements AuthenticationK
     public void validateParameter(String paramName, String value) throws FilterConfigException {}
 
     /** Creates a validation exception (used by inheriting mappers). */
-    protected AuthenticationKeyFilterConfigException createFilterException(
-            String errorid, Object... args) {
+    protected AuthenticationKeyFilterConfigException createFilterException(String errorid, Object... args) {
         return new AuthenticationKeyFilterConfigException(errorid, args);
     }
 

@@ -59,8 +59,8 @@ public abstract class AbstractURLPublisher extends AbstractController {
     protected boolean replaceWindowsFileSeparator = false;
 
     @Override
-    protected ModelAndView handleRequestInternal(
-            HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected ModelAndView handleRequestInternal(HttpServletRequest request, HttpServletResponse response)
+            throws Exception {
         String reqPath = getRequestPath(request);
         URL url = getUrl(request, reqPath);
 
@@ -92,7 +92,10 @@ public abstract class AbstractURLPublisher extends AbstractController {
         String dispositionType = isAttachment(reqPath, filename, mime) ? "attachment" : "inline";
         response.setHeader(
                 "Content-Disposition",
-                ContentDisposition.builder(dispositionType).filename(filename).build().toString());
+                ContentDisposition.builder(dispositionType)
+                        .filename(filename)
+                        .build()
+                        .toString());
 
         // set the content length and content type
         URLConnection connection = url.openConnection();
@@ -114,8 +117,7 @@ public abstract class AbstractURLPublisher extends AbstractController {
             // Read the first four bytes, and determine charset encoding
             count = input.read(b4);
             encInfo = XmlCharsetDetector.getEncodingName(b4, count);
-            response.setCharacterEncoding(
-                    encInfo.getEncoding() != null ? encInfo.getEncoding() : "UTF-8");
+            response.setCharacterEncoding(encInfo.getEncoding() != null ? encInfo.getEncoding() : "UTF-8");
 
             // count < 1 -> empty file
             if (count > 0) {
@@ -138,10 +140,9 @@ public abstract class AbstractURLPublisher extends AbstractController {
 
     private boolean checkNotModified(HttpServletRequest request, long timeStamp) {
         Enumeration headers = request.getHeaders("If-Modified-Since");
-        String header =
-                headers != null && headers.hasMoreElements()
-                        ? headers.nextElement().toString()
-                        : null;
+        String header = headers != null && headers.hasMoreElements()
+                ? headers.nextElement().toString()
+                : null;
         if (header != null && !header.isEmpty()) {
             long ifModSinceSeconds = lastModified(header);
             // the HTTP header has second precision
@@ -152,9 +153,8 @@ public abstract class AbstractURLPublisher extends AbstractController {
     }
 
     private String getRequestPath(HttpServletRequest request) throws IOException {
-        String reqPath =
-                URLDecoder.decode(request.getRequestURI(), "UTF-8")
-                        .substring(request.getContextPath().length());
+        String reqPath = URLDecoder.decode(request.getRequestURI(), "UTF-8")
+                .substring(request.getContextPath().length());
         if (this.replaceWindowsFileSeparator) {
             reqPath = reqPath.replace(File.separatorChar, '/');
         }

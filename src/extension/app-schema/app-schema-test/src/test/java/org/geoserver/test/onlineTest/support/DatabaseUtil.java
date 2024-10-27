@@ -38,8 +38,7 @@ public class DatabaseUtil {
      */
     public List<String> splitPostgisSQLScript(InputStream inputStream) throws Exception {
         if (inputStream == null) {
-            throw new IllegalArgumentException(
-                    "PostGIS SQL Script is null, check resource reference");
+            throw new IllegalArgumentException("PostGIS SQL Script is null, check resource reference");
         }
         StringBuilder contents = new StringBuilder();
 
@@ -47,8 +46,7 @@ public class DatabaseUtil {
         try {
             // use buffering, reading one line at a time
             // FileReader always assumes default encoding is OK!
-            try (BufferedReader input =
-                    new BufferedReader(new InputStreamReader(new DataInputStream(inputStream)))) {
+            try (BufferedReader input = new BufferedReader(new InputStreamReader(new DataInputStream(inputStream)))) {
                 String line = null;
                 PostgisIgnoreOperator pio = new PostgisIgnoreOperator();
                 while ((line = input.readLine()) != null) {
@@ -206,8 +204,7 @@ public class DatabaseUtil {
         try {
             // use buffering, reading one line at a time
             // FileReader always assumes default encoding is OK!
-            try (BufferedReader input =
-                    new BufferedReader(new InputStreamReader(new DataInputStream(inputStream)))) {
+            try (BufferedReader input = new BufferedReader(new InputStreamReader(new DataInputStream(inputStream)))) {
                 String line = null, suffix = null; // not declared within while loop
                 boolean start = true;
 
@@ -225,12 +222,10 @@ public class DatabaseUtil {
                                 start = trimedLine.endsWith(suffix) ? true : false;
                                 contents.append(trimedLine + NEWLINE);
                                 if (start) {
-                                    statements.add(
-                                            (contents.toString().trim())
-                                                    .substring(
-                                                            0,
-                                                            contents.toString().trim().length()
-                                                                    - 1));
+                                    statements.add((contents.toString().trim())
+                                            .substring(
+                                                    0,
+                                                    contents.toString().trim().length() - 1));
                                     contents.setLength(0);
                                     suffix = null;
                                 }

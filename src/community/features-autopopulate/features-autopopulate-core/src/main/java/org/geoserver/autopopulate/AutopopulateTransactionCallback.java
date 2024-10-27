@@ -72,8 +72,7 @@ import org.geotools.util.logging.Logging;
  */
 public class AutopopulateTransactionCallback implements TransactionCallback {
 
-    public static final String TRANSACTION_CUSTOMIZER_PROPERTIES =
-            "transactionCustomizer.properties";
+    public static final String TRANSACTION_CUSTOMIZER_PROPERTIES = "transactionCustomizer.properties";
     /** logger */
     private static final Logger LOGGER = Logging.getLogger(AutopopulateTransactionCallback.class);
     /** The GeoServer catalog */
@@ -121,8 +120,7 @@ public class AutopopulateTransactionCallback implements TransactionCallback {
      * @see TransactionCallback#afterTransaction(TransactionRequest, TransactionResponse, boolean)
      */
     @Override
-    public void afterTransaction(
-            final TransactionRequest request, TransactionResponse result, boolean committed) {
+    public void afterTransaction(final TransactionRequest request, TransactionResponse result, boolean committed) {
         // nothing to do
     }
 
@@ -171,10 +169,7 @@ public class AutopopulateTransactionCallback implements TransactionCallback {
                             // Do never make the transaction fail due to an
                             // AutopopulateTransactionCallback error.
                             // Yell on the logs though
-                            LOGGER.log(
-                                    Level.WARNING,
-                                    "Error pre computing the transaction's affected attributes",
-                                    e);
+                            LOGGER.log(Level.WARNING, "Error pre computing the transaction's affected attributes", e);
                             newFeatures.add((SimpleFeature) of);
                         }
                     }
@@ -183,8 +178,7 @@ public class AutopopulateTransactionCallback implements TransactionCallback {
                 insertElement.setFeatures(newFeatures);
                 newElements.add(element);
             } else if (element instanceof Update) {
-                FeatureTypeInfo featureTypeInfo =
-                        getFeatureTypeInfo(new NameImpl(element.getTypeName()));
+                FeatureTypeInfo featureTypeInfo = getFeatureTypeInfo(new NameImpl(element.getTypeName()));
                 try {
                     Update updateElement = (Update) element;
                     SimpleFeature feature = getTransactionFeatureTemplate(updateElement);
@@ -199,10 +193,9 @@ public class AutopopulateTransactionCallback implements TransactionCallback {
                                     .forEach(prop -> prop.setValue(prop.getValue()));
                         } else {
                             Property updateProperty = updateElement.createProperty();
-                            updateProperty.setName(
-                                    new QName(
-                                            featureTypeInfo.getNamespace().getURI(),
-                                            p.getName().getLocalPart()));
+                            updateProperty.setName(new QName(
+                                    featureTypeInfo.getNamespace().getURI(),
+                                    p.getName().getLocalPart()));
                             updateProperty.setValue(p.getValue());
                             properties.add(updateProperty);
                         }
@@ -212,10 +205,7 @@ public class AutopopulateTransactionCallback implements TransactionCallback {
                     // Do never make the transaction fail due to an
                     // AutopopulateTransactionCallback error.
                     // Yell on the logs though
-                    LOGGER.log(
-                            Level.WARNING,
-                            "Error pre computing the transaction's affected attributes",
-                            e);
+                    LOGGER.log(Level.WARNING, "Error pre computing the transaction's affected attributes", e);
                 }
                 newElements.add(element);
             } else if (element instanceof Delete) {
@@ -253,8 +243,7 @@ public class AutopopulateTransactionCallback implements TransactionCallback {
     private FeatureTypeInfo getFeatureTypeInfo(Name featureTypeName) {
         FeatureTypeInfo featureTypeInfo = catalog.getFeatureTypeByName(featureTypeName);
         if (featureTypeInfo == null) {
-            throw new RuntimeException(
-                    String.format("Couldn't find feature type info ''%s.", featureTypeName));
+            throw new RuntimeException(String.format("Couldn't find feature type info ''%s.", featureTypeName));
         }
         return featureTypeInfo;
     }
@@ -329,8 +318,7 @@ public class AutopopulateTransactionCallback implements TransactionCallback {
      * @return SimpleFeature the feature to be persisted
      */
     private SimpleFeature applyTemplate(SimpleFeature source) throws IOException {
-        AutopopulateTemplate t =
-                lookupTemplate(source.getFeatureType(), TRANSACTION_CUSTOMIZER_PROPERTIES);
+        AutopopulateTemplate t = lookupTemplate(source.getFeatureType(), TRANSACTION_CUSTOMIZER_PROPERTIES);
         if (t != null) {
             for (Map.Entry<String, String> entry : t.getAllProperties().entrySet()) {
                 String key = entry.getKey();
@@ -349,8 +337,7 @@ public class AutopopulateTransactionCallback implements TransactionCallback {
      * Returns the template for the specified feature type. Looking up templates is pretty
      * expensive, so we cache templates by feature type and template.
      */
-    public AutopopulateTemplate lookupTemplate(SimpleFeatureType featureType, String path)
-            throws IOException {
+    public AutopopulateTemplate lookupTemplate(SimpleFeatureType featureType, String path) throws IOException {
 
         // lookup the cache first
         TemplateKey key = new TemplateKey(featureType, path);
@@ -358,12 +345,10 @@ public class AutopopulateTransactionCallback implements TransactionCallback {
         if (t != null && !t.needsReload()) return t;
 
         // if not found, load the template
-        GeoServerResourceLoader resourceLoader =
-                GeoServerExtensions.bean(GeoServerResourceLoader.class);
+        GeoServerResourceLoader resourceLoader = GeoServerExtensions.bean(GeoServerResourceLoader.class);
         Catalog catalog = (Catalog) GeoServerExtensions.bean("catalog");
         FeatureTypeInfo feature = catalog.getFeatureTypeByName(featureType.getTypeName());
-        AutopopulateTemplateLoader templateLoader =
-                new AutopopulateTemplateLoader(resourceLoader, feature);
+        AutopopulateTemplateLoader templateLoader = new AutopopulateTemplateLoader(resourceLoader, feature);
         t = templateLoader.loadTemplate(path);
         templateCache.put(key, t);
         return t;

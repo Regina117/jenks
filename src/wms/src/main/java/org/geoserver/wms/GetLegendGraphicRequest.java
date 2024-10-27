@@ -599,10 +599,7 @@ public class GetLegendGraphicRequest extends WMSRequest {
         T converted = Converters.convert(value, optionClass);
         if (converted == null) {
             throw new ServiceException(
-                    "Invalid syntax for option "
-                            + key
-                            + ", cannot be convered to a "
-                            + optionClass.getSimpleName());
+                    "Invalid syntax for option " + key + ", cannot be convered to a " + optionClass.getSimpleName());
         }
         return converted;
     }

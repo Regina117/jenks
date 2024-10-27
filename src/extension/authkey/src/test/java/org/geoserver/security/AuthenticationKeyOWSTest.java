@@ -113,15 +113,13 @@ public class AuthenticationKeyOWSTest extends GeoServerSystemTestSupport {
 
         SecurityManagerConfig mconfig = getSecurityManager().getSecurityConfig();
         GeoServerSecurityFilterChain filterChain = mconfig.getFilterChain();
-        VariableFilterChain chain =
-                (VariableFilterChain) filterChain.getRequestChainByName("default");
+        VariableFilterChain chain = (VariableFilterChain) filterChain.getRequestChainByName("default");
         chain.getFilterNames().add(0, filterName);
         getSecurityManager().saveSecurityConfig(mconfig);
 
         GeoServerAuthenticationKeyFilter authKeyFilter =
                 (GeoServerAuthenticationKeyFilter) getSecurityManager().loadFilter(filterName);
-        PropertyAuthenticationKeyMapper mapper =
-                (PropertyAuthenticationKeyMapper) authKeyFilter.getMapper();
+        PropertyAuthenticationKeyMapper mapper = (PropertyAuthenticationKeyMapper) authKeyFilter.getMapper();
         mapper.synchronize();
 
         for (Entry<Object, Object> entry : mapper.authKeyProps.entrySet()) {
@@ -141,8 +139,7 @@ public class AuthenticationKeyOWSTest extends GeoServerSystemTestSupport {
 
         SecurityManagerConfig mconfig = getSecurityManager().getSecurityConfig();
         GeoServerSecurityFilterChain filterChain = mconfig.getFilterChain();
-        VariableFilterChain chain =
-                (VariableFilterChain) filterChain.getRequestChainByName("default");
+        VariableFilterChain chain = (VariableFilterChain) filterChain.getRequestChainByName("default");
         List<Filter> result = new ArrayList<>();
         for (String filterName : chain.getCompiledFilterNames()) {
             try {
@@ -162,9 +159,9 @@ public class AuthenticationKeyOWSTest extends GeoServerSystemTestSupport {
 
         // check we have the sf layers, but not the cite ones not the cdf ones
         XpathEngine engine = XMLUnit.newXpathEngine();
-        assertTrue(
-                engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'sf:')]", doc).getLength()
-                        > 1);
+        assertTrue(engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'sf:')]", doc)
+                        .getLength()
+                > 1);
         assertEquals(
                 0,
                 engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'cite:')]", doc)
@@ -182,17 +179,15 @@ public class AuthenticationKeyOWSTest extends GeoServerSystemTestSupport {
 
         // check we have all the layers
         XpathEngine engine = XMLUnit.newXpathEngine();
-        assertTrue(
-                engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'sf:')]", doc).getLength()
-                        > 1);
-        assertTrue(
-                engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'cdf:')]", doc)
-                                .getLength()
-                        > 1);
-        assertTrue(
-                engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'cite:')]", doc)
-                                .getLength()
-                        > 1);
+        assertTrue(engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'sf:')]", doc)
+                        .getLength()
+                > 1);
+        assertTrue(engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'cdf:')]", doc)
+                        .getLength()
+                > 1);
+        assertTrue(engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'cite:')]", doc)
+                        .getLength()
+                > 1);
 
         // check the authentication key has been propagated
         String url = engine.evaluate("//GetMap/DCPType/HTTP/Get/OnlineResource/@xlink:href", doc);
@@ -206,13 +201,12 @@ public class AuthenticationKeyOWSTest extends GeoServerSystemTestSupport {
 
         // check we have the sf and cite layers, but not cdf
         XpathEngine engine = XMLUnit.newXpathEngine();
-        assertTrue(
-                engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'sf:')]", doc).getLength()
-                        > 1);
-        assertTrue(
-                engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'cite:')]", doc)
-                                .getLength()
-                        > 1);
+        assertTrue(engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'sf:')]", doc)
+                        .getLength()
+                > 1);
+        assertTrue(engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'cite:')]", doc)
+                        .getLength()
+                > 1);
         assertEquals(
                 0,
                 engine.getMatchingNodes("//Layer/Name[starts-with(text(), 'cdf:')]", doc)
@@ -226,20 +220,16 @@ public class AuthenticationKeyOWSTest extends GeoServerSystemTestSupport {
     @Test
     public void testAnonymousGetFeature() throws Exception {
         Document doc =
-                getAsDOM(
-                        "wfs?service=WFS&version=1.0.0&request=GetFeature&typeName="
-                                + getLayerId(MockData.PONDS));
+                getAsDOM("wfs?service=WFS&version=1.0.0&request=GetFeature&typeName=" + getLayerId(MockData.PONDS));
         assertEquals("ServiceExceptionReport", doc.getDocumentElement().getLocalName());
     }
 
     @Test
     public void testAdminGetFeature() throws Exception {
-        Document doc =
-                getAsDOM(
-                        "wfs?service=WFS&version=1.0.0&request=GetFeature&typeName="
-                                + getLayerId(MockData.PONDS)
-                                + "&authkey="
-                                + adminKey);
+        Document doc = getAsDOM("wfs?service=WFS&version=1.0.0&request=GetFeature&typeName="
+                + getLayerId(MockData.PONDS)
+                + "&authkey="
+                + adminKey);
         // print(doc);
         assertXpathEvaluatesTo("1", "count(//wfs:FeatureCollection)", doc);
 
@@ -250,12 +240,10 @@ public class AuthenticationKeyOWSTest extends GeoServerSystemTestSupport {
 
     @Test
     public void testCiteGetFeature() throws Exception {
-        Document doc =
-                getAsDOM(
-                        "wfs?service=WFS&version=1.0.0&request=GetFeature&typeName="
-                                + getLayerId(MockData.PONDS)
-                                + "&authkey="
-                                + citeKey);
+        Document doc = getAsDOM("wfs?service=WFS&version=1.0.0&request=GetFeature&typeName="
+                + getLayerId(MockData.PONDS)
+                + "&authkey="
+                + citeKey);
         // print(doc);
         assertXpathEvaluatesTo("1", "count(//wfs:FeatureCollection)", doc);
 
@@ -266,12 +254,10 @@ public class AuthenticationKeyOWSTest extends GeoServerSystemTestSupport {
 
     @Test
     public void testCiteGetFeatureCaseInsensitive() throws Exception {
-        Document doc =
-                getAsDOM(
-                        "wfs?service=WFS&version=1.0.0&request=GetFeature&typeName="
-                                + getLayerId(MockData.PONDS)
-                                + "&AUTHKEY="
-                                + citeKey);
+        Document doc = getAsDOM("wfs?service=WFS&version=1.0.0&request=GetFeature&typeName="
+                + getLayerId(MockData.PONDS)
+                + "&AUTHKEY="
+                + citeKey);
         // print(doc);
         assertXpathEvaluatesTo("1", "count(//wfs:FeatureCollection)", doc);
 
@@ -285,30 +271,26 @@ public class AuthenticationKeyOWSTest extends GeoServerSystemTestSupport {
      */
     @Test
     public void testOpenLayersMapOutput() throws Exception {
-        MockHttpServletResponse response =
-                getAsServletResponse(
-                        "cite/wms?service=WMS&"
-                                + "version=1.1.0&"
-                                + "request=GetMap&"
-                                + "bbox=-2.0,2.0,-1.0,6.0&"
-                                + "layers="
-                                + MockData.BASIC_POLYGONS.getPrefix()
-                                + ":"
-                                + MockData.BASIC_POLYGONS.getLocalPart()
-                                + "&"
-                                + "width=300&"
-                                + "height=300&"
-                                + "srs=EPSG:4326&"
-                                + "format=application/openlayers"
-                                + "&authkey="
-                                + citeKey);
+        MockHttpServletResponse response = getAsServletResponse("cite/wms?service=WMS&"
+                + "version=1.1.0&"
+                + "request=GetMap&"
+                + "bbox=-2.0,2.0,-1.0,6.0&"
+                + "layers="
+                + MockData.BASIC_POLYGONS.getPrefix()
+                + ":"
+                + MockData.BASIC_POLYGONS.getLocalPart()
+                + "&"
+                + "width=300&"
+                + "height=300&"
+                + "srs=EPSG:4326&"
+                + "format=application/openlayers"
+                + "&authkey="
+                + citeKey);
         byte[] responseContent = getBinary(response);
         String htmlDoc = new String(responseContent, StandardCharsets.UTF_8);
         assertThat(
                 htmlDoc,
                 containsString(
-                        "<input type=\"hidden\" id=\"servicePath\" value=\"cite/wms?authkey="
-                                + citeKey
-                                + "\"/>"));
+                        "<input type=\"hidden\" id=\"servicePath\" value=\"cite/wms?authkey=" + citeKey + "\"/>"));
     }
 }

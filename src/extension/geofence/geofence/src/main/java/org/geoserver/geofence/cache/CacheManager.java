@@ -40,9 +40,7 @@ public class CacheManager {
     private LoadingCache<RuleFilter, AccessInfo> ruleCache;
     private LoadingCache<NamePw, AuthUser> userCache;
     private LoadingCache<RuleFilter, AccessInfo> authCache;
-    private LoadingCache<
-                    ContainerAccessCacheLoaderFactory.ResolveParams,
-                    ContainerLimitResolver.ProcessingResult>
+    private LoadingCache<ContainerAccessCacheLoaderFactory.ResolveParams, ContainerLimitResolver.ProcessingResult>
             contCache;
 
     private final GeoFenceConfigurationManager configurationManager;
@@ -94,22 +92,17 @@ public class CacheManager {
         ruleCache = getCacheBuilder().build(ruleServiceLoaderFactory.createRuleLoader());
         userCache = getCacheBuilder().build(ruleServiceLoaderFactory.createUserLoader());
         authCache = getCacheBuilder().build(ruleServiceLoaderFactory.createAuthLoader());
-        contCache =
-                getCacheBuilder()
-                        .build(containerAccessCacheLoaderFactory.createProcessingResultLoader());
+        contCache = getCacheBuilder().build(containerAccessCacheLoaderFactory.createProcessingResultLoader());
     }
 
     protected CacheBuilder<Object, Object> getCacheBuilder() {
-        CacheBuilder<Object, Object> builder =
-                CacheBuilder.newBuilder()
-                        .maximumSize(cacheConfiguration.getSize())
-                        .refreshAfterWrite(
-                                cacheConfiguration.getRefreshMilliSec(),
-                                TimeUnit.MILLISECONDS) // reloadable after x time
-                        .expireAfterWrite(
-                                cacheConfiguration.getExpireMilliSec(),
-                                TimeUnit.MILLISECONDS) // throw away entries too old
-                        .recordStats();
+        CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder()
+                .maximumSize(cacheConfiguration.getSize())
+                .refreshAfterWrite(
+                        cacheConfiguration.getRefreshMilliSec(), TimeUnit.MILLISECONDS) // reloadable after x time
+                .expireAfterWrite(
+                        cacheConfiguration.getExpireMilliSec(), TimeUnit.MILLISECONDS) // throw away entries too old
+                .recordStats();
         // .expireAfterAccess(timeoutMillis, TimeUnit.MILLISECONDS)
         // .removalListener(MY_LISTENER)
         // this should only be used while testing
@@ -124,8 +117,7 @@ public class CacheManager {
     }
 
     public void invalidateAll() {
-        if (LOGGER.isLoggable(Level.WARNING))
-            LOGGER.log(Level.WARNING, "Forcing cache invalidation");
+        if (LOGGER.isLoggable(Level.WARNING)) LOGGER.log(Level.WARNING, "Forcing cache invalidation");
         ruleCache.invalidateAll();
         userCache.invalidateAll();
         authCache.invalidateAll();
@@ -153,29 +145,24 @@ public class CacheManager {
     }
 
     public LoadingCache<RuleFilter, AccessInfo> getRuleCache() {
-        if (ruleCache == null)
-            throw new IllegalStateException("CacheManager is not properly inizialized");
+        if (ruleCache == null) throw new IllegalStateException("CacheManager is not properly inizialized");
         logStats();
         return ruleCache;
     }
 
     public LoadingCache<NamePw, AuthUser> getUserCache() {
-        if (userCache == null)
-            throw new IllegalStateException("CacheManager is not properly inizialized");
+        if (userCache == null) throw new IllegalStateException("CacheManager is not properly inizialized");
         logStats();
         return userCache;
     }
 
     public LoadingCache<RuleFilter, AccessInfo> getAuthCache() {
-        if (authCache == null)
-            throw new IllegalStateException("CacheManager is not properly inizialized");
+        if (authCache == null) throw new IllegalStateException("CacheManager is not properly inizialized");
         logStats();
         return authCache;
     }
 
-    public LoadingCache<
-                    ContainerAccessCacheLoaderFactory.ResolveParams,
-                    ContainerLimitResolver.ProcessingResult>
+    public LoadingCache<ContainerAccessCacheLoaderFactory.ResolveParams, ContainerLimitResolver.ProcessingResult>
             getContainerCache() {
         logStats();
         return contCache;

@@ -56,19 +56,8 @@ public class ServiceDescription implements Serializable, Comparable<ServiceDescr
      * <p>Order has no real significance it is for display, see {@link
      * #compareTo(ServiceDescription)}.
      */
-    private static List<String> OGC_SERVICE_ORDER =
-            Collections.unmodifiableList(
-                    Arrays.asList(
-                            "CSW",
-                            "WMS",
-                            "WMTS",
-                            "WMS-C",
-                            "WFS",
-                            "WCS",
-                            "WPS",
-                            "Styles",
-                            "DGGS",
-                            "Experimental"));
+    private static List<String> OGC_SERVICE_ORDER = Collections.unmodifiableList(
+            Arrays.asList("CSW", "WMS", "WMTS", "WMS-C", "WFS", "WCS", "WPS", "Styles", "DGGS", "Experimental"));
 
     /** Service links. */
     Set<ServiceLinkDescription> links = new HashSet<>();
@@ -89,8 +78,7 @@ public class ServiceDescription implements Serializable, Comparable<ServiceDescr
      * @param title Service title
      * @param description Service description
      */
-    public ServiceDescription(
-            String serviceType, InternationalString title, InternationalString description) {
+    public ServiceDescription(String serviceType, InternationalString title, InternationalString description) {
         this(serviceType, title, description, true, false, null, null);
     }
 
@@ -103,10 +91,7 @@ public class ServiceDescription implements Serializable, Comparable<ServiceDescr
      * @param workspace Workspace prefix, or {@code null} for global service
      */
     public ServiceDescription(
-            String serviceType,
-            InternationalString title,
-            InternationalString description,
-            String workspace) {
+            String serviceType, InternationalString title, InternationalString description, String workspace) {
         this(serviceType, title, description, true, false, workspace, null);
     }
 

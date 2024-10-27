@@ -49,64 +49,58 @@ public class DataSecurityPage extends AbstractSecurityPage {
     public DataSecurityPage() {
         DataAccessRuleProvider provider = new DataAccessRuleProvider();
         add(
-                rules =
-                        new GeoServerTablePanel<>("table", provider, true) {
+                rules = new GeoServerTablePanel<>("table", provider, true) {
 
-                            @Override
-                            protected Component getComponentForProperty(
-                                    String id,
-                                    IModel<DataAccessRule> itemModel,
-                                    Property<DataAccessRule> property) {
-                                if (property == DataAccessRuleProvider.RULEKEY) {
-                                    return editRuleLink(id, itemModel, property);
-                                }
-                                if (property == DataAccessRuleProvider.ROLES) {
-                                    return new Label(id, property.getModel(itemModel));
-                                }
-                                throw new RuntimeException("Uknown property " + property);
-                            }
+                    @Override
+                    protected Component getComponentForProperty(
+                            String id, IModel<DataAccessRule> itemModel, Property<DataAccessRule> property) {
+                        if (property == DataAccessRuleProvider.RULEKEY) {
+                            return editRuleLink(id, itemModel, property);
+                        }
+                        if (property == DataAccessRuleProvider.ROLES) {
+                            return new Label(id, property.getModel(itemModel));
+                        }
+                        throw new RuntimeException("Uknown property " + property);
+                    }
 
-                            @Override
-                            protected void onSelectionUpdate(AjaxRequestTarget target) {
-                                removal.setEnabled(!rules.getSelection().isEmpty());
-                                target.add(removal);
-                            }
-                        });
+                    @Override
+                    protected void onSelectionUpdate(AjaxRequestTarget target) {
+                        removal.setEnabled(!rules.getSelection().isEmpty());
+                        target.add(removal);
+                    }
+                });
 
         rules.setOutputMarkupId(true);
 
         setHeaderPanel(headerPanel());
 
-        Form form =
-                new Form<>(
-                        "catalogModeForm",
-                        new CompoundPropertyModel<>(
-                                new CatalogModeModel(DataAccessRuleDAO.get().getMode())));
+        Form form = new Form<>(
+                "catalogModeForm",
+                new CompoundPropertyModel<>(
+                        new CatalogModeModel(DataAccessRuleDAO.get().getMode())));
         add(form);
         form.add(new HelpLink("catalogModeHelp").setDialog(dialog));
 
-        catalogModeChoice =
-                new RadioChoice<>("catalogMode", CATALOG_MODES, new CatalogModeRenderer());
+        catalogModeChoice = new RadioChoice<>("catalogMode", CATALOG_MODES, new CatalogModeRenderer());
         catalogModeChoice.add(new FormComponentUpdatingBehavior() {});
         catalogModeChoice.setSuffix(" ");
         form.add(catalogModeChoice);
 
-        form.add(
-                new SubmitLink("save") {
-                    @Override
-                    public void onSubmit() {
-                        try {
-                            DataAccessRuleDAO dao = DataAccessRuleDAO.get();
-                            CatalogMode newMode = dao.getByAlias(catalogModeChoice.getValue());
-                            dao.setCatalogMode(newMode);
-                            dao.storeRules();
-                            doReturn();
-                        } catch (Exception e) {
-                            LOGGER.log(Level.SEVERE, "Error occurred while saving user", e);
-                            error(new ParamResourceModel("saveError", getPage(), e.getMessage()));
-                        }
-                    }
-                });
+        form.add(new SubmitLink("save") {
+            @Override
+            public void onSubmit() {
+                try {
+                    DataAccessRuleDAO dao = DataAccessRuleDAO.get();
+                    CatalogMode newMode = dao.getByAlias(catalogModeChoice.getValue());
+                    dao.setCatalogMode(newMode);
+                    dao.storeRules();
+                    doReturn();
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Error occurred while saving user", e);
+                    error(new ParamResourceModel("saveError", getPage(), e.getMessage()));
+                }
+            }
+        });
         form.add(new BookmarkablePageLink<>("cancel", GeoServerHomePage.class));
     }
 
@@ -114,28 +108,25 @@ public class DataSecurityPage extends AbstractSecurityPage {
     public void renderHead(IHeaderResponse response) {
         super.renderHead(response);
         // Content-Security-Policy: inline styles must be nonce=...
-        String css =
-                " #catalogMode {\n"
-                        + "         display:block;\n"
-                        + "         padding-top: 0.5em;\n"
-                        + "       }\n"
-                        + "       #catalogMode input {\n"
-                        + "          display: block;\n"
-                        + "          float: left;\n"
-                        + "          clear:left;\n"
-                        + "          padding-top:0.5em;\n"
-                        + "          margin-bottom: 0.5em;\n"
-                        + "       }\n"
-                        + "       #catalogMode label {\n"
-                        + "          clear:right;\n"
-                        + "          margin-bottom: 0.5em;\n"
-                        + "       }";
-        response.render(
-                CssHeaderItem.forCSS(css, "org-geoserver-security-web-data-DataSecurityPage-1"));
+        String css = " #catalogMode {\n"
+                + "         display:block;\n"
+                + "         padding-top: 0.5em;\n"
+                + "       }\n"
+                + "       #catalogMode input {\n"
+                + "          display: block;\n"
+                + "          float: left;\n"
+                + "          clear:left;\n"
+                + "          padding-top:0.5em;\n"
+                + "          margin-bottom: 0.5em;\n"
+                + "       }\n"
+                + "       #catalogMode label {\n"
+                + "          clear:right;\n"
+                + "          margin-bottom: 0.5em;\n"
+                + "       }";
+        response.render(CssHeaderItem.forCSS(css, "org-geoserver-security-web-data-DataSecurityPage-1"));
     }
 
-    Component editRuleLink(
-            String id, IModel<DataAccessRule> itemModel, Property<DataAccessRule> property) {
+    Component editRuleLink(String id, IModel<DataAccessRule> itemModel, Property<DataAccessRule> property) {
         return new SimpleAjaxLink<>(id, itemModel, property.getModel(itemModel)) {
 
             @Override

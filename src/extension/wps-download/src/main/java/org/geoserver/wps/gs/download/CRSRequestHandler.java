@@ -105,10 +105,7 @@ class CRSRequestHandler {
     private double resolutionsDifferenceTolerance;
 
     public CRSRequestHandler(
-            GridCoverage2DReader reader,
-            Catalog catalog,
-            CoordinateReferenceSystem originalTargetCRS,
-            Geometry roi) {
+            GridCoverage2DReader reader, Catalog catalog, CoordinateReferenceSystem originalTargetCRS, Geometry roi) {
         this.reader = reader;
         this.catalog = catalog;
         this.originalTargetCRS = originalTargetCRS;
@@ -190,9 +187,8 @@ class CRSRequestHandler {
         // Initialize dimension descriptors
         if (structuredReader != null) {
             String coverageName = structuredReader.getGridCoverageNames()[0];
-            descriptors =
-                    structuredReader.getDimensionDescriptors(coverageName).stream()
-                            .collect(Collectors.toMap(dd -> dd.getName(), dd -> dd));
+            descriptors = structuredReader.getDimensionDescriptors(coverageName).stream()
+                    .collect(Collectors.toMap(dd -> dd.getName(), dd -> dd));
             DimensionDescriptor crsDescriptor = descriptors.get(DimensionDescriptor.CRS);
             crsAttribute = crsDescriptor != null ? crsDescriptor.getStartAttribute() : null;
         } else {
@@ -201,24 +197,20 @@ class CRSRequestHandler {
 
         // Check if the request can actually use the TargetCRS as if it would be the
         // native one of the reader (so no reprojection in the mix).
-        canUseTargetCRSAsNative =
-                minimizeReprojections
-                        && roi != null
-                        && originalTargetCRS != null
-                        && descriptors.containsKey(DimensionDescriptor.CRS)
-                        && (referenceFeatureForAlignment =
-                                        getFirstGranuleMatchingCRS(
-                                                reader, originalTargetCRS, roi, filter))
-                                != null
-                        && !CRS.equalsIgnoreMetadata(originalNativeCRS, originalTargetCRS)
-                        && Utils.isSupportedCRS(reader, originalTargetCRS);
+        canUseTargetCRSAsNative = minimizeReprojections
+                && roi != null
+                && originalTargetCRS != null
+                && descriptors.containsKey(DimensionDescriptor.CRS)
+                && (referenceFeatureForAlignment = getFirstGranuleMatchingCRS(reader, originalTargetCRS, roi, filter))
+                        != null
+                && !CRS.equalsIgnoreMetadata(originalNativeCRS, originalTargetCRS)
+                && Utils.isSupportedCRS(reader, originalTargetCRS);
 
         // direct download case
         if (roi == null
                 && originalTargetCRS != null
                 && descriptors.containsKey(DimensionDescriptor.CRS)
-                && (referenceFeatureForAlignment =
-                                getFirstGranuleMatchingCRS(reader, originalTargetCRS, roi, filter))
+                && (referenceFeatureForAlignment = getFirstGranuleMatchingCRS(reader, originalTargetCRS, roi, filter))
                         != null) canUseTargetCRSAsNative = true;
 
         MathTransform reprojectionTransform = null;
@@ -252,9 +244,7 @@ class CRSRequestHandler {
             this.roiManager.useNativeCRS(getSelectedNativeCRS());
             this.roiManager.useTargetCRS(getSelectedTargetCRS());
             targetEnvelope =
-                    new ReferencedEnvelope(
-                            roiManager.getRoiInTargetCRS().getEnvelopeInternal(),
-                            selectedTargetCRS);
+                    new ReferencedEnvelope(roiManager.getRoiInTargetCRS().getEnvelopeInternal(), selectedTargetCRS);
         } else {
             targetEnvelope = new ReferencedEnvelope(reader.getOriginalEnvelope());
             if (needsReprojection) {
@@ -271,10 +261,7 @@ class CRSRequestHandler {
      * @return
      */
     private SimpleFeature getFirstGranuleMatchingCRS(
-            GridCoverage2DReader reader,
-            CoordinateReferenceSystem targetCRS,
-            Geometry roi,
-            Filter filter)
+            GridCoverage2DReader reader, CoordinateReferenceSystem targetCRS, Geometry roi, Filter filter)
             throws IOException, FactoryException {
         if (structuredReader == null) {
             // only StructuredGridCoverage2DReader can support requests in targetCRS,
@@ -298,10 +285,8 @@ class CRSRequestHandler {
             final PropertyName geometryProperty = FF.property(geomDescriptor.getName());
             filters.add(FF.intersects(geometryProperty, FF.literal(queryGeometry)));
         }
-        filters.add(
-                FF.equals(
-                        FF.property(crsDescriptor.getStartAttribute()),
-                        FF.literal(SrsSyntax.AUTH_CODE.getSRS(crsId))));
+        filters.add(FF.equals(
+                FF.property(crsDescriptor.getStartAttribute()), FF.literal(SrsSyntax.AUTH_CODE.getSRS(crsId))));
         // Add the filter if specified
         if (filter != null) {
             filters.add(filter);
@@ -340,8 +325,7 @@ class CRSRequestHandler {
         }
     }
 
-    public BoundingBox computeBBoxReproject(
-            SimpleFeature feature, CoordinateReferenceSystem schemaCRS)
+    public BoundingBox computeBBoxReproject(SimpleFeature feature, CoordinateReferenceSystem schemaCRS)
             throws IOException, FactoryException, TransformException {
         String granuleCrsCode = (String) feature.getAttribute(crsAttribute);
         CoordinateReferenceSystem granuleCRS = getCRS(granuleCrsCode);

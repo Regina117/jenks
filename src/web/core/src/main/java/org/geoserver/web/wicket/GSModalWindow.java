@@ -21,16 +21,15 @@ public class GSModalWindow extends Panel {
 
     public GSModalWindow(String id) {
         super(id);
-        delegate =
-                new ModalWindow("modal") {
-                    @Override
-                    protected void onComponentTag(ComponentTag tag) {
-                        super.onComponentTag(tag);
-                        // to avoid local style being blocked by CSP
-                        tag.remove("style");
-                        tag.put("class", "hidden");
-                    }
-                };
+        delegate = new ModalWindow("modal") {
+            @Override
+            protected void onComponentTag(ComponentTag tag) {
+                super.onComponentTag(tag);
+                // to avoid local style being blocked by CSP
+                tag.remove("style");
+                tag.put("class", "hidden");
+            }
+        };
         add(delegate);
     }
 

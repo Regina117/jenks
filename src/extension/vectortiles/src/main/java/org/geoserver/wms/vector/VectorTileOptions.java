@@ -56,8 +56,7 @@ class VectorTileOptions {
      * @param mapContent
      */
     VectorTileOptions(Layer layer, WMSMapContent mapContent) {
-        List<LiteFeatureTypeStyle> liteFeatureStyles =
-                StyleQueryUtil.getLiteFeatureStyles(layer, mapContent);
+        List<LiteFeatureTypeStyle> liteFeatureStyles = StyleQueryUtil.getLiteFeatureStyles(layer, mapContent);
         for (LiteFeatureTypeStyle lft : liteFeatureStyles) {
             if (lft.options == null) continue;
             collectVectorTileOptions(lft.options);
@@ -89,8 +88,7 @@ class VectorTileOptions {
      */
     boolean isPolygonLabelEnabled() {
         Class<?> binding = geometryDescriptor.getType().getBinding();
-        return Polygon.class.isAssignableFrom(binding)
-                || MultiPolygon.class.isAssignableFrom(binding);
+        return Polygon.class.isAssignableFrom(binding) || MultiPolygon.class.isAssignableFrom(binding);
     }
 
     /**
@@ -134,20 +132,15 @@ class VectorTileOptions {
     private SortBy[] getCoalesceSortBy(List<String> attributes, SortBy[] sortBy) {
         Set<PropertyName> sortAttributes;
         if (attributes == null) {
-            sortAttributes =
-                    schema.getDescriptors().stream()
-                            .filter(pd -> !(pd instanceof GeometryDescriptor))
-                            .map(pd -> FF.property(pd.getName()))
-                            .collect(Collectors.toCollection(LinkedHashSet::new));
+            sortAttributes = schema.getDescriptors().stream()
+                    .filter(pd -> !(pd instanceof GeometryDescriptor))
+                    .map(pd -> FF.property(pd.getName()))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
         } else {
-            sortAttributes =
-                    attributes.stream()
-                            .filter(
-                                    att ->
-                                            !(schema.getDescriptor(att)
-                                                    instanceof GeometryDescriptor))
-                            .map(FF::property)
-                            .collect(Collectors.toCollection(LinkedHashSet::new));
+            sortAttributes = attributes.stream()
+                    .filter(att -> !(schema.getDescriptor(att) instanceof GeometryDescriptor))
+                    .map(FF::property)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
         }
 
         // remove the sorts we already have
@@ -157,14 +150,12 @@ class VectorTileOptions {
             }
         }
 
-        Stream<SortBy> attributesSort =
-                sortAttributes.stream().map(p -> new SortByImpl(p, SortOrder.ASCENDING));
+        Stream<SortBy> attributesSort = sortAttributes.stream().map(p -> new SortByImpl(p, SortOrder.ASCENDING));
 
         if (sortBy == null) {
             return attributesSort.toArray(n -> new SortBy[n]);
         } else {
-            return Streams.concat(Arrays.stream(sortBy), attributesSort)
-                    .toArray(n -> new SortBy[n]);
+            return Streams.concat(Arrays.stream(sortBy), attributesSort).toArray(n -> new SortBy[n]);
         }
     }
 
@@ -182,10 +173,9 @@ class VectorTileOptions {
     private Filter getNonNullFilter(List<String> attributes) {
         if (attributes.size() == 1) return FF.not(FF.isNull(FF.property(attributes.get(0))));
 
-        List<Filter> filters =
-                attributes.stream()
-                        .map(att -> FF.not(FF.isNull(FF.property(att))))
-                        .collect(Collectors.toList());
+        List<Filter> filters = attributes.stream()
+                .map(att -> FF.not(FF.isNull(FF.property(att))))
+                .collect(Collectors.toList());
         return FF.and(filters);
     }
 

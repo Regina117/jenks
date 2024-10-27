@@ -45,8 +45,7 @@ public class GeoServerSecurityMetadataSource implements SecurityMetadataSource {
      */
     static class LoginPageRequestMatcher implements RequestMatcher {
 
-        RequestMatcher webChainMatcher1 =
-                new AntPathRequestMatcher("/" + GeoServerSecurityFilterChain.WEB_CHAIN_NAME);
+        RequestMatcher webChainMatcher1 = new AntPathRequestMatcher("/" + GeoServerSecurityFilterChain.WEB_CHAIN_NAME);
 
         RequestMatcher webChainMatcher2 =
                 new AntPathRequestMatcher("/" + GeoServerSecurityFilterChain.WEB_CHAIN_NAME + "/");
@@ -55,8 +54,7 @@ public class GeoServerSecurityMetadataSource implements SecurityMetadataSource {
         public boolean matches(HttpServletRequest request) {
 
             // check if we are on the "web" chain
-            boolean isOnWebChain =
-                    webChainMatcher1.matches(request) || webChainMatcher2.matches(request);
+            boolean isOnWebChain = webChainMatcher1.matches(request) || webChainMatcher2.matches(request);
             if (isOnWebChain == false) return false;
 
             Map<String, String[]> params = request.getParameterMap();
@@ -119,14 +117,10 @@ public class GeoServerSecurityMetadataSource implements SecurityMetadataSource {
                 return entry.getValue();
             } else {
                 if (this.logger.isLoggable(Level.FINEST)) {
-                    String msg =
-                            LogMessage.format(
-                                            "Did not match request to %s - %s (%d/%d)",
-                                            entry.getKey(),
-                                            entry.getValue(),
-                                            ++count,
-                                            requestMap.size())
-                                    .toString();
+                    String msg = LogMessage.format(
+                                    "Did not match request to %s - %s (%d/%d)",
+                                    entry.getKey(), entry.getValue(), ++count, requestMap.size())
+                            .toString();
                     this.logger.finest(msg);
                 }
             }

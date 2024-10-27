@@ -63,8 +63,7 @@ public class AutopopulateTemplate {
                     try {
                         propertiesMap.put(key, getValue(expression));
                     } catch (CQLException e) {
-                        LOGGER.warning(
-                                "Unable to parse the following Expression" + e.getSyntaxError());
+                        LOGGER.warning("Unable to parse the following Expression" + e.getSyntaxError());
                     }
                 }
             }

@@ -21,8 +21,7 @@ public class MapMLHTMLResponse extends AbstractMapResponse {
     }
 
     @Override
-    public void write(Object value, OutputStream output, Operation operation)
-            throws IOException, ServiceException {
+    public void write(Object value, OutputStream output, Operation operation) throws IOException, ServiceException {
         MapMLHTMLMap mapmlHTMLMap = (MapMLHTMLMap) value;
         try {
             String mapmlHTML = mapmlHTMLMap.getMapmlHTML();

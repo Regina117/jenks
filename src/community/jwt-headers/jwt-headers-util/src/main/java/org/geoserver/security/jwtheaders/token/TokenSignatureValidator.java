@@ -28,23 +28,20 @@ import org.geoserver.security.jwtheaders.JwtConfiguration;
  */
 public class TokenSignatureValidator {
 
-    public static LoadingCache<String, JWKSet> jwks =
-            CacheBuilder.newBuilder()
-                    .maximumSize(50000)
-                    .expireAfterWrite(1, TimeUnit.HOURS)
-                    .build(
-                            new CacheLoader<String, JWKSet>() {
-                                public JWKSet load(String urlStr) throws Exception {
+    public static LoadingCache<String, JWKSet> jwks = CacheBuilder.newBuilder()
+            .maximumSize(50000)
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .build(new CacheLoader<String, JWKSet>() {
+                public JWKSet load(String urlStr) throws Exception {
 
-                                    return loadJWKSet(urlStr);
-                                }
-                            });
+                    return loadJWKSet(urlStr);
+                }
+            });
 
-    public static Cache<Object, Object> validAccessKeys =
-            CacheBuilder.newBuilder()
-                    .maximumSize(50000)
-                    .expireAfterWrite(1, TimeUnit.HOURS)
-                    .build();
+    public static Cache<Object, Object> validAccessKeys = CacheBuilder.newBuilder()
+            .maximumSize(50000)
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .build();
 
     JwtConfiguration jwtHeadersConfig;
 
@@ -60,8 +57,7 @@ public class TokenSignatureValidator {
     public void validate(String accessToken) throws Exception {
         if (!jwtHeadersConfig.isValidateTokenSignature()) return; // don't validate
 
-        if (validAccessKeys.getIfPresent(accessToken) != null)
-            return; // we already know this is a good accessToken
+        if (validAccessKeys.getIfPresent(accessToken) != null) return; // we already know this is a good accessToken
 
         JWSObject jwsToken = JWSObject.parse(accessToken);
         String keyId = jwsToken.getHeader().getKeyID();
@@ -89,8 +85,7 @@ public class TokenSignatureValidator {
 
         var valid = token.verify(verifier);
         if (!valid) {
-            throw new Exception(
-                    "Could not verify signature of the JWT with the given RSA Public Key");
+            throw new Exception("Could not verify signature of the JWT with the given RSA Public Key");
         }
     }
 }

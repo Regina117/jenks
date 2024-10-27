@@ -53,8 +53,8 @@ import org.xml.sax.helpers.NamespaceSupport;
  * @author Simone Giannecchini, GeoSolutions
  */
 public class WCS20DescribeCoverageTransformer extends GMLTransformer {
-    public static final Logger LOGGER =
-            Logging.getLogger(WCS20DescribeCoverageTransformer.class.getPackage().getName());
+    public static final Logger LOGGER = Logging.getLogger(
+            WCS20DescribeCoverageTransformer.class.getPackage().getName());
 
     private MIMETypeMapper mimemapper;
 
@@ -71,16 +71,13 @@ public class WCS20DescribeCoverageTransformer extends GMLTransformer {
 
     /** Creates a new WFSCapsTransformer object. */
     public WCS20DescribeCoverageTransformer(
-            Catalog catalog,
-            EnvelopeAxesLabelsMapper envelopeDimensionsMapper,
-            MIMETypeMapper mimemapper) {
+            Catalog catalog, EnvelopeAxesLabelsMapper envelopeDimensionsMapper, MIMETypeMapper mimemapper) {
         super(envelopeDimensionsMapper);
         this.catalog = catalog;
         this.mimemapper = mimemapper;
         setNamespaceDeclarationEnabled(false);
         setIndentation(2);
-        this.wcsDescribeCoverageExtensions =
-                GeoServerExtensions.extensions(WCS20DescribeCoverageExtension.class);
+        this.wcsDescribeCoverageExtensions = GeoServerExtensions.extensions(WCS20DescribeCoverageExtension.class);
         this.availableDescribeCoverageExtensions =
                 wcsDescribeCoverageExtensions != null && !wcsDescribeCoverageExtensions.isEmpty();
     }
@@ -102,8 +99,9 @@ public class WCS20DescribeCoverageTransformer extends GMLTransformer {
         public void encode(Object o) throws IllegalArgumentException {
 
             if (!(o instanceof DescribeCoverageType)) {
-                throw new IllegalArgumentException(
-                        new StringBuffer("Not a DescribeCoverageType: ").append(o).toString());
+                throw new IllegalArgumentException(new StringBuffer("Not a DescribeCoverageType: ")
+                        .append(o)
+                        .toString());
             }
 
             this.request = (DescribeCoverageType) o;
@@ -127,11 +125,10 @@ public class WCS20DescribeCoverageTransformer extends GMLTransformer {
                 } else {
                     // if we get there there is an internal error, the coverage existence is
                     // checked before creating the transformer
-                    throw new IllegalArgumentException(
-                            "Failed to locate coverage "
-                                    + encodedCoverageId
-                                    + ", unexpected, the coverage existance has been "
-                                    + "checked earlier in the request lifecycle");
+                    throw new IllegalArgumentException("Failed to locate coverage "
+                            + encodedCoverageId
+                            + ", unexpected, the coverage existance has been "
+                            + "checked earlier in the request lifecycle");
                 }
             }
 
@@ -146,13 +143,12 @@ public class WCS20DescribeCoverageTransformer extends GMLTransformer {
             // ok: build the response
             final AttributesImpl attributes = WCS20Const.getDefaultNamespaces();
             helper.registerNamespaces(getNamespaceSupport(), attributes);
-            String location =
-                    buildSchemaLocation(
-                            request.getBaseUrl(),
-                            WCS.NAMESPACE,
-                            "http://schemas.opengis.net/wcs/2.0/wcsDescribeCoverage.xsd",
-                            "http://www.geoserver.org/wcsgs/2.0",
-                            buildSchemaURL(request.getBaseUrl(), "wcs/2.0/wcsgs.xsd"));
+            String location = buildSchemaLocation(
+                    request.getBaseUrl(),
+                    WCS.NAMESPACE,
+                    "http://schemas.opengis.net/wcs/2.0/wcsDescribeCoverage.xsd",
+                    "http://www.geoserver.org/wcsgs/2.0",
+                    buildSchemaURL(request.getBaseUrl(), "wcs/2.0/wcsgs.xsd"));
             attributes.addAttribute("", "xsi:schemaLocation", "xsi:schemaLocation", "", location);
             start("wcs:CoverageDescriptions", attributes);
             int coverageIndex = 0;
@@ -173,8 +169,7 @@ public class WCS20DescribeCoverageTransformer extends GMLTransformer {
                     handleCoverageDescription(newCoverageID, ciNew);
                     coverageIndex++;
                 } catch (Exception e) {
-                    throw new RuntimeException(
-                            "Unexpected error occurred during describe coverage xml encoding", e);
+                    throw new RuntimeException("Unexpected error occurred during describe coverage xml encoding", e);
                 }
             }
             end("wcs:CoverageDescriptions");
@@ -192,8 +187,7 @@ public class WCS20DescribeCoverageTransformer extends GMLTransformer {
         public void handleCoverageDescription(String encodedId, CoverageInfo ci) {
 
             try {
-                GridCoverage2DReader reader =
-                        (GridCoverage2DReader) ci.getGridCoverageReader(null, null);
+                GridCoverage2DReader reader = (GridCoverage2DReader) ci.getGridCoverageReader(null, null);
                 if (reader == null) {
                     throw new WCS20Exception("Unable to read sample coverage for " + ci.getName());
                 }
@@ -203,22 +197,19 @@ public class WCS20DescribeCoverageTransformer extends GMLTransformer {
                         WCSDimensionsHelper.getDimensionsFromMetadata(ci.getMetadata());
                 WCSDimensionsHelper dimensionsHelper = null;
                 if (dimensionsMap != null && !dimensionsMap.isEmpty()) {
-                    dimensionsHelper =
-                            WCSDimensionsHelper.getWCSDimensionsHelper(encodedId, ci, reader);
+                    dimensionsHelper = WCSDimensionsHelper.getWCSDimensionsHelper(encodedId, ci, reader);
                 }
 
                 // get the crs and look for an EPSG code
                 final CoordinateReferenceSystem crs = ci.getCRS();
-                List<String> axesNames =
-                        envelopeDimensionsMapper.getAxesNames(ci.boundingBox(), true);
+                List<String> axesNames = envelopeDimensionsMapper.getAxesNames(ci.boundingBox(), true);
 
                 // lookup CRS identifier and encode as HTTP URI
                 String identifier = ResourcePool.lookupIdentifier(crs, false);
                 String srsName = SrsSyntax.OGC_HTTP_URI.getSRS(identifier);
 
                 // handle axes swap for geographic crs
-                final boolean axisSwap =
-                        !CRS.getAxisOrder(CRS.decode(srsName)).equals(AxisOrder.EAST_NORTH);
+                final boolean axisSwap = !CRS.getAxisOrder(CRS.decode(srsName)).equals(AxisOrder.EAST_NORTH);
 
                 // encoding ID of the coverage
                 final AttributesImpl coverageAttributes = new AttributesImpl();

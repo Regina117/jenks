@@ -71,13 +71,11 @@ public class GeoServerJwtHeadersFilter extends GeoServerPreAuthenticatedUserName
      * @return
      */
     public boolean existingAuthIsFromThisConfig(Authentication existingAuth) {
-        if (existingAuth == null || existingAuth.getDetails() == null)
-            return false; // not existing auth, or no details
+        if (existingAuth == null || existingAuth.getDetails() == null) return false; // not existing auth, or no details
         if (!(existingAuth.getDetails() instanceof JwtHeadersWebAuthenticationDetails))
             return false; // details isn't from us, so this isn't our auth
 
-        JwtHeadersWebAuthenticationDetails details =
-                (JwtHeadersWebAuthenticationDetails) existingAuth.getDetails();
+        JwtHeadersWebAuthenticationDetails details = (JwtHeadersWebAuthenticationDetails) existingAuth.getDetails();
         return details.getJwtHeadersConfigId().equals(this.filterConfig.id);
     }
 
@@ -90,8 +88,7 @@ public class GeoServerJwtHeadersFilter extends GeoServerPreAuthenticatedUserName
      */
     public boolean principleHasChanged(Authentication existingAuth, String requestPrincipleName) {
         if (existingAuth == null) return false; // no existing auth, so it cannot be a change
-        if (requestPrincipleName == null)
-            return false; // request doesn't contain an auth, so it cannot change
+        if (requestPrincipleName == null) return false; // request doesn't contain an auth, so it cannot change
 
         return !requestPrincipleName.equals(existingAuth.getPrincipal().toString());
     }
@@ -157,8 +154,7 @@ public class GeoServerJwtHeadersFilter extends GeoServerPreAuthenticatedUserName
     @Override
     protected String getPreAuthenticatedPrincipalName(HttpServletRequest request) {
         String headerValue =
-                request.getHeader(
-                        filterConfig.getJwtConfiguration().getUserNameHeaderAttributeName());
+                request.getHeader(filterConfig.getJwtConfiguration().getUserNameHeaderAttributeName());
         JwtHeaderUserNameExtractor extractor =
                 new JwtHeaderUserNameExtractor(getFilterConfig().getJwtConfiguration());
         String userName = extractor.extractUserName(headerValue);
@@ -184,8 +180,7 @@ public class GeoServerJwtHeadersFilter extends GeoServerPreAuthenticatedUserName
      * UserGroupService, RoleService)
      */
     @Override
-    protected Collection<GeoServerRole> getRoles(HttpServletRequest request, String principal)
-            throws IOException {
+    protected Collection<GeoServerRole> getRoles(HttpServletRequest request, String principal) throws IOException {
         // validate if we validated the user - if so process roles
         String id = (String) request.getAttribute(HTTP_ATTRIBUTE_CONFIG_ID);
         if (id == null || !id.equals(filterConfig.getId())) {
@@ -193,12 +188,10 @@ public class GeoServerJwtHeadersFilter extends GeoServerPreAuthenticatedUserName
         }
 
         if (filterConfig.getRoleSource() == GeoServerJwtHeadersFilterConfig.JWTHeaderRoleSource.JWT
-                || filterConfig.getRoleSource()
-                        == GeoServerJwtHeadersFilterConfig.JWTHeaderRoleSource.JSON) {
+                || filterConfig.getRoleSource() == GeoServerJwtHeadersFilterConfig.JWTHeaderRoleSource.JSON) {
             String headerValue =
                     request.getHeader(filterConfig.getJwtConfiguration().getRolesHeaderName());
-            JwtHeadersRolesExtractor extractor =
-                    new JwtHeadersRolesExtractor(filterConfig.getJwtConfiguration());
+            JwtHeadersRolesExtractor extractor = new JwtHeadersRolesExtractor(filterConfig.getJwtConfiguration());
             var roles = extractor.getRoles(headerValue);
             return roles.stream().map(x -> new GeoServerRole(x)).collect(Collectors.toList());
         }

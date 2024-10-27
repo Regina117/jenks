@@ -44,20 +44,14 @@ public class FeatureTypeDimensionsAccessor {
      */
     public Map<String, DimensionInfo> getCustomDimensions(boolean removePrefix) {
         return typeInfo.getMetadata().entrySet().stream()
-                .filter(
-                        e ->
-                                e.getValue() instanceof DimensionInfo
-                                        && e.getKey() != null
-                                        && e.getKey().startsWith(DIMENSION_PREFIX)
-                                        && !ResourceInfo.ELEVATION.equals(e.getKey())
-                                        && !ResourceInfo.TIME.equals(e.getKey()))
-                .map(
-                        e ->
-                                Pair.of(
-                                        removePrefix
-                                                ? e.getKey().replaceFirst(DIMENSION_PREFIX, "")
-                                                : e.getKey(),
-                                        (DimensionInfo) e.getValue()))
+                .filter(e -> e.getValue() instanceof DimensionInfo
+                        && e.getKey() != null
+                        && e.getKey().startsWith(DIMENSION_PREFIX)
+                        && !ResourceInfo.ELEVATION.equals(e.getKey())
+                        && !ResourceInfo.TIME.equals(e.getKey()))
+                .map(e -> Pair.of(
+                        removePrefix ? e.getKey().replaceFirst(DIMENSION_PREFIX, "") : e.getKey(),
+                        (DimensionInfo) e.getValue()))
                 .collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
     }
 
@@ -68,16 +62,12 @@ public class FeatureTypeDimensionsAccessor {
      * @return type binding class
      */
     public Optional<Class<?>> getBinding(String dimensionName) {
-        final Optional<Entry<String, DimensionInfo>> dimEntry =
-                getCustomDimensionByName(dimensionName);
-        final Optional<String> attributeNameOpt =
-                dimEntry.map(Entry::getValue).map(DimensionInfo::getAttribute);
-        return attributeNameOpt.flatMap(
-                s ->
-                        typeInfo.getAttributes().stream()
-                                .filter(a -> Objects.equals(a.getName(), s))
-                                .map(this::getBinding)
-                                .findFirst());
+        final Optional<Entry<String, DimensionInfo>> dimEntry = getCustomDimensionByName(dimensionName);
+        final Optional<String> attributeNameOpt = dimEntry.map(Entry::getValue).map(DimensionInfo::getAttribute);
+        return attributeNameOpt.flatMap(s -> typeInfo.getAttributes().stream()
+                .filter(a -> Objects.equals(a.getName(), s))
+                .map(this::getBinding)
+                .findFirst());
     }
 
     private Class<?> getBinding(AttributeTypeInfo attributeTypeInfo) {
@@ -91,13 +81,11 @@ public class FeatureTypeDimensionsAccessor {
     public MetadataMap getMetadataMap() {
         MetadataMap metadataMap = typeInfo.getMetadata();
         if (metadataMap == null)
-            throw new IllegalStateException(
-                    "Unable to get MetadataMap for feature info: " + typeInfo);
+            throw new IllegalStateException("Unable to get MetadataMap for feature info: " + typeInfo);
         return metadataMap;
     }
 
-    public Optional<Map.Entry<String, DimensionInfo>> getCustomDimensionByName(
-            String dimensionName) {
+    public Optional<Map.Entry<String, DimensionInfo>> getCustomDimensionByName(String dimensionName) {
         if (dimensionName == null) return Optional.empty();
         Serializable dimension = getMetadataMap().get(DIMENSION_PREFIX + dimensionName);
         if (!(dimension instanceof DimensionInfo)) return Optional.empty();

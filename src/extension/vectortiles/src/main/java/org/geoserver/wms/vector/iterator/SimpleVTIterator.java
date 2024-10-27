@@ -45,8 +45,7 @@ class SimpleVTIterator implements VTIterator {
     }
 
     private Map<String, Object> getProperties(SimpleFeature f) {
-        if (this.descriptors == null)
-            this.descriptors = f.getFeatureType().getAttributeDescriptors();
+        if (this.descriptors == null) this.descriptors = f.getFeatureType().getAttributeDescriptors();
         List<Object> attributeValues = f.getAttributes();
         Map<String, Object> properties = new HashMap<>();
         for (int i = 0; i < descriptors.size(); i++) {

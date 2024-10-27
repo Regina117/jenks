@@ -64,9 +64,7 @@ public class TokenValidatorTest {
         validator.tokenEndpointValidator = Mockito.mock(TokenEndpointValidator.class);
         validator.tokenAudienceValidator = Mockito.mock(TokenAudienceValidator.class);
 
-        doThrow(new Exception("boom"))
-                .when(validator.tokenSignatureValidator)
-                .validate(ArgumentMatchers.any());
+        doThrow(new Exception("boom")).when(validator.tokenSignatureValidator).validate(ArgumentMatchers.any());
 
         String token = JwtHeaderUserNameExtractorTest.accessToken;
         validator.validate(token);
@@ -91,9 +89,7 @@ public class TokenValidatorTest {
         validator.tokenEndpointValidator = Mockito.mock(TokenEndpointValidator.class);
         validator.tokenAudienceValidator = Mockito.mock(TokenAudienceValidator.class);
 
-        doThrow(new Exception("boom"))
-                .when(validator.tokenExpiryValidator)
-                .validate(ArgumentMatchers.any());
+        doThrow(new Exception("boom")).when(validator.tokenExpiryValidator).validate(ArgumentMatchers.any());
 
         String token = JwtHeaderUserNameExtractorTest.accessToken;
         validator.validate(token);
@@ -118,9 +114,7 @@ public class TokenValidatorTest {
         validator.tokenEndpointValidator = Mockito.mock(TokenEndpointValidator.class);
         validator.tokenAudienceValidator = Mockito.mock(TokenAudienceValidator.class);
 
-        doThrow(new Exception("boom"))
-                .when(validator.tokenEndpointValidator)
-                .validate(ArgumentMatchers.any());
+        doThrow(new Exception("boom")).when(validator.tokenEndpointValidator).validate(ArgumentMatchers.any());
 
         String token = JwtHeaderUserNameExtractorTest.accessToken;
         validator.validate(token);
@@ -145,9 +139,7 @@ public class TokenValidatorTest {
         validator.tokenEndpointValidator = Mockito.mock(TokenEndpointValidator.class);
         validator.tokenAudienceValidator = Mockito.mock(TokenAudienceValidator.class);
 
-        doThrow(new Exception("boom"))
-                .when(validator.tokenAudienceValidator)
-                .validate(ArgumentMatchers.any());
+        doThrow(new Exception("boom")).when(validator.tokenAudienceValidator).validate(ArgumentMatchers.any());
 
         String token = JwtHeaderUserNameExtractorTest.accessToken;
         validator.validate(token);

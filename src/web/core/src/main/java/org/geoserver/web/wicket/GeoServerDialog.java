@@ -101,10 +101,8 @@ public class GeoServerDialog extends Panel {
         window.setContent(new ContentsPage(userPanel));
 
         // make sure close == cancel behavior wise
-        window.setCloseButtonCallback(
-                (GSModalWindow.CloseButtonCallback) target12 -> delegate.onCancel(target12));
-        window.setWindowClosedCallback(
-                (GSModalWindow.WindowClosedCallback) target1 -> delegate.onClose(target1));
+        window.setCloseButtonCallback((GSModalWindow.CloseButtonCallback) target12 -> delegate.onCancel(target12));
+        window.setWindowClosedCallback((GSModalWindow.WindowClosedCallback) target1 -> delegate.onClose(target1));
 
         // show the window
         this.delegate = delegate;
@@ -120,9 +118,7 @@ public class GeoServerDialog extends Panel {
      */
     @SafeVarargs
     public final void showInfo(
-            AjaxRequestTarget target,
-            final IModel<String> heading,
-            final IModel<String>... messages) {
+            AjaxRequestTarget target, final IModel<String> heading, final IModel<String>... messages) {
         window.setPageCreator((GSModalWindow.PageCreator) () -> new InfoPage(heading, messages));
         window.show(target);
     }
@@ -152,19 +148,18 @@ public class GeoServerDialog extends Panel {
 
     /** Submit link that will forward to the {@link DialogDelegate} */
     AjaxSubmitLink sumbitLink(Component contents) {
-        AjaxSubmitLink link =
-                new AjaxSubmitLink("submit") {
+        AjaxSubmitLink link = new AjaxSubmitLink("submit") {
 
-                    @Override
-                    protected void onSubmit(AjaxRequestTarget target) {
-                        submit(target, (Component) this.getDefaultModelObject());
-                    }
+            @Override
+            protected void onSubmit(AjaxRequestTarget target) {
+                submit(target, (Component) this.getDefaultModelObject());
+            }
 
-                    @Override
-                    protected void onError(AjaxRequestTarget target) {
-                        delegate.onError(target, getForm());
-                    }
-                };
+            @Override
+            protected void onError(AjaxRequestTarget target) {
+                delegate.onError(target, getForm());
+            }
+        };
         link.setDefaultModel(new Model<>(contents));
         return link;
     }
@@ -208,15 +203,12 @@ public class GeoServerDialog extends Panel {
         @SafeVarargs
         public InfoPage(IModel<String> title, IModel<String>... messages) {
             add(new Label("title", title));
-            add(
-                    new ListView<>("messages", Arrays.asList(messages)) {
-                        @Override
-                        protected void populateItem(ListItem<IModel<String>> item) {
-                            item.add(
-                                    new Label("message", item.getModelObject())
-                                            .setEscapeModelStrings(false));
-                        }
-                    });
+            add(new ListView<>("messages", Arrays.asList(messages)) {
+                @Override
+                protected void populateItem(ListItem<IModel<String>> item) {
+                    item.add(new Label("message", item.getModelObject()).setEscapeModelStrings(false));
+                }
+            });
         }
     }
 
@@ -239,14 +231,11 @@ public class GeoServerDialog extends Panel {
          * target
          */
         public void onError(final AjaxRequestTarget target, Form<?> form) {
-            form.getPage()
-                    .visitChildren(
-                            IFeedback.class,
-                            (component, visit) -> {
-                                if (component.getOutputMarkupId()) {
-                                    target.add(component);
-                                }
-                            });
+            form.getPage().visitChildren(IFeedback.class, (component, visit) -> {
+                if (component.getOutputMarkupId()) {
+                    target.add(component);
+                }
+            });
         }
 
         /**

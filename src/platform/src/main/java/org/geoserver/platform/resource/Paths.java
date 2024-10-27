@@ -226,10 +226,7 @@ public class Paths {
      */
     private static String reportInvalidPath(List<String> names, String item) {
         throw new IllegalArgumentException(
-                "Contains invalid '"
-                        + item
-                        + "' path: "
-                        + names.stream().collect(Collectors.joining("/")));
+                "Contains invalid '" + item + "' path: " + names.stream().collect(Collectors.joining("/")));
     }
 
     /**
@@ -336,8 +333,7 @@ public class Paths {
     public static String convert(File base, File file) {
         if (base == null) {
             if (file.isAbsolute()) {
-                throw new IllegalArgumentException(
-                        "Unable to determine relative path as file was absolute");
+                throw new IllegalArgumentException("Unable to determine relative path as file was absolute");
             } else {
                 return convert(file.getPath());
             }
@@ -387,8 +383,7 @@ public class Paths {
                     resolvedPath.remove(resolvedPath.size() - 1);
                     continue;
                 } else {
-                    throw new IllegalStateException(
-                            "File location " + fileLocation + " outside of " + base.getPath());
+                    throw new IllegalStateException("File location " + fileLocation + " outside of " + base.getPath());
                 }
             }
             resolvedPath.add(item);
@@ -423,8 +418,7 @@ public class Paths {
                     resolvedPath.remove(resolvedPath.size() - 1);
                     continue;
                 } else {
-                    throw new IllegalStateException(
-                            "File location " + filePath + " outside of " + base.getPath());
+                    throw new IllegalStateException("File location " + filePath + " outside of " + base.getPath());
                 }
             }
             resolvedPath.add(item);
@@ -474,8 +468,7 @@ public class Paths {
         }
         String filePath = convert(filename);
         if (FilePaths.isAbsolute(filePath)) {
-            throw new IllegalArgumentException(
-                    "File location " + filename + " absolute, must be relative to " + path);
+            throw new IllegalArgumentException("File location " + filename + " absolute, must be relative to " + path);
         }
         List<String> folderPathNames = names(path);
         List<String> filePathNames = names(filePath);
@@ -491,8 +484,7 @@ public class Paths {
                     resolvedPath.remove(resolvedPath.size() - 1);
                     continue;
                 } else {
-                    throw new IllegalStateException(
-                            "File location " + filename + " outside of " + path);
+                    throw new IllegalStateException("File location " + filename + " outside of " + path);
                 }
             }
             resolvedPath.add(item);

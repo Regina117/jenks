@@ -23,8 +23,7 @@ import org.geoserver.platform.resource.Resource;
 public class AutopopulateTemplateLoader {
 
     /** logger */
-    private static final Logger LOGGER =
-            org.geotools.util.logging.Logging.getLogger(AutopopulateTemplateLoader.class);
+    private static final Logger LOGGER = org.geotools.util.logging.Logging.getLogger(AutopopulateTemplateLoader.class);
     /**
      * Feature type directory to load template against. Its presence is mutually exclusive with
      * coverageName
@@ -42,8 +41,7 @@ public class AutopopulateTemplateLoader {
     public AutopopulateTemplateLoader(GeoServerResourceLoader rl, ResourceInfo resource) {
         this(
                 rl == null
-                        ? new GeoServerDataDirectory(
-                                GeoServerExtensions.bean(GeoServerResourceLoader.class))
+                        ? new GeoServerDataDirectory(GeoServerExtensions.bean(GeoServerResourceLoader.class))
                         : new GeoServerDataDirectory(rl),
                 resource);
     }

@@ -34,11 +34,10 @@ public class TokenEndpointValidator {
 
     JwtConfiguration jwtHeadersConfig;
 
-    public static Cache<Object, Object> validEndpoints =
-            CacheBuilder.newBuilder()
-                    .maximumSize(50000)
-                    .expireAfterWrite(1, TimeUnit.HOURS)
-                    .build();
+    public static Cache<Object, Object> validEndpoints = CacheBuilder.newBuilder()
+            .maximumSize(50000)
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .build();
 
     public TokenEndpointValidator(JwtConfiguration config) {
         jwtHeadersConfig = config;
@@ -47,8 +46,7 @@ public class TokenEndpointValidator {
     public void validate(String accessToken) throws Exception {
         if (!jwtHeadersConfig.isValidateTokenAgainstURL()) return; // nothing to do
 
-        if (validEndpoints.getIfPresent(accessToken) != null)
-            return; // we already know this is a good accessToken
+        if (validEndpoints.getIfPresent(accessToken) != null) return; // we already know this is a good accessToken
 
         validateEndpoint(accessToken);
 
@@ -69,7 +67,8 @@ public class TokenEndpointValidator {
 
         JWSObject jwsToken = JWSObject.parse(accessToken);
         String subject_userinfo = (String) extractFromJSON(result, "sub");
-        String subject_accesstoken = (String) jwsToken.getPayload().toJSONObject().get("sub");
+        String subject_accesstoken =
+                (String) jwsToken.getPayload().toJSONObject().get("sub");
         if (subject_userinfo == null || subject_accesstoken == null)
             throw new Exception("couldn't extract subject from token or userinfo");
         if (!subject_userinfo.equals(subject_accesstoken))

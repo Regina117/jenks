@@ -52,9 +52,8 @@ public final class ClientStreamAbortedException extends IOException {
                 .filter(ClientStreamAbortedException.class::isInstance)
                 .map(ClientStreamAbortedException.class::cast)
                 .findFirst()
-                .ifPresent(
-                        cause -> {
-                            throw new java.io.UncheckedIOException(cause);
-                        });
+                .ifPresent(cause -> {
+                    throw new java.io.UncheckedIOException(cause);
+                });
     }
 }

@@ -71,8 +71,7 @@ public interface ResourceAccessManager {
      * null} in which case the caller is responsible for building a filter based on calls to the
      * manager's other methods.
      */
-    public @Nullable Filter getSecurityFilter(
-            Authentication user, final Class<? extends CatalogInfo> clazz);
+    public @Nullable Filter getSecurityFilter(Authentication user, final Class<? extends CatalogInfo> clazz);
 
     /**
      * Checks if {@code user} has admin privileges on at least one workspace of {@code catalog}.
@@ -85,8 +84,7 @@ public interface ResourceAccessManager {
      * a more efficient implementation whenever possible.
      */
     default boolean isWorkspaceAdmin(Authentication user, Catalog catalog) {
-        try (CloseableIterator<WorkspaceInfo> workspaces =
-                catalog.list(WorkspaceInfo.class, Filter.INCLUDE)) {
+        try (CloseableIterator<WorkspaceInfo> workspaces = catalog.list(WorkspaceInfo.class, Filter.INCLUDE)) {
             while (workspaces.hasNext()) {
                 WorkspaceInfo ws = workspaces.next();
                 WorkspaceAccessLimits accessLimits = getAccessLimits(user, ws);

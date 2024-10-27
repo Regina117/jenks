@@ -59,9 +59,7 @@ public class TokenEndpointValidatorTest {
 
         validator.tokenEndpointValidator = spy(validator.tokenEndpointValidator);
 
-        doReturn(null)
-                .when(validator.tokenEndpointValidator)
-                .download(ArgumentMatchers.any(), ArgumentMatchers.any());
+        doReturn(null).when(validator.tokenEndpointValidator).download(ArgumentMatchers.any(), ArgumentMatchers.any());
 
         String token = JwtHeaderUserNameExtractorTest.accessToken;
         validator.validate(token);

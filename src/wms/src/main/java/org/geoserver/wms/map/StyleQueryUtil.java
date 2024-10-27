@@ -75,14 +75,13 @@ public final class StyleQueryUtil {
      */
     public static List<Query> getStyleQuery(List<Layer> layers, WMSMapContent mapContent) {
         return layers.stream()
-                .map(
-                        layer -> {
-                            try {
-                                return getStyleQuery(layer, mapContent);
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
+                .map(layer -> {
+                    try {
+                        return getStyleQuery(layer, mapContent);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .collect(Collectors.toList());
     }
 
@@ -93,8 +92,7 @@ public final class StyleQueryUtil {
     public static Query getStyleQuery(Layer layer, WMSMapContent mapContent) throws IOException {
 
         final ReferencedEnvelope renderingArea = mapContent.getRenderingArea();
-        final Rectangle screenSize =
-                new Rectangle(mapContent.getMapWidth(), mapContent.getMapHeight());
+        final Rectangle screenSize = new Rectangle(mapContent.getMapWidth(), mapContent.getMapHeight());
         final double mapScale = getMapScale(mapContent, renderingArea);
 
         final int requestBufferScreen = mapContent.getBuffer();
@@ -135,8 +133,7 @@ public final class StyleQueryUtil {
         return query;
     }
 
-    public static List<LiteFeatureTypeStyle> getLiteFeatureStyles(
-            Layer layer, WMSMapContent mapContent) {
+    public static List<LiteFeatureTypeStyle> getLiteFeatureStyles(Layer layer, WMSMapContent mapContent) {
         final ReferencedEnvelope renderingArea = mapContent.getRenderingArea();
         final double mapScale = getMapScale(mapContent, renderingArea);
         FeatureSource<?, ?> featureSource = layer.getFeatureSource();
@@ -151,8 +148,7 @@ public final class StyleQueryUtil {
      * @param renderingArea the rendering area
      * @return the scale denominator
      */
-    public static double getMapScale(
-            WMSMapContent mapContent, final ReferencedEnvelope renderingArea) {
+    public static double getMapScale(WMSMapContent mapContent, final ReferencedEnvelope renderingArea) {
         return RendererUtilities.calculateOGCScale(renderingArea, mapContent.getMapWidth(), null);
     }
 
@@ -163,17 +159,12 @@ public final class StyleQueryUtil {
      * @param styleList the list of styles to be rendered
      * @return the buffer to be used for rendering
      */
-    public static int getComputedBuffer(
-            final int requestBufferScreen, List<LiteFeatureTypeStyle> styleList) {
+    public static int getComputedBuffer(final int requestBufferScreen, List<LiteFeatureTypeStyle> styleList) {
         final int bufferScreen;
         if (requestBufferScreen <= 0) {
             MetaBufferEstimator bufferEstimator = new MetaBufferEstimator();
             styleList.stream()
-                    .flatMap(
-                            fts ->
-                                    Stream.concat(
-                                            Arrays.stream(fts.elseRules),
-                                            Arrays.stream(fts.ruleList)))
+                    .flatMap(fts -> Stream.concat(Arrays.stream(fts.elseRules), Arrays.stream(fts.ruleList)))
                     .forEach(bufferEstimator::visit);
             bufferScreen = bufferEstimator.getBuffer();
         } else {
@@ -190,34 +181,27 @@ public final class StyleQueryUtil {
      * @param schema the feature type
      * @return the list of feature type styles
      */
-    public static List<LiteFeatureTypeStyle> getFeatureStyles(
-            Layer layer, final double mapScale, FeatureType schema) {
+    public static List<LiteFeatureTypeStyle> getFeatureStyles(Layer layer, final double mapScale, FeatureType schema) {
         Style style = layer.getStyle();
         List<FeatureTypeStyle> featureStyles = style.featureTypeStyles();
         return createLiteFeatureTypeStyles(layer, featureStyles, schema, mapScale);
     }
 
-    private static double[] getPixelSize(
-            final ReferencedEnvelope renderingArea, final Rectangle screenSize) {
+    private static double[] getPixelSize(final ReferencedEnvelope renderingArea, final Rectangle screenSize) {
         double[] pixelSize;
         try {
-            pixelSize =
-                    Decimator.computeGeneralizationDistances(
-                            ProjectiveTransform.create(
-                                            RendererUtilities.worldToScreenTransform(
-                                                    renderingArea, screenSize))
-                                    .inverse(),
-                            screenSize,
-                            1.0);
+            pixelSize = Decimator.computeGeneralizationDistances(
+                    ProjectiveTransform.create(RendererUtilities.worldToScreenTransform(renderingArea, screenSize))
+                            .inverse(),
+                    screenSize,
+                    1.0);
         } catch (TransformException ex) {
             if (LOGGER.isLoggable(Level.WARNING)) {
                 LOGGER.log(Level.WARNING, "Error while computing pixel size", ex);
             }
-            pixelSize =
-                    new double[] {
-                        renderingArea.getWidth() / screenSize.getWidth(),
-                        renderingArea.getHeight() / screenSize.getHeight()
-                    };
+            pixelSize = new double[] {
+                renderingArea.getWidth() / screenSize.getWidth(), renderingArea.getHeight() / screenSize.getHeight()
+            };
         }
         return pixelSize;
     }
@@ -246,16 +230,12 @@ public final class StyleQueryUtil {
         query.setProperties(Query.ALL_PROPERTIES);
 
         String geomName = geometryAttribute.getLocalName();
-        Filter filter =
-                reprojectSpatialFilter(
-                        queryArea.getCoordinateReferenceSystem(),
-                        schema,
-                        FF.bbox(FF.property(geomName), queryArea));
+        Filter filter = reprojectSpatialFilter(
+                queryArea.getCoordinateReferenceSystem(), schema, FF.bbox(FF.property(geomName), queryArea));
 
         query.setFilter(filter);
 
-        LiteFeatureTypeStyle[] styles =
-                styleList.toArray(new LiteFeatureTypeStyle[styleList.size()]);
+        LiteFeatureTypeStyle[] styles = styleList.toArray(new LiteFeatureTypeStyle[styleList.size()]);
 
         try {
             processRuleForQuery(styles, query);
@@ -310,10 +290,7 @@ public final class StyleQueryUtil {
      * @return a list of LiteFeatureTypeStyles
      */
     private static ArrayList<LiteFeatureTypeStyle> createLiteFeatureTypeStyles(
-            Layer layer,
-            List<FeatureTypeStyle> featureStyles,
-            FeatureType ftype,
-            double scaleDenominator) {
+            Layer layer, List<FeatureTypeStyle> featureStyles, FeatureType ftype, double scaleDenominator) {
 
         ArrayList<LiteFeatureTypeStyle> result = new ArrayList<>();
 
@@ -334,14 +311,8 @@ public final class StyleQueryUtil {
                 // we can optimize this one and draw directly on the graphics, assuming
                 // there is no composition
                 Graphics2D graphics = null;
-                lfts =
-                        new LiteFeatureTypeStyle(
-                                layer,
-                                graphics,
-                                ruleList,
-                                elseRuleList,
-                                fts.getTransformation(),
-                                fts.getOptions());
+                lfts = new LiteFeatureTypeStyle(
+                        layer, graphics, ruleList, elseRuleList, fts.getTransformation(), fts.getOptions());
 
                 result.add(lfts);
             }
@@ -358,8 +329,7 @@ public final class StyleQueryUtil {
      * @return an array of two lists: the first one contains the rules that are active at the
      *     current
      */
-    private static List<Rule>[] splitRules(
-            final FeatureTypeStyle fts, final double scaleDenominator) {
+    private static List<Rule>[] splitRules(final FeatureTypeStyle fts, final double scaleDenominator) {
 
         List<Rule> ruleList = new ArrayList<>();
         List<Rule> elseRuleList = new ArrayList<>();
@@ -464,10 +434,7 @@ public final class StyleQueryUtil {
             query.setFilter(ruleFiltersCombined);
         } catch (Exception e) {
             if (LOGGER.isLoggable(Level.WARNING)) {
-                LOGGER.log(
-                        Level.SEVERE,
-                        "Could not send rules to datastore due to: " + e.getMessage(),
-                        e);
+                LOGGER.log(Level.SEVERE, "Could not send rules to datastore due to: " + e.getMessage(), e);
             }
         }
     }
@@ -485,8 +452,7 @@ public final class StyleQueryUtil {
      *     transform if the two crs are equal
      * @throws FactoryException If no transform is available to the destCRS
      */
-    public static MathTransform buildTransform(
-            CoordinateReferenceSystem sourceCRS, CoordinateReferenceSystem destCRS)
+    public static MathTransform buildTransform(CoordinateReferenceSystem sourceCRS, CoordinateReferenceSystem destCRS)
             throws FactoryException {
         Preconditions.checkNotNull(sourceCRS, "sourceCRS");
         Preconditions.checkNotNull(destCRS, "destCRS");
@@ -495,18 +461,14 @@ public final class StyleQueryUtil {
         if (sourceCRS.getCoordinateSystem().getDimension() >= 3) {
             // We are going to transform over to DefaultGeographic.WGS84 on the fly
             // so we will set up our math transform to take it from there
-            MathTransform toWgs84_3d =
-                    CRS.findMathTransform(sourceCRS, DefaultGeographicCRS.WGS84_3D);
-            MathTransform toWgs84_2d =
-                    CRS.findMathTransform(
-                            DefaultGeographicCRS.WGS84_3D, DefaultGeographicCRS.WGS84);
+            MathTransform toWgs84_3d = CRS.findMathTransform(sourceCRS, DefaultGeographicCRS.WGS84_3D);
+            MathTransform toWgs84_2d = CRS.findMathTransform(DefaultGeographicCRS.WGS84_3D, DefaultGeographicCRS.WGS84);
             transform = ConcatenatedTransform.create(toWgs84_3d, toWgs84_2d);
             sourceCRS = DefaultGeographicCRS.WGS84;
         }
 
         // the basic crs transformation, if any
-        MathTransform2D sourceToTarget =
-                (MathTransform2D) CRS.findMathTransform(sourceCRS, destCRS, true);
+        MathTransform2D sourceToTarget = (MathTransform2D) CRS.findMathTransform(sourceCRS, destCRS, true);
 
         if (transform == null) {
             return sourceToTarget;

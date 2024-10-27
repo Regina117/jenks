@@ -16,8 +16,7 @@ import org.geotools.util.logging.Logging;
  *
  * @param <T>
  */
-public abstract class AbstractServiceHTMLMessageConverter<T>
-        extends AbstractHTMLMessageConverter<T> {
+public abstract class AbstractServiceHTMLMessageConverter<T> extends AbstractHTMLMessageConverter<T> {
     static final Logger LOGGER = Logging.getLogger(AbstractServiceHTMLMessageConverter.class);
     protected final Class<?> binding;
     protected final Class<? extends ServiceInfo> serviceConfigurationClass;

@@ -17,8 +17,7 @@ import org.geotools.data.memory.MemoryDataStore;
  */
 public class TestDirectoryStoreFactorySpi implements DataStoreFactorySpi {
 
-    public static final Param URL_PARAM =
-            new Param("url", URL.class, "A file or directory", true, null);
+    public static final Param URL_PARAM = new Param("url", URL.class, "A file or directory", true, null);
 
     @Override
     public DataStore createDataStore(Map<String, ?> params) throws IOException {

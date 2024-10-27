@@ -74,8 +74,7 @@ public class CSWRecordDescriptor extends AbstractRecordDescriptor {
 
     public static final Name SIMPLE_LITERAL_VALUE = new NameImpl(DC.NAMESPACE, "value");
 
-    public static final Name DC_ELEMENT_NAME =
-            new NameImpl(DC.NAMESPACE, DC.DCelement.getLocalPart());
+    public static final Name DC_ELEMENT_NAME = new NameImpl(DC.NAMESPACE, DC.DCelement.getLocalPart());
 
     public static final NameImpl RECORD_BBOX_NAME = new NameImpl(OWS.NAMESPACE, "BoundingBox");
 
@@ -150,11 +149,8 @@ public class CSWRecordDescriptor extends AbstractRecordDescriptor {
             throw new RuntimeException("Failed to parse CSW Record Schemas", e);
         }
 
-        FeatureTypeRegistry featureTypeRegistry =
-                new FeatureTypeRegistry(
-                        NAMESPACES,
-                        typeFactory,
-                        new RecordFeatureTypeRegistryConfiguration("RecordType"));
+        FeatureTypeRegistry featureTypeRegistry = new FeatureTypeRegistry(
+                NAMESPACES, typeFactory, new RecordFeatureTypeRegistryConfiguration("RecordType"));
 
         featureTypeRegistry.register(SIMPLE_LITERAL);
 
@@ -162,13 +158,9 @@ public class CSWRecordDescriptor extends AbstractRecordDescriptor {
 
         featureTypeRegistry.addSchemas(index);
 
-        RECORD_TYPE =
-                (FeatureType)
-                        featureTypeRegistry.getAttributeType(
-                                new NameImpl(CSW.NAMESPACE, "RecordType"));
+        RECORD_TYPE = (FeatureType) featureTypeRegistry.getAttributeType(new NameImpl(CSW.NAMESPACE, "RecordType"));
 
-        RECORD_DESCRIPTOR =
-                featureTypeRegistry.getDescriptor(new NameImpl(CSW.NAMESPACE, "Record"), null);
+        RECORD_DESCRIPTOR = featureTypeRegistry.getDescriptor(new NameImpl(CSW.NAMESPACE, "Record"), null);
 
         RECORD_BBOX_DESCRIPTOR = (AttributeDescriptor) RECORD_TYPE.getDescriptor(RECORD_BBOX_NAME);
         DC_ELEMENT = (AttributeDescriptor) RECORD_TYPE.getDescriptor(DC_ELEMENT_NAME);
@@ -176,22 +168,19 @@ public class CSWRecordDescriptor extends AbstractRecordDescriptor {
         // ---
 
         // setup the list of names for brief and summary records
-        BRIEF_ELEMENTS =
-                createNameList(
-                        NAMESPACES, "dc:identifier", "dc:title", "dc:type", "ows:BoundingBox");
-        SUMMARY_ELEMENTS =
-                createNameList(
-                        NAMESPACES,
-                        "dc:identifier",
-                        "dc:title",
-                        "dc:type",
-                        "dc:subject",
-                        "dc:format",
-                        "dc:relation",
-                        "dct:modified",
-                        "dct:abstract",
-                        "dct:spatial",
-                        "ows:BoundingBox");
+        BRIEF_ELEMENTS = createNameList(NAMESPACES, "dc:identifier", "dc:title", "dc:type", "ows:BoundingBox");
+        SUMMARY_ELEMENTS = createNameList(
+                NAMESPACES,
+                "dc:identifier",
+                "dc:title",
+                "dc:type",
+                "dc:subject",
+                "dc:format",
+                "dc:relation",
+                "dct:modified",
+                "dct:abstract",
+                "dct:spatial",
+                "ows:BoundingBox");
 
         // create the xpath extender that fill adapt dc:title to dc:title/dc:value
         PATH_EXTENDER = new CRSRecordProjectyPathAdapter(NAMESPACES);
@@ -203,34 +192,31 @@ public class CSWRecordDescriptor extends AbstractRecordDescriptor {
         CRS_REPROJECTOR = new ReprojectingFilterVisitor(FF, RECORD_TYPE);
 
         // build queriables list
-        QUERIABLES =
-                createNameList(
-                        NAMESPACES,
-                        "dc:contributor",
-                        "dc:source",
-                        "dc:language",
-                        "dc:title",
-                        "dc:subject",
-                        "dc:creator",
-                        "dc:type",
-                        "ows:BoundingBox",
-                        "dct:modified",
-                        "dct:abstract",
-                        "dc:relation",
-                        "dc:date",
-                        "dc:identifier",
-                        "dc:publisher",
-                        "dc:format",
-                        "csw:AnyText",
-                        "dc:rights");
+        QUERIABLES = createNameList(
+                NAMESPACES,
+                "dc:contributor",
+                "dc:source",
+                "dc:language",
+                "dc:title",
+                "dc:subject",
+                "dc:creator",
+                "dc:type",
+                "ows:BoundingBox",
+                "dct:modified",
+                "dct:abstract",
+                "dc:relation",
+                "dc:date",
+                "dc:identifier",
+                "dc:publisher",
+                "dc:format",
+                "csw:AnyText",
+                "dc:rights");
     }
 
     /** Checks if a field is public static final */
     static boolean isConstant(Field field) {
         int modifier = field.getModifiers();
-        return Modifier.isStatic(modifier)
-                && Modifier.isPublic(modifier)
-                && Modifier.isFinal(modifier);
+        return Modifier.isStatic(modifier) && Modifier.isPublic(modifier) && Modifier.isFinal(modifier);
     }
 
     @Override
@@ -311,8 +297,7 @@ public class CSWRecordDescriptor extends AbstractRecordDescriptor {
     @Override
     public List<PropertyName> translateProperty(Name name) {
         return Collections.singletonList(
-                new CSWPropertyPathExtender()
-                        .extendProperty(buildPropertyName(NAMESPACES, name), FF, NAMESPACES));
+                new CSWPropertyPathExtender().extendProperty(buildPropertyName(NAMESPACES, name), FF, NAMESPACES));
     }
 
     @Override

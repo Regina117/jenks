@@ -32,8 +32,7 @@ class RasterAttributeTableVisitor extends RasterSymbolizerVisitor {
     private final GridCoverage2DReader reader;
     private final String coverageName;
 
-    public RasterAttributeTableVisitor(
-            double scaleDenominator, String nativeName, GridCoverage2DReader reader) {
+    public RasterAttributeTableVisitor(double scaleDenominator, String nativeName, GridCoverage2DReader reader) {
         super(scaleDenominator, null);
         this.reader = reader;
         this.coverageName = nativeName;
@@ -61,17 +60,15 @@ class RasterAttributeTableVisitor extends RasterSymbolizerVisitor {
     private PAMRasterBand getAttributeTableBand() {
         List<PAMRasterBand> pamRasterBands = null;
         for (RasterSymbolizer rs : getRasterSymbolizers()) {
-            boolean addAttributeTable =
-                    Boolean.valueOf(rs.getOptions().getOrDefault(INCLUDE_RAT, "false"));
+            boolean addAttributeTable = Boolean.valueOf(rs.getOptions().getOrDefault(INCLUDE_RAT, "false"));
             if (addAttributeTable) {
                 // lazy load PAM dataset, but return early if it's not found
                 if (pamRasterBands == null) {
                     ResourceInfo info = reader.getInfo(coverageName);
                     if (!(info instanceof PAMResourceInfo)) {
-                        LOGGER.fine(
-                                "No PAM dataset found in raster attribute table, even if "
-                                        + INCLUDE_RAT
-                                        + " is set to true.");
+                        LOGGER.fine("No PAM dataset found in raster attribute table, even if "
+                                + INCLUDE_RAT
+                                + " is set to true.");
                         return null;
                     }
                     PAMResourceInfo pamInfo = (PAMResourceInfo) info;
@@ -81,9 +78,7 @@ class RasterAttributeTableVisitor extends RasterSymbolizerVisitor {
                             || pam.getPAMRasterBand() == null
                             || pam.getPAMRasterBand().isEmpty()) {
                         LOGGER.fine(
-                                "No Raster bands found in PAM dataset, even if "
-                                        + INCLUDE_RAT
-                                        + " is set to true.");
+                                "No Raster bands found in PAM dataset, even if " + INCLUDE_RAT + " is set to true.");
                         return null;
                     }
                     pamRasterBands = pam.getPAMRasterBand();
@@ -99,10 +94,9 @@ class RasterAttributeTableVisitor extends RasterSymbolizerVisitor {
                     PAMRasterBand band = getBandWithRAT(channelName, pamRasterBands);
                     if (band != null && band.getGdalRasterAttributeTable() != null) return band;
                     else
-                        LOGGER.fine(
-                                "No RAT found in PAM dataset for the gray channel even if "
-                                        + INCLUDE_RAT
-                                        + " is set to true.");
+                        LOGGER.fine("No RAT found in PAM dataset for the gray channel even if "
+                                + INCLUDE_RAT
+                                + " is set to true.");
 
                 } else if (cs.getRGBChannels() != null && cs.getRGBChannels().length > 0) {
                     for (SelectedChannelType sct : cs.getRGBChannels()) {
@@ -110,11 +104,10 @@ class RasterAttributeTableVisitor extends RasterSymbolizerVisitor {
                         PAMRasterBand band = getBandWithRAT(channelName, pamRasterBands);
                         if (band != null && band.getGdalRasterAttributeTable() != null) return band;
                     }
-                    LOGGER.fine(
-                            "No RAT found in PAM dataset for any of the RGB channels"
-                                    + " even if "
-                                    + INCLUDE_RAT
-                                    + " is set to true.");
+                    LOGGER.fine("No RAT found in PAM dataset for any of the RGB channels"
+                            + " even if "
+                            + INCLUDE_RAT
+                            + " is set to true.");
                 }
             }
         }
@@ -127,8 +120,7 @@ class RasterAttributeTableVisitor extends RasterSymbolizerVisitor {
      * Returns PAMRasterBand, ensuring it has a valid index, or <code>null</code>, if the channel
      * name does not resolve to a valid band index, or if the band does not have a valid RAT.
      */
-    private static PAMRasterBand getBandWithRAT(
-            Expression channelName, List<PAMRasterBand> pamRasterBands) {
+    private static PAMRasterBand getBandWithRAT(Expression channelName, List<PAMRasterBand> pamRasterBands) {
         Integer bandIdx = channelName.evaluate(null, Integer.class);
         if (bandIdx != null) {
             bandIdx--;

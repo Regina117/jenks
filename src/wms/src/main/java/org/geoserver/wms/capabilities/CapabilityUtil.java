@@ -46,17 +46,14 @@ public final class CapabilityUtil {
     }
 
     /** Helper method: aggregates min/max scale denominators of a set of styles. */
-    public static NumberRange<Double> searchMinMaxScaleDenominator(Set<StyleInfo> styles)
-            throws IOException {
+    public static NumberRange<Double> searchMinMaxScaleDenominator(Set<StyleInfo> styles) throws IOException {
         // searches the maximum and minimum denominator in the style's rules that are contained in
         // the style set.
-        MinMaxDenominator minMaxDenominator =
-                new MinMaxDenominator(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
+        MinMaxDenominator minMaxDenominator = new MinMaxDenominator(Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY);
 
         for (StyleInfo styleInfo : styles) {
             Optional<StyledLayer[]> styledLayers =
-                    Optional.ofNullable(styleInfo.getSLD())
-                            .map(StyledLayerDescriptor::getStyledLayers);
+                    Optional.ofNullable(styleInfo.getSLD()).map(StyledLayerDescriptor::getStyledLayers);
             if (styledLayers.isPresent()) {
                 for (StyledLayer styledLayer : styledLayers.get()) {
                     List<Style> stylesList = Collections.emptyList();
@@ -86,11 +83,9 @@ public final class CapabilityUtil {
         if (minMaxDenominator.getMax() == Double.NEGATIVE_INFINITY) {
             minMaxDenominator.setMax(Double.POSITIVE_INFINITY);
         }
-        assert minMaxDenominator.getMin() <= minMaxDenominator.getMax()
-                : "Min <= Max scale is expected";
+        assert minMaxDenominator.getMin() <= minMaxDenominator.getMax() : "Min <= Max scale is expected";
 
-        return new NumberRange<>(
-                Double.class, minMaxDenominator.getMin(), minMaxDenominator.getMax());
+        return new NumberRange<>(Double.class, minMaxDenominator.getMin(), minMaxDenominator.getMax());
     }
 
     /**
@@ -99,8 +94,7 @@ public final class CapabilityUtil {
      * @param style Style to be analyzed
      * @param minMaxDenominator Min and Max scale denominators
      */
-    private static void populateMinMaxScaleDenominator(
-            Style style, MinMaxDenominator minMaxDenominator) {
+    private static void populateMinMaxScaleDenominator(Style style, MinMaxDenominator minMaxDenominator) {
         for (FeatureTypeStyle fts : style.featureTypeStyles()) {
             for (Rule rule : fts.rules()) {
                 if (rule.getMinScaleDenominator() < minMaxDenominator.getMin()) {
@@ -125,8 +119,7 @@ public final class CapabilityUtil {
      *
      * @return Max and Min denominator
      */
-    public static NumberRange<Double> searchMinMaxScaleDenominator(final LayerInfo layer)
-            throws IOException {
+    public static NumberRange<Double> searchMinMaxScaleDenominator(final LayerInfo layer) throws IOException {
 
         Set<StyleInfo> stylesCopy;
         StyleInfo defaultStyle;
@@ -173,8 +166,7 @@ public final class CapabilityUtil {
      *
      * @return Max and Min denominator
      */
-    public static NumberRange<Double> searchMinMaxScaleDenominator(final LayerGroupInfo layerGroup)
-            throws IOException {
+    public static NumberRange<Double> searchMinMaxScaleDenominator(final LayerGroupInfo layerGroup) throws IOException {
 
         Set<StyleInfo> stylesCopy = new HashSet<>();
         findLayerGroupStyles(layerGroup, stylesCopy);
@@ -195,8 +187,8 @@ public final class CapabilityUtil {
      *
      * @return Max and Min denominator
      */
-    public static NumberRange<Double> searchMinMaxScaleDenominator(
-            final PublishedInfo publishedInfo) throws IOException {
+    public static NumberRange<Double> searchMinMaxScaleDenominator(final PublishedInfo publishedInfo)
+            throws IOException {
         if (publishedInfo instanceof LayerInfo) {
             return searchMinMaxScaleDenominator((LayerInfo) publishedInfo);
         } else if (publishedInfo instanceof LayerGroupInfo) {
@@ -224,10 +216,7 @@ public final class CapabilityUtil {
 
     /** Returns true if legend accomplish some rules to be a valid one. */
     public static boolean validateLegendInfo(LegendInfo legend) {
-        return legend != null
-                && legend.getOnlineResource() != null
-                && legend.getHeight() > 0
-                && legend.getWidth() > 0;
+        return legend != null && legend.getOnlineResource() != null && legend.getHeight() > 0 && legend.getWidth() > 0;
     }
 
     /**
@@ -238,8 +227,7 @@ public final class CapabilityUtil {
      * @param XLINK_NS Namsepace like (e.g http://www.w3.org/1999/xlink)
      * @return attrs with Legend URL attributes
      */
-    public static AttributesImpl addGetLegendAttributes(
-            AttributesImpl attrs, String legendURL, String XLINK_NS) {
+    public static AttributesImpl addGetLegendAttributes(AttributesImpl attrs, String legendURL, String XLINK_NS) {
 
         attrs.addAttribute("", "xmlns:xlink", "xmlns:xlink", "", XLINK_NS);
         attrs.addAttribute(XLINK_NS, "type", "xlink:type", "", "simple");
