@@ -62,8 +62,7 @@ public class WorkspaceAdminComponentAuthorizer extends AdminComponentAuthorizer 
 
     ResourceAccessManager getAccessManager() {
         // the secure catalog builds and owns the ResourceAccessManager
-        SecureCatalogImpl secureCatalog =
-                GeoServerApplication.get().getBeanOfType(SecureCatalogImpl.class);
+        SecureCatalogImpl secureCatalog = GeoServerApplication.get().getBeanOfType(SecureCatalogImpl.class);
         if (null == secureCatalog) return null;
         return secureCatalog.getResourceAccessManager();
     }
@@ -71,8 +70,7 @@ public class WorkspaceAdminComponentAuthorizer extends AdminComponentAuthorizer 
     void setCachedValue(boolean workspaceAdmin) {
         RequestAttributes atts = RequestContextHolder.getRequestAttributes();
         if (null != atts) {
-            atts.setAttribute(
-                    REQUEST_CONTEXT_CACHE_KEY, workspaceAdmin, RequestAttributes.SCOPE_REQUEST);
+            atts.setAttribute(REQUEST_CONTEXT_CACHE_KEY, workspaceAdmin, RequestAttributes.SCOPE_REQUEST);
         }
     }
 
@@ -80,8 +78,7 @@ public class WorkspaceAdminComponentAuthorizer extends AdminComponentAuthorizer 
     Boolean getCachedValue() {
         RequestAttributes atts = RequestContextHolder.getRequestAttributes();
         if (null != atts) {
-            return (Boolean)
-                    atts.getAttribute(REQUEST_CONTEXT_CACHE_KEY, RequestAttributes.SCOPE_REQUEST);
+            return (Boolean) atts.getAttribute(REQUEST_CONTEXT_CACHE_KEY, RequestAttributes.SCOPE_REQUEST);
         }
         return null;
     }

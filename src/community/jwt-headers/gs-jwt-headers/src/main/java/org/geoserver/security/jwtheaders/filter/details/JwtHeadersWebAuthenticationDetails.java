@@ -16,8 +16,7 @@ public class JwtHeadersWebAuthenticationDetails extends WebAuthenticationDetails
 
     public String jwtHeadersConfigId;
 
-    public JwtHeadersWebAuthenticationDetails(
-            String jwtHeadersConfigId, HttpServletRequest request) {
+    public JwtHeadersWebAuthenticationDetails(String jwtHeadersConfigId, HttpServletRequest request) {
         super(request);
         this.jwtHeadersConfigId = jwtHeadersConfigId;
     }

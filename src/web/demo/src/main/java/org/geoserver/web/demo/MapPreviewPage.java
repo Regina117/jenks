@@ -66,50 +66,45 @@ public class MapPreviewPage extends GeoServerBasePage {
         final List<String> wfsOutputFormats = getAvailableWFSFormats();
 
         // build the table
-        table =
-                new GeoServerTablePanel<>("table", provider) {
+        table = new GeoServerTablePanel<>("table", provider) {
 
-                    private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
-                    @Override
-                    protected Component getComponentForProperty(
-                            String id,
-                            IModel<PreviewLayer> itemModel,
-                            Property<PreviewLayer> property) {
-                        PreviewLayer layer = itemModel.getObject();
-                        boolean wmsVisible = layer.hasServiceSupport("WMS");
-                        boolean wfsVisible = layer.hasServiceSupport("WFS");
-                        if (property == TYPE) {
-                            Fragment f = new Fragment(id, "iconFragment", MapPreviewPage.this);
-                            f.add(new Image("layerIcon", layer.getIcon()));
-                            return f;
-                        } else if (property == NAME) {
-                            return new Label(id, property.getModel(itemModel));
-                        } else if (property == TITLE) {
-                            return new Label(id, property.getModel(itemModel));
-                        } else if (property == COMMON) {
-                            Fragment f = new Fragment(id, "commonLinks", MapPreviewPage.this);
-                            ListView<ExternalLink> lv =
-                                    new ListView<>("commonFormat", commonFormatLinks(layer)) {
-                                        @Override
-                                        public void populateItem(ListItem<ExternalLink> item) {
-                                            final ExternalLink link = item.getModelObject();
-                                            item.add(link);
-                                        }
-                                    };
-                            f.add(lv);
-                            return f;
-                        } else if (property == ALL) {
-                            return buildJSWMSSelect(
-                                    id,
-                                    wmsVisible ? wmsOutputFormats : Collections.emptyList(),
-                                    wfsVisible ? wfsOutputFormats : Collections.emptyList(),
-                                    layer);
+            @Override
+            protected Component getComponentForProperty(
+                    String id, IModel<PreviewLayer> itemModel, Property<PreviewLayer> property) {
+                PreviewLayer layer = itemModel.getObject();
+                boolean wmsVisible = layer.hasServiceSupport("WMS");
+                boolean wfsVisible = layer.hasServiceSupport("WFS");
+                if (property == TYPE) {
+                    Fragment f = new Fragment(id, "iconFragment", MapPreviewPage.this);
+                    f.add(new Image("layerIcon", layer.getIcon()));
+                    return f;
+                } else if (property == NAME) {
+                    return new Label(id, property.getModel(itemModel));
+                } else if (property == TITLE) {
+                    return new Label(id, property.getModel(itemModel));
+                } else if (property == COMMON) {
+                    Fragment f = new Fragment(id, "commonLinks", MapPreviewPage.this);
+                    ListView<ExternalLink> lv = new ListView<>("commonFormat", commonFormatLinks(layer)) {
+                        @Override
+                        public void populateItem(ListItem<ExternalLink> item) {
+                            final ExternalLink link = item.getModelObject();
+                            item.add(link);
                         }
-                        throw new IllegalArgumentException(
-                                "Don't know a property named " + property.getName());
-                    }
-                };
+                    };
+                    f.add(lv);
+                    return f;
+                } else if (property == ALL) {
+                    return buildJSWMSSelect(
+                            id,
+                            wmsVisible ? wmsOutputFormats : Collections.emptyList(),
+                            wfsVisible ? wfsOutputFormats : Collections.emptyList(),
+                            layer);
+                }
+                throw new IllegalArgumentException("Don't know a property named " + property.getName());
+            }
+        };
         table.setOutputMarkupId(true);
         add(table);
     }
@@ -159,8 +154,7 @@ public class MapPreviewPage extends GeoServerBasePage {
 
     private List<ExternalLink> commonFormatLinks(PreviewLayer layer) {
         List<ExternalLink> links = new ArrayList<>();
-        List<CommonFormatLink> formats =
-                getGeoServerApplication().getBeansOfType(CommonFormatLink.class);
+        List<CommonFormatLink> formats = getGeoServerApplication().getBeansOfType(CommonFormatLink.class);
         Collections.sort(formats);
         for (CommonFormatLink link : formats) {
             links.add(link.getFormatLink(layer));
@@ -203,8 +197,7 @@ public class MapPreviewPage extends GeoServerBasePage {
         formats = new ArrayList<>();
 
         final GeoServerApplication application = getGeoServerApplication();
-        final List<GetMapOutputFormat> outputFormats =
-                application.getBeansOfType(GetMapOutputFormat.class);
+        final List<GetMapOutputFormat> outputFormats = application.getBeansOfType(GetMapOutputFormat.class);
         for (GetMapOutputFormat producer : outputFormats) {
             Set<String> producerFormats = new HashSet<>(producer.getOutputFormatNames());
             producerFormats.add(producer.getMimeType());
@@ -228,8 +221,7 @@ public class MapPreviewPage extends GeoServerBasePage {
         List<String> formats = new ArrayList<>();
 
         final GeoServerApplication application = getGeoServerApplication();
-        for (WFSGetFeatureOutputFormat producer :
-                application.getBeansOfType(WFSGetFeatureOutputFormat.class)) {
+        for (WFSGetFeatureOutputFormat producer : application.getBeansOfType(WFSGetFeatureOutputFormat.class)) {
             for (String format : producer.getOutputFormats()) {
                 formats.add(format);
             }
@@ -251,10 +243,7 @@ public class MapPreviewPage extends GeoServerBasePage {
 
     /** Builds a select that reacts like a menu, fully javascript based, for wms outputs */
     private Component buildJSWMSSelect(
-            String id,
-            List<String> wmsOutputFormats,
-            List<String> wfsOutputFormats,
-            PreviewLayer layer) {
+            String id, List<String> wmsOutputFormats, List<String> wfsOutputFormats, PreviewLayer layer) {
         Fragment f = new Fragment(id, "menuFragment", this);
         WebMarkupContainer menu = new WebMarkupContainer("menu");
 
@@ -265,9 +254,7 @@ public class MapPreviewPage extends GeoServerBasePage {
             String label = translateFormat("format.wms.", wmsOutputFormat);
             // build option with text and value
             Label format = new Label(i + "", label);
-            format.add(
-                    new AttributeModifier(
-                            "value", new Model<>(ResponseUtils.urlEncode(wmsOutputFormat))));
+            format.add(new AttributeModifier("value", new Model<>(ResponseUtils.urlEncode(wmsOutputFormat))));
             wmsFormats.add(format);
         }
         wmsFormatsGroup.add(wmsFormats);
@@ -275,10 +262,9 @@ public class MapPreviewPage extends GeoServerBasePage {
         menu.add(wmsFormatsGroup);
 
         // the vector ones, it depends, we might have to hide them
-        boolean vector =
-                layer.groupInfo == null
-                        && (layer.layerInfo.getType() == PublishedType.VECTOR
-                                || layer.layerInfo.getType() == PublishedType.REMOTE);
+        boolean vector = layer.groupInfo == null
+                && (layer.layerInfo.getType() == PublishedType.VECTOR
+                        || layer.layerInfo.getType() == PublishedType.REMOTE);
         WebMarkupContainer wfsFormatsGroup = new WebMarkupContainer("wfs");
         RepeatingView wfsFormats = new RepeatingView("wfsFormats");
         if (vector) {
@@ -287,9 +273,7 @@ public class MapPreviewPage extends GeoServerBasePage {
                 String label = translateFormat("format.wfs.", wfsOutputFormat);
                 // build option with text and value
                 Label format = new Label(i + "", label);
-                format.add(
-                        new AttributeModifier(
-                                "value", new Model<>(ResponseUtils.urlEncode(wfsOutputFormat))));
+                format.add(new AttributeModifier("value", new Model<>(ResponseUtils.urlEncode(wfsOutputFormat))));
                 wfsFormats.add(format);
             }
         }

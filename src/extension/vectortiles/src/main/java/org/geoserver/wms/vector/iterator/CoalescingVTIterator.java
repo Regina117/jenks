@@ -53,9 +53,7 @@ public class CoalescingVTIterator implements VTIterator {
                 merger.add(geometry);
                 @SuppressWarnings("unchecked")
                 List<LineString> merged = (List<LineString>) merger.getMergedLineStrings();
-                geometry =
-                        geometry.getFactory()
-                                .createMultiLineString(merged.toArray(n -> new LineString[n]));
+                geometry = geometry.getFactory().createMultiLineString(merged.toArray(n -> new LineString[n]));
             }
             curr.setGeometry(geometry);
         }

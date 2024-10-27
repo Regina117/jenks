@@ -54,15 +54,11 @@ public class GeoServerExceptionTranslationFilter extends GeoServerCompositeFilte
 
         @Override
         public void commence(
-                HttpServletRequest request,
-                HttpServletResponse response,
-                AuthenticationException authException)
+                HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
                 throws IOException, ServletException {
 
-            AuthenticationEntryPoint aep =
-                    (AuthenticationEntryPoint)
-                            request.getAttribute(
-                                    GeoServerSecurityFilter.AUTHENTICATION_ENTRY_POINT_HEADER);
+            AuthenticationEntryPoint aep = (AuthenticationEntryPoint)
+                    request.getAttribute(GeoServerSecurityFilter.AUTHENTICATION_ENTRY_POINT_HEADER);
             if (aep != null) // remove from request
             request.removeAttribute(AUTHENTICATION_ENTRY_POINT_HEADER);
 

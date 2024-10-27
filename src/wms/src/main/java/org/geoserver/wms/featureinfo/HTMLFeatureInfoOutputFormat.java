@@ -35,8 +35,7 @@ public class HTMLFeatureInfoOutputFormat extends GetFeatureInfoOutputFormat {
         super(FORMAT);
         this.wms = wms;
         this.templateManager =
-                new HTMLTemplateManager(
-                        FreeMarkerTemplateManager.OutputFormat.HTML, wms, resourceLoader);
+                new HTMLTemplateManager(FreeMarkerTemplateManager.OutputFormat.HTML, wms, resourceLoader);
     }
 
     /**
@@ -47,8 +46,7 @@ public class HTMLFeatureInfoOutputFormat extends GetFeatureInfoOutputFormat {
      * @throws java.io.IOException For problems writing the output.
      */
     @Override
-    public void write(
-            FeatureCollectionType results, GetFeatureInfoRequest request, OutputStream out)
+    public void write(FeatureCollectionType results, GetFeatureInfoRequest request, OutputStream out)
             throws ServiceException, IOException {
         @SuppressWarnings("unchecked")
         List<FeatureCollection> collections = results.getFeature();

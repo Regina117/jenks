@@ -129,8 +129,7 @@ public class DGGSResolutionCalculatorTest {
 
     @Test
     public void testGetTargetResolutionWMSScale() {
-        EnvFunction.setLocalValues(
-                Map.of(DGGSResolutionCalculator.WMS_SCALE_DENOMINATOR, 10_000_000));
+        EnvFunction.setLocalValues(Map.of(DGGSResolutionCalculator.WMS_SCALE_DENOMINATOR, 10_000_000));
         try {
             Query query = new Query("testLayer");
             int resolution = calculator.getTargetResolution(query, 1);

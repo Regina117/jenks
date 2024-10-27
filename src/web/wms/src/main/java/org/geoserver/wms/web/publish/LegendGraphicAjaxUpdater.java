@@ -47,17 +47,15 @@ class LegendGraphicAjaxUpdater implements Serializable {
                 // the style name and layer name will be ws qualified instead
                 url = RequestCycle.get().getUrlRenderer().renderContextRelativeUrl("wms") + "?";
             } else {
-                url =
-                        RequestCycle.get()
-                                        .getUrlRenderer()
-                                        .renderContextRelativeUrl(
-                                                styleInfo.getWorkspace().getName() + "/wms")
-                                + "?";
+                url = RequestCycle.get()
+                                .getUrlRenderer()
+                                .renderContextRelativeUrl(
+                                        styleInfo.getWorkspace().getName() + "/wms")
+                        + "?";
             }
             String style = styleInfo.prefixedName();
-            url +=
-                    "REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&STRICT=false&style="
-                            + style;
+            url += "REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image/png&WIDTH=20&HEIGHT=20&STRICT=false&style="
+                    + style;
             urlModel.setObject(url);
             if (target != null) {
                 target.add(image);

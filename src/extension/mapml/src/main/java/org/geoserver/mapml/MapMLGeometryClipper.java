@@ -45,8 +45,7 @@ class MapMLGeometryClipper {
 
         // tolerance used to avoid numerical issues testing for segment on boundary
         Envelope originalBounds = original.getEnvelopeInternal();
-        double max =
-                Math.max(Math.abs(originalBounds.getMaxX()), Math.abs(originalBounds.getMaxY()));
+        double max = Math.max(Math.abs(originalBounds.getMaxX()), Math.abs(originalBounds.getMaxY()));
         this.eps = (Math.nextUp(max) - max) * 10;
 
         // if a clipped geometry is fully inside this envelope, it cannot contain artificial sides
@@ -65,10 +64,7 @@ class MapMLGeometryClipper {
                 Polygon g = (Polygon) clippedGeom.getGeometryN(i);
                 if (!g.isEmpty()) geometries.add(g);
             }
-            clippedGeom =
-                    clippedGeom
-                            .getFactory()
-                            .createMultiPolygon(geometries.toArray(n -> new Polygon[n]));
+            clippedGeom = clippedGeom.getFactory().createMultiPolygon(geometries.toArray(n -> new Polygon[n]));
         } else if (clippedGeom instanceof GeometryCollection) {
             List<Geometry> geometries = new ArrayList<>();
             for (int i = 0; i < clippedGeom.getNumGeometries(); i++) {
@@ -117,25 +113,21 @@ class MapMLGeometryClipper {
         List<LinearRing> rings = new ArrayList<>();
         original.apply(new PolygonRingsExtractor(rings));
         Envelope clippedEnvelope = reversed.getEnvelopeInternal();
-        List<LinearRing> boundaries =
-                rings.stream()
-                        .filter(b -> b.getEnvelopeInternal().intersects(clippedEnvelope))
-                        .collect(Collectors.toList());
+        List<LinearRing> boundaries = rings.stream()
+                .filter(b -> b.getEnvelopeInternal().intersects(clippedEnvelope))
+                .collect(Collectors.toList());
 
         // collect tagged boundary and tagged holes
-        TaggedPolygon.TaggedLineString boundary =
-                tagLineString(reversed.getExteriorRing(), boundaries);
-        List<TaggedPolygon.TaggedLineString> holes =
-                IntStream.range(0, reversed.getNumInteriorRing())
-                        .mapToObj(i -> tagLineString(reversed.getInteriorRingN(i), boundaries))
-                        .collect(Collectors.toList());
+        TaggedPolygon.TaggedLineString boundary = tagLineString(reversed.getExteriorRing(), boundaries);
+        List<TaggedPolygon.TaggedLineString> holes = IntStream.range(0, reversed.getNumInteriorRing())
+                .mapToObj(i -> tagLineString(reversed.getInteriorRingN(i), boundaries))
+                .collect(Collectors.toList());
 
         TaggedPolygon tagged = new TaggedPolygon(boundary, holes);
         clipped.setUserData(tagged);
     }
 
-    private TaggedPolygon.TaggedLineString tagLineString(
-            LinearRing ring, List<LinearRing> boundaries) {
+    private TaggedPolygon.TaggedLineString tagLineString(LinearRing ring, List<LinearRing> boundaries) {
         // Grab the coordinates. A valid ring has at least 3
         Coordinate[] coordinates = ring.getCoordinates();
         // build first segment and test it
@@ -229,9 +221,7 @@ class MapMLGeometryClipper {
                 DistanceToPoint.computeDistance(boundary, first, distance0);
                 DistanceToPoint.computeDistance(boundary, second, distance1);
                 DistanceToPoint.computeDistance(boundary, mid, distanceMid);
-                if (distance0.getDistance() < eps
-                        && distance1.getDistance() < eps
-                        && distanceMid.getDistance() < eps) {
+                if (distance0.getDistance() < eps && distance1.getDistance() < eps && distanceMid.getDistance() < eps) {
                     return true;
                 }
             }

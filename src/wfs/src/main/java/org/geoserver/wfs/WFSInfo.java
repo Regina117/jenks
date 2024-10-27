@@ -131,10 +131,7 @@ public interface WFSInfo extends ServiceInfo {
 
             @Override
             public List<Operation> getOps() {
-                return Arrays.asList(
-                        Operation.GETCAPABILITIES,
-                        Operation.DESCRIBEFEATURETYPE,
-                        Operation.GETFEATURE);
+                return Arrays.asList(Operation.GETCAPABILITIES, Operation.DESCRIBEFEATURETYPE, Operation.GETFEATURE);
             }
         },
         TRANSACTIONAL {

@@ -48,14 +48,11 @@ public class LayerGroupProvider extends GeoServerDataProvider<LayerGroupInfo> {
 
     public static Property<LayerGroupInfo> NAME = new BeanProperty<>("name", "name");
 
-    public static Property<LayerGroupInfo> WORKSPACE =
-            new BeanProperty<>("workspace", "workspace.name");
+    public static Property<LayerGroupInfo> WORKSPACE = new BeanProperty<>("workspace", "workspace.name");
 
-    static final Property<LayerGroupInfo> MODIFIED_TIMESTAMP =
-            new BeanProperty<>("datemodfied", "dateModified");
+    static final Property<LayerGroupInfo> MODIFIED_TIMESTAMP = new BeanProperty<>("datemodfied", "dateModified");
 
-    static final Property<LayerGroupInfo> CREATED_TIMESTAMP =
-            new BeanProperty<>("datecreated", "dateCreated");
+    static final Property<LayerGroupInfo> CREATED_TIMESTAMP = new BeanProperty<>("datecreated", "dateCreated");
 
     public static Property<LayerGroupInfo> ENABLED = new BeanProperty<>("enabled", "enabled");
 
@@ -100,15 +97,9 @@ public class LayerGroupProvider extends GeoServerDataProvider<LayerGroupInfo> {
         List<Property<LayerGroupInfo>> modifiedPropertiesList =
                 PROPERTIES.stream().map(c -> c).collect(Collectors.toList());
         // check geoserver properties
-        if (GeoServerApplication.get()
-                .getGeoServer()
-                .getSettings()
-                .isShowCreatedTimeColumnsInAdminList())
+        if (GeoServerApplication.get().getGeoServer().getSettings().isShowCreatedTimeColumnsInAdminList())
             modifiedPropertiesList.add(CREATED_TIMESTAMP);
-        if (GeoServerApplication.get()
-                .getGeoServer()
-                .getSettings()
-                .isShowModifiedTimeColumnsInAdminList())
+        if (GeoServerApplication.get().getGeoServer().getSettings().isShowModifiedTimeColumnsInAdminList())
             modifiedPropertiesList.add(MODIFIED_TIMESTAMP);
         return modifiedPropertiesList;
     }
@@ -125,14 +116,10 @@ public class LayerGroupProvider extends GeoServerDataProvider<LayerGroupInfo> {
      */
     @SuppressWarnings("PMD.CloseResource")
     private Stream<LayerGroupInfo> query(
-            Filter filter,
-            @Nullable Integer first,
-            @Nullable Integer count,
-            @Nullable SortBy sortOrder) {
+            Filter filter, @Nullable Integer first, @Nullable Integer count, @Nullable SortBy sortOrder) {
         Catalog catalog = getCatalog();
 
-        CloseableIterator<LayerGroupInfo> items =
-                catalog.list(LayerGroupInfo.class, filter, first, count, sortOrder);
+        CloseableIterator<LayerGroupInfo> items = catalog.list(LayerGroupInfo.class, filter, first, count, sortOrder);
 
         Stream<LayerGroupInfo> stream = Streams.stream(items);
         return stream.onClose(items::close);

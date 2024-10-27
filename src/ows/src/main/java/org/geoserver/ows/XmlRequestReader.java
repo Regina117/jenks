@@ -131,7 +131,11 @@ public abstract class XmlRequestReader {
     /** Implementation of hashcode. */
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(element).append(version).append(serviceId).toHashCode();
+        return new HashCodeBuilder()
+                .append(element)
+                .append(version)
+                .append(serviceId)
+                .toHashCode();
     }
 
     public String getServiceId() {
@@ -173,9 +177,7 @@ public abstract class XmlRequestReader {
         Throwable cause = saxException.getCause();
         // We only wish to check SAXException which echos internal caused by message
         // Subclasses such as SAXParserException provide a useful message
-        if (saxException != null
-                && saxException.getCause() != null
-                && saxException.getClass() == SAXException.class) {
+        if (saxException != null && saxException.getCause() != null && saxException.getClass() == SAXException.class) {
             String saxMessage = saxException.getMessage();
             String causeMessage = cause.getLocalizedMessage();
             if (causeMessage != null && saxMessage.contains(causeMessage)) {
@@ -201,10 +203,9 @@ public abstract class XmlRequestReader {
 
         // Provide clean SAXException message, keep stacktrace history (for verbose service
         // exception document)
-        String cleanMessage =
-                "Parsing failed, the xml request is most probably not compliant to "
-                        + getElement().getLocalPart()
-                        + " element";
+        String cleanMessage = "Parsing failed, the xml request is most probably not compliant to "
+                + getElement().getLocalPart()
+                + " element";
         SAXException saxException = new SAXException(cleanMessage);
         saxException.setStackTrace(cause.getStackTrace());
         return saxException;

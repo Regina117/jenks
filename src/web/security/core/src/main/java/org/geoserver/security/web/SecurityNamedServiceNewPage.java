@@ -32,8 +32,7 @@ import org.geoserver.web.GeoServerApplication;
  *
  * @author Justin Deoliveira, OpenGeo
  */
-public class SecurityNamedServiceNewPage<
-                S extends GeoServerSecurityService, T extends SecurityNamedServiceConfig>
+public class SecurityNamedServiceNewPage<S extends GeoServerSecurityService, T extends SecurityNamedServiceConfig>
         extends SecurityNamedServicePage<T> {
 
     Form<T> form;
@@ -47,26 +46,22 @@ public class SecurityNamedServiceNewPage<
 
         List<SecurityNamedServicePanelInfo> panelInfos = lookupPanelInfos(serviceClass);
 
-        AjaxLinkGroup<SecurityNamedServicePanelInfo> serviceLinks =
-                new AjaxLinkGroup<>("services", panelInfos) {
+        AjaxLinkGroup<SecurityNamedServicePanelInfo> serviceLinks = new AjaxLinkGroup<>("services", panelInfos) {
 
-                    @Override
-                    protected void populateItem(ListItem<SecurityNamedServicePanelInfo> item) {
-                        SecurityNamedServicePanelInfo panelInfo = item.getModelObject();
-                        item.add(
-                                newLink("link", item.getModel())
-                                        .add(new Label("title", createShortTitleModel(panelInfo)))
-                                        .setEnabled(item.getIndex() > 0));
-                        item.add(new Label("description", createDescriptionModel(panelInfo)));
-                    }
+            @Override
+            protected void populateItem(ListItem<SecurityNamedServicePanelInfo> item) {
+                SecurityNamedServicePanelInfo panelInfo = item.getModelObject();
+                item.add(newLink("link", item.getModel())
+                        .add(new Label("title", createShortTitleModel(panelInfo)))
+                        .setEnabled(item.getIndex() > 0));
+                item.add(new Label("description", createDescriptionModel(panelInfo)));
+            }
 
-                    @Override
-                    protected void onClick(
-                            AjaxLink<SecurityNamedServicePanelInfo> link,
-                            AjaxRequestTarget target) {
-                        updatePanel(link.getModelObject(), target);
-                    }
-                };
+            @Override
+            protected void onClick(AjaxLink<SecurityNamedServicePanelInfo> link, AjaxRequestTarget target) {
+                updatePanel(link.getModelObject(), target);
+            }
+        };
 
         add(new WebMarkupContainer("servicesContainer").add(serviceLinks).setOutputMarkupId(true));
 
@@ -76,20 +71,18 @@ public class SecurityNamedServiceNewPage<
         form.add(panelContainer = new WebMarkupContainer("panel"));
         panelContainer.setOutputMarkupId(true);
 
-        form.add(
-                new SubmitLink("save", form) {
-                    @Override
-                    public void onSubmit() {
-                        handleSubmit(getForm());
-                    }
-                });
-        form.add(
-                new Link<>("cancel") {
-                    @Override
-                    public void onClick() {
-                        doReturn();
-                    }
-                });
+        form.add(new SubmitLink("save", form) {
+            @Override
+            public void onSubmit() {
+                handleSubmit(getForm());
+            }
+        });
+        form.add(new Link<>("cancel") {
+            @Override
+            public void onClick() {
+                doReturn();
+            }
+        });
 
         updatePanel(panelInfos.get(0), null);
     }
@@ -120,10 +113,10 @@ public class SecurityNamedServiceNewPage<
     @SuppressWarnings("unchecked")
     private T getConfig(SecurityNamedServicePanelInfo panelInfo) {
         try {
-            return (T) panelInfo.getServiceConfigClass().getDeclaredConstructor().newInstance();
+            return (T)
+                    panelInfo.getServiceConfigClass().getDeclaredConstructor().newInstance();
         } catch (Exception e) {
-            throw new WicketRuntimeException(
-                    "Unable to create config class: " + panelInfo.getServiceConfigClass(), e);
+            throw new WicketRuntimeException("Unable to create config class: " + panelInfo.getServiceConfigClass(), e);
         }
     }
 
@@ -138,8 +131,7 @@ public class SecurityNamedServiceNewPage<
         }
 
         if (panelInfos.isEmpty()) {
-            throw new RuntimeException(
-                    "Unable to find panel info for service class: " + serviceClass);
+            throw new RuntimeException("Unable to find panel info for service class: " + serviceClass);
         }
 
         return panelInfos;
@@ -158,28 +150,25 @@ public class SecurityNamedServiceNewPage<
         }
 
         protected AjaxLink<T> newLink(String id, IModel<T> model) {
-            AjaxLink<T> result =
-                    new AjaxLink<>(id, model) {
-                        @Override
-                        public void onClick(final AjaxRequestTarget target) {
-                            // set all links enabled
-                            AjaxLinkGroup.this.visitChildren(
-                                    AjaxLink.class,
-                                    (component, visit) -> {
-                                        component.setEnabled(true);
-                                        target.add(component);
-                                        visit.dontGoDeeper();
-                                    });
-                            // set this link disabled
-                            setEnabled(false);
+            AjaxLink<T> result = new AjaxLink<>(id, model) {
+                @Override
+                public void onClick(final AjaxRequestTarget target) {
+                    // set all links enabled
+                    AjaxLinkGroup.this.visitChildren(AjaxLink.class, (component, visit) -> {
+                        component.setEnabled(true);
+                        target.add(component);
+                        visit.dontGoDeeper();
+                    });
+                    // set this link disabled
+                    setEnabled(false);
 
-                            // update
-                            // target.add(AjaxLinkGroup.this.getParent());
-                            target.add(this);
+                    // update
+                    // target.add(AjaxLinkGroup.this.getParent());
+                    target.add(this);
 
-                            AjaxLinkGroup.this.onClick(this, target);
-                        }
-                    };
+                    AjaxLinkGroup.this.onClick(this, target);
+                }
+            };
             result.setOutputMarkupId(true);
             return result;
         }

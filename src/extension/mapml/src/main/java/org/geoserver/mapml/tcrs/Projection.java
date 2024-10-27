@@ -34,9 +34,7 @@ public class Projection {
         try {
             this.crs = CRS.decode(code);
             this.baseCRS =
-                    CRS.getProjectedCRS(crs) != null
-                            ? CRS.getProjectedCRS(crs).getBaseCRS()
-                            : this.crs;
+                    CRS.getProjectedCRS(crs) != null ? CRS.getProjectedCRS(crs).getBaseCRS() : this.crs;
             this.baseLatLon = CRS.getAxisOrder(this.baseCRS) == CRS.AxisOrder.NORTH_EAST;
             this.toProjected = CRS.findMathTransform(this.baseCRS, crs);
             this.toLatLng = this.toProjected.inverse();

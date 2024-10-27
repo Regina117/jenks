@@ -64,17 +64,13 @@ public class OgcApiServiceDescriptionProvider<SERVICEINFOTYPE extends ServiceInf
         this.serviceType = serviceType;
         this.specificServiceType = specificServiceType;
         @SuppressWarnings("unchecked")
-        var infoClass =
-                (Class<SERVICEINFOTYPE>)
-                        ((ParameterizedType) this.getClass().getGenericSuperclass())
-                                .getActualTypeArguments()[0];
+        var infoClass = (Class<SERVICEINFOTYPE>)
+                ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         this.infoClass = infoClass;
 
         @SuppressWarnings("unchecked")
-        var serviceClass =
-                (Class<SERVICETYPE>)
-                        ((ParameterizedType) this.getClass().getGenericSuperclass())
-                                .getActualTypeArguments()[1];
+        var serviceClass = (Class<SERVICETYPE>)
+                ((ParameterizedType) this.getClass().getGenericSuperclass()).getActualTypeArguments()[1];
         this.serviceClass = serviceClass;
     }
 
@@ -97,8 +93,7 @@ public class OgcApiServiceDescriptionProvider<SERVICEINFOTYPE extends ServiceInf
     }
 
     @Override
-    public List<ServiceDescription> getServices(
-            WorkspaceInfo workspaceInfo, PublishedInfo layerInfo) {
+    public List<ServiceDescription> getServices(WorkspaceInfo workspaceInfo, PublishedInfo layerInfo) {
 
         List<ServiceDescription> descriptions = new ArrayList<>();
         SERVICEINFOTYPE info = info(workspaceInfo, layerInfo);
@@ -122,31 +117,23 @@ public class OgcApiServiceDescriptionProvider<SERVICEINFOTYPE extends ServiceInf
      */
     @Override
     protected ServiceDescription description(
-            String serviceType,
-            ServiceInfo info,
-            WorkspaceInfo workspaceInfo,
-            PublishedInfo layerInfo) {
+            String serviceType, ServiceInfo info, WorkspaceInfo workspaceInfo, PublishedInfo layerInfo) {
         boolean available = isAvailable(serviceType, info, layerInfo);
 
-        InternationalString title =
-                InternationalStringUtils.growable(
-                        info.getInternationalTitle(),
-                        Strings.isEmpty(info.getTitle()) ? info.getName() : info.getTitle());
+        InternationalString title = InternationalStringUtils.growable(
+                info.getInternationalTitle(), Strings.isEmpty(info.getTitle()) ? info.getName() : info.getTitle());
 
-        InternationalString description =
-                InternationalStringUtils.growable(
-                        info.getInternationalAbstract(),
-                        Strings.isEmpty(info.getAbstract()) ? null : info.getAbstract());
+        InternationalString description = InternationalStringUtils.growable(
+                info.getInternationalAbstract(), Strings.isEmpty(info.getAbstract()) ? null : info.getAbstract());
 
-        var serviceDesc =
-                new ServiceDescription(
-                        serviceType,
-                        title,
-                        description,
-                        available,
-                        false,
-                        workspaceInfo != null ? workspaceInfo.getName() : null,
-                        layerInfo != null ? layerInfo.getName() : null);
+        var serviceDesc = new ServiceDescription(
+                serviceType,
+                title,
+                description,
+                available,
+                false,
+                workspaceInfo != null ? workspaceInfo.getName() : null,
+                layerInfo != null ? layerInfo.getName() : null);
 
         serviceDesc.setDescriptionPriority(10.0);
 
@@ -154,8 +141,7 @@ public class OgcApiServiceDescriptionProvider<SERVICEINFOTYPE extends ServiceInf
     }
 
     @Override
-    public List<ServiceLinkDescription> getServiceLinks(
-            WorkspaceInfo workspaceInfo, PublishedInfo layerInfo) {
+    public List<ServiceLinkDescription> getServiceLinks(WorkspaceInfo workspaceInfo, PublishedInfo layerInfo) {
         List<ServiceLinkDescription> links = new ArrayList<>();
 
         if (workspaceInfo == null && !geoserver.getGlobal().isGlobalServices()) {
@@ -167,21 +153,19 @@ public class OgcApiServiceDescriptionProvider<SERVICEINFOTYPE extends ServiceInf
             if (service.getService().getClass() == serviceClass) {
                 String link = null;
                 if (service.getCustomCapabilitiesLink() != null) {
-                    link =
-                            ogcApiCustomCapabilitiesLinkMangler(
-                                    service.getCustomCapabilitiesLink(), workspaceInfo, layerInfo);
+                    link = ogcApiCustomCapabilitiesLinkMangler(
+                            service.getCustomCapabilitiesLink(), workspaceInfo, layerInfo);
                 }
 
                 if (link != null) {
-                    links.add(
-                            new ServiceLinkDescription(
-                                    serviceType,
-                                    service.getVersion(),
-                                    link,
-                                    workspaceInfo != null ? workspaceInfo.getName() : null,
-                                    layerInfo != null ? layerInfo.getName() : null,
-                                    serviceName,
-                                    specificServiceType));
+                    links.add(new ServiceLinkDescription(
+                            serviceType,
+                            service.getVersion(),
+                            link,
+                            workspaceInfo != null ? workspaceInfo.getName() : null,
+                            layerInfo != null ? layerInfo.getName() : null,
+                            serviceName,
+                            specificServiceType));
                 }
             }
         }

@@ -16,8 +16,7 @@ import org.geoserver.web.wicket.GSModalWindow;
 public class PlainCodePage extends WebPage {
     String code;
 
-    public PlainCodePage(
-            final GSModalWindow container, final GSModalWindow responseWindow, String initialXml) {
+    public PlainCodePage(final GSModalWindow container, final GSModalWindow responseWindow, String initialXml) {
         this.code = initialXml;
 
         add(new Label("code", new PropertyModel<>(this, "code")));

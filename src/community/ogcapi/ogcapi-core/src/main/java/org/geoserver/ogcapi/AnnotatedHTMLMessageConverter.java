@@ -30,8 +30,7 @@ import org.springframework.web.method.HandlerMethod;
  * @param <T>
  */
 @Component
-public class AnnotatedHTMLMessageConverter<T> extends AbstractHTMLMessageConverter<T>
-        implements ExtensionPriority {
+public class AnnotatedHTMLMessageConverter<T> extends AbstractHTMLMessageConverter<T> implements ExtensionPriority {
 
     private static final String ANNOTATION = "annotation";
     private static final String BASE_CLASS = "baseClass";
@@ -52,8 +51,7 @@ public class AnnotatedHTMLMessageConverter<T> extends AbstractHTMLMessageConvert
      */
     public static void processAnnotation(HandlerMethod handler) {
         RequestAttributes attributes = RequestContextHolder.currentRequestAttributes();
-        HTMLResponseBody htmlResponseBody =
-                handler.getMethod().getAnnotation(HTMLResponseBody.class);
+        HTMLResponseBody htmlResponseBody = handler.getMethod().getAnnotation(HTMLResponseBody.class);
         if (attributes != null && htmlResponseBody != null) {
             attributes.setAttribute(ANNOTATION, htmlResponseBody, SCOPE_REQUEST);
 
@@ -66,8 +64,7 @@ public class AnnotatedHTMLMessageConverter<T> extends AbstractHTMLMessageConvert
             APIService apiService =
                     APIDispatcher.getApiServiceAnnotation(handler.getBean().getClass());
             if (apiService != null) {
-                attributes.setAttribute(
-                        SERVICE_INFO_CLASS, apiService.serviceClass(), SCOPE_REQUEST);
+                attributes.setAttribute(SERVICE_INFO_CLASS, apiService.serviceClass(), SCOPE_REQUEST);
             }
         }
     }
@@ -107,9 +104,7 @@ public class AnnotatedHTMLMessageConverter<T> extends AbstractHTMLMessageConvert
         try {
             HashMap<String, Object> model = setupModel(value);
             Charset defaultCharset = getDefaultCharset();
-            if (outputMessage != null
-                    && outputMessage.getBody() != null
-                    && defaultCharset != null) {
+            if (outputMessage != null && outputMessage.getBody() != null && defaultCharset != null) {
                 templateSupport.processTemplate(
                         null,
                         getRequestAttribute(ANNOTATION, HTMLResponseBody.class).templateName(),
@@ -118,9 +113,8 @@ public class AnnotatedHTMLMessageConverter<T> extends AbstractHTMLMessageConvert
                         new OutputStreamWriter(outputMessage.getBody(), defaultCharset),
                         defaultCharset);
             } else {
-                LOGGER.warning(
-                        "Either the default character set, output message or body was null, so the "
-                                + "template could not be processed.");
+                LOGGER.warning("Either the default character set, output message or body was null, so the "
+                        + "template could not be processed.");
             }
         } finally {
             // the model can be working over feature collections, make sure they are cleaned up

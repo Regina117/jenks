@@ -112,8 +112,7 @@ public class DGGSConfigPanel extends PublishedConfigurationPanel<LayerInfo> {
 
             if (minValue != null && maxValue != null && minValue > maxValue) {
                 ValidationError error = new ValidationError();
-                error.setMessage(
-                        new ParamResourceModel("minMaxError", DGGSConfigPanel.this).getObject());
+                error.setMessage(new ParamResourceModel("minMaxError", DGGSConfigPanel.this).getObject());
                 minField.error(error);
             }
         }

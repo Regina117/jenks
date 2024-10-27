@@ -54,21 +54,14 @@ public class SidecarStoreTypeTest extends SidecarTypeTest {
 
         // registering elevation and time dimensions for a vector
         FeatureTypeInfo vectorInfo =
-                getCatalog()
-                        .getFeatureTypeByName(
-                                MAINSTORE_URI, VECTOR_ELEVATION_TIME_SS.getLocalPart());
+                getCatalog().getFeatureTypeByName(MAINSTORE_URI, VECTOR_ELEVATION_TIME_SS.getLocalPart());
         registerLayerDimension(
                 vectorInfo,
                 ResourceInfo.ELEVATION,
                 "startElevation",
                 DimensionPresentation.CONTINUOUS_INTERVAL,
                 minimumValue());
-        registerLayerDimension(
-                vectorInfo,
-                ResourceInfo.TIME,
-                "startTime",
-                DimensionPresentation.LIST,
-                minimumValue());
+        registerLayerDimension(vectorInfo, ResourceInfo.TIME, "startTime", DimensionPresentation.LIST, minimumValue());
     }
 
     @Override
@@ -80,8 +73,7 @@ public class SidecarStoreTypeTest extends SidecarTypeTest {
     protected void setupVectorSidecar() throws Exception {
         Catalog catalog = getCatalog();
         FeatureTypeInfo vector = catalog.getFeatureTypeByName(getTestLayerId());
-        vector.getMetadata()
-                .put(MultiDimensionalExtension.SIDECAR_TYPE, SIDECAR_VECTOR_ET_SS.getLocalPart());
+        vector.getMetadata().put(MultiDimensionalExtension.SIDECAR_TYPE, SIDECAR_VECTOR_ET_SS.getLocalPart());
         vector.getMetadata().put(SIDECAR_STORE, SIDESTORE_PREFIX + ":" + SIDESTORE_PREFIX);
         catalog.save(vector);
     }

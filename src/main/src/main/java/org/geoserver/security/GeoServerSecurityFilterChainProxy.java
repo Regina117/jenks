@@ -107,8 +107,7 @@ public class GeoServerSecurityFilterChainProxy
             return true;
         }
 
-        if (Boolean.TRUE.equals(REQUEST.get().getAttribute(SECURITY_ENABLED_ATTRIBUTE)))
-            return true;
+        if (Boolean.TRUE.equals(REQUEST.get().getAttribute(SECURITY_ENABLED_ATTRIBUTE))) return true;
 
         return false;
     }
@@ -162,8 +161,7 @@ public class GeoServerSecurityFilterChainProxy
         }
 
         SecurityManagerConfig config = securityManager.getSecurityConfig();
-        GeoServerSecurityFilterChain filterChain =
-                new GeoServerSecurityFilterChain(config.getFilterChain());
+        GeoServerSecurityFilterChain filterChain = new GeoServerSecurityFilterChain(config.getFilterChain());
 
         // similar to the list of authentication providers
         // adding required providers like GeoServerRootAuthenticationProvider
@@ -180,8 +178,7 @@ public class GeoServerSecurityFilterChainProxy
                 try {
                     Filter filter = lookupFilter(filterName);
                     if (filter == null) {
-                        throw new NullPointerException(
-                                "No filter named " + filterName + " could " + "be found");
+                        throw new NullPointerException("No filter named " + filterName + " could " + "be found");
                     }
                     filters.add(filter);
                 } catch (Exception ex) {

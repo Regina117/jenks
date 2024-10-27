@@ -22,8 +22,7 @@ public class WMSWorkspaceQualifier extends WorkspaceQualifyingCallback {
     }
 
     @Override
-    protected void qualifyRequest(
-            WorkspaceInfo ws, PublishedInfo l, Service service, Request request) {
+    protected void qualifyRequest(WorkspaceInfo ws, PublishedInfo l, Service service, Request request) {
         if (WebMapService.class.isInstance(service.getService()) && request.getRawKvp() != null) {
             String layers = (String) request.getRawKvp().get("LAYERS");
             if (layers != null) {
@@ -53,8 +52,7 @@ public class WMSWorkspaceQualifier extends WorkspaceQualifyingCallback {
     }
 
     @Override
-    protected void qualifyRequest(
-            WorkspaceInfo ws, PublishedInfo l, Operation operation, Request request) {
+    protected void qualifyRequest(WorkspaceInfo ws, PublishedInfo l, Operation operation, Request request) {
         GetCapabilitiesRequest gc = parameter(operation, GetCapabilitiesRequest.class);
         if (gc != null) {
             gc.setNamespace(ws.getName());
@@ -78,8 +76,7 @@ public class WMSWorkspaceQualifier extends WorkspaceQualifyingCallback {
             String qualified = qualifyName(baseName, ws);
             // only qualify if it's not a layer group (and prefer local layers to groups in case of
             // name clash), but also check for workspace specific layer groups
-            if (catalog.getLayerByName(qualified) != null
-                    || catalog.getLayerGroupByName(baseName) == null) {
+            if (catalog.getLayerByName(qualified) != null || catalog.getLayerGroupByName(baseName) == null) {
                 names.set(i, qualified);
             } else if (catalog.getLayerGroupByName(qualified) != null) {
                 names.set(i, qualified);

@@ -33,8 +33,7 @@ import org.junit.Test;
 
 public class MultiDimLayerPanelTest extends GeoServerWicketTestSupport {
 
-    protected static final QName WATERTEMP =
-            new QName(MockData.SF_URI, "watertemp", MockData.SF_PREFIX);
+    protected static final QName WATERTEMP = new QName(MockData.SF_URI, "watertemp", MockData.SF_PREFIX);
 
     @Override
     protected void setUpTestData(SystemTestData testData) throws Exception {
@@ -84,9 +83,7 @@ public class MultiDimLayerPanelTest extends GeoServerWicketTestSupport {
 
         // setup dimensions
         FeatureTypeInfo timeElevationSidecar =
-                getCatalog()
-                        .getFeatureTypeByName(
-                                MAINSTORE_URI, VECTOR_ELEVATION_TIME_SS.getLocalPart());
+                getCatalog().getFeatureTypeByName(MAINSTORE_URI, VECTOR_ELEVATION_TIME_SS.getLocalPart());
         TestsSupport.registerLayerDimension(
                 timeElevationSidecar,
                 ResourceInfo.ELEVATION,

@@ -50,8 +50,7 @@ public abstract class GeoServerDataProvider<T> extends SortableDataProvider<T, O
      * characters. The backreference (<code>\\1</code>) ensures that the start and end quotes are
      * the same, maintaining balance.
      */
-    private static final Pattern EXACT_TERM_KEYWORD_PATTERN =
-            Pattern.compile("^([\"'])(?<keyword>.+)\\1$");
+    private static final Pattern EXACT_TERM_KEYWORD_PATTERN = Pattern.compile("^([\"'])(?<keyword>.+)\\1$");
 
     private static final long serialVersionUID = -6876929036365601443L;
 
@@ -508,8 +507,7 @@ public abstract class GeoServerDataProvider<T> extends SortableDataProvider<T, O
             } catch (NestedNullException nne) {
                 return null;
             } catch (Exception e) {
-                throw new RuntimeException(
-                        "Could not find property " + propertyPath + " in " + bean.getClass(), e);
+                throw new RuntimeException("Could not find property " + propertyPath + " in " + bean.getClass(), e);
             }
         }
 

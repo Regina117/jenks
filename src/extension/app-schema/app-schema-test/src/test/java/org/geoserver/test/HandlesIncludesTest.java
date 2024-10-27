@@ -28,8 +28,7 @@ public class HandlesIncludesTest extends StationsAppSchemaTestSupport {
      */
     @Test
     public void testGMLOutput32_With_Include() throws Exception {
-        Document document =
-                getAsDOM("wfs?request=GetFeature&version=1.1.0&typename=st_gml32:Station_gml32");
+        Document document = getAsDOM("wfs?request=GetFeature&version=1.1.0&typename=st_gml32:Station_gml32");
         assertXpathEvaluatesTo(
                 "http://www.measurements_gml32.org/1.0",
                 "namespace-uri(//*[local-name()='Measurement_gml32'][1])",
@@ -56,11 +55,7 @@ public class HandlesIncludesTest extends StationsAppSchemaTestSupport {
                     "handlesIncludes/measurements.xml",
                     gml32Parameters);
             addStationFeatureType(
-                    STATIONS_PREFIX_GML32,
-                    "gml32",
-                    "stations",
-                    "handlesIncludes/stations.xml",
-                    gml32Parameters);
+                    STATIONS_PREFIX_GML32, "gml32", "stations", "handlesIncludes/stations.xml", gml32Parameters);
         }
 
         /**
@@ -78,27 +73,17 @@ public class HandlesIncludesTest extends StationsAppSchemaTestSupport {
             File gmlDirectory = getDirectoryForGmlPrefix(gmlPrefix);
             gmlDirectory.mkdirs();
             // add the necessary files
-            File stationsMappings =
-                    new File(gmlDirectory, String.format("%s_%s.xml", mappingsName, gmlPrefix));
-            File stationsProperties =
-                    new File(gmlDirectory, String.format("stations_%s.properties", gmlPrefix));
-            File stationsSchema =
-                    new File(gmlDirectory, String.format("stations_%s.xsd", gmlPrefix));
-            File measurementsSchema =
-                    new File(gmlDirectory, String.format("measurements_%s.xsd", gmlPrefix));
+            File stationsMappings = new File(gmlDirectory, String.format("%s_%s.xml", mappingsName, gmlPrefix));
+            File stationsProperties = new File(gmlDirectory, String.format("stations_%s.properties", gmlPrefix));
+            File stationsSchema = new File(gmlDirectory, String.format("stations_%s.xsd", gmlPrefix));
+            File measurementsSchema = new File(gmlDirectory, String.format("measurements_%s.xsd", gmlPrefix));
             // perform the parameterization
+            substituteParameters("/test-data/stations/" + mappingsPath, parameters, stationsMappings);
             substituteParameters(
-                    "/test-data/stations/" + mappingsPath, parameters, stationsMappings);
+                    "/test-data/stations/handlesIncludes/stations.properties", parameters, stationsProperties);
+            substituteParameters("/test-data/stations/handlesIncludes/stations.xsd", parameters, stationsSchema);
             substituteParameters(
-                    "/test-data/stations/handlesIncludes/stations.properties",
-                    parameters,
-                    stationsProperties);
-            substituteParameters(
-                    "/test-data/stations/handlesIncludes/stations.xsd", parameters, stationsSchema);
-            substituteParameters(
-                    "/test-data/stations/handlesIncludes/measurements.xsd",
-                    parameters,
-                    measurementsSchema);
+                    "/test-data/stations/handlesIncludes/measurements.xsd", parameters, measurementsSchema);
             // extra features to add:
             addStationFeatures(stationsProperties);
             // create station feature type
@@ -126,23 +111,16 @@ public class HandlesIncludesTest extends StationsAppSchemaTestSupport {
             File gmlDirectory = getDirectoryForGmlPrefix(gmlPrefix);
             gmlDirectory.mkdirs();
             // add the necessary files
-            File measurementsMappings =
-                    new File(gmlDirectory, String.format("%s_%s.xml", mappingsName, gmlPrefix));
+            File measurementsMappings = new File(gmlDirectory, String.format("%s_%s.xml", mappingsName, gmlPrefix));
             File measurementsProperties =
                     new File(gmlDirectory, String.format("measurements_%s.properties", gmlPrefix));
-            File measurementsSchema =
-                    new File(gmlDirectory, String.format("measurements_%s.xsd", gmlPrefix));
+            File measurementsSchema = new File(gmlDirectory, String.format("measurements_%s.xsd", gmlPrefix));
             // perform the parameterization
+            substituteParameters("/test-data/stations/" + mappingsPath, parameters, measurementsMappings);
             substituteParameters(
-                    "/test-data/stations/" + mappingsPath, parameters, measurementsMappings);
+                    "/test-data/stations/handlesIncludes/measurements.properties", parameters, measurementsProperties);
             substituteParameters(
-                    "/test-data/stations/handlesIncludes/measurements.properties",
-                    parameters,
-                    measurementsProperties);
-            substituteParameters(
-                    "/test-data/stations/handlesIncludes/measurements.xsd",
-                    parameters,
-                    measurementsSchema);
+                    "/test-data/stations/handlesIncludes/measurements.xsd", parameters, measurementsSchema);
             // add extra features
             addMeasurementFeatures(measurementsProperties);
             // create measurements feature type

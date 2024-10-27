@@ -25,8 +25,7 @@ class AttributeTableEnricher {
      */
     private Predicate<PAMDataset.PAMRasterBand.Row> getRowMatcher(
             PAMDataset.PAMRasterBand.GDALRasterAttributeTable rat, double value) {
-        Optional<Integer> minMax =
-                getFieldWithUsage(rat, PAMDataset.PAMRasterBand.FieldUsage.MinMax);
+        Optional<Integer> minMax = getFieldWithUsage(rat, PAMDataset.PAMRasterBand.FieldUsage.MinMax);
         if (minMax.isPresent())
             return row -> {
                 // we have no idea of absolute tolerance, so we use a relative one,
@@ -53,8 +52,7 @@ class AttributeTableEnricher {
     }
 
     private static Optional<Integer> getFieldWithUsage(
-            PAMDataset.PAMRasterBand.GDALRasterAttributeTable rat,
-            PAMDataset.PAMRasterBand.FieldUsage usage) {
+            PAMDataset.PAMRasterBand.GDALRasterAttributeTable rat, PAMDataset.PAMRasterBand.FieldUsage usage) {
         return rat.getFieldDefn().stream()
                 .filter(f -> f.getUsage() == usage)
                 .map(f -> f.getIndex())
@@ -95,15 +93,13 @@ class AttributeTableEnricher {
     public void addRowValues(List<Object> values, double[] pixelValues) {
         int band = pamRasterBand.getBand() - 1;
         if (band >= pixelValues.length)
-            throw new RuntimeException(
-                    "Band in PAMRasterBand out of range, band: "
-                            + pamRasterBand.getBand()
-                            + ", pixelValues.length: "
-                            + pixelValues.length);
+            throw new RuntimeException("Band in PAMRasterBand out of range, band: "
+                    + pamRasterBand.getBand()
+                    + ", pixelValues.length: "
+                    + pixelValues.length);
 
         double value = pixelValues[band];
-        PAMDataset.PAMRasterBand.GDALRasterAttributeTable rat =
-                pamRasterBand.getGdalRasterAttributeTable();
+        PAMDataset.PAMRasterBand.GDALRasterAttributeTable rat = pamRasterBand.getGdalRasterAttributeTable();
         Predicate<PAMDataset.PAMRasterBand.Row> rowMatcher = getRowMatcher(rat, value);
 
         for (PAMDataset.PAMRasterBand.Row row : rat.getRow()) {

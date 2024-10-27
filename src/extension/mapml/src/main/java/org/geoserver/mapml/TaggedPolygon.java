@@ -42,12 +42,7 @@ class TaggedPolygon {
 
         @Override
         public String toString() {
-            return "TaggedCoordinateSequence{"
-                    + "visible="
-                    + visible
-                    + ", coordinates="
-                    + coordinates
-                    + '}';
+            return "TaggedCoordinateSequence{" + "visible=" + visible + ", coordinates=" + coordinates + '}';
         }
     }
 

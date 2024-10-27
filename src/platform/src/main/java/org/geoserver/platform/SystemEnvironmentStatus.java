@@ -85,10 +85,9 @@ public class SystemEnvironmentStatus implements ModuleStatus {
     @Override
     public Optional<String> getMessage() {
         if (!isShow()) {
-            var message =
-                    String.format(
-                            "Environment variables hidden for security reasons.  Set the environment variable '%s' to 'true' to see them.",
-                            SystemEnvironmentStatusEnabledEnvironmentVar);
+            var message = String.format(
+                    "Environment variables hidden for security reasons.  Set the environment variable '%s' to 'true' to see them.",
+                    SystemEnvironmentStatusEnabledEnvironmentVar);
             return Optional.of(message);
         }
 

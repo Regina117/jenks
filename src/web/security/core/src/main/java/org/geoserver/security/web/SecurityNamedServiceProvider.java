@@ -28,20 +28,17 @@ public abstract class SecurityNamedServiceProvider<T extends SecurityNamedServic
     private static final long serialVersionUID = 1L;
 
     /** name of the config */
-    public static final Property<SecurityNamedServiceConfig> NAME =
-            new BeanProperty<>("name", "name");
+    public static final Property<SecurityNamedServiceConfig> NAME = new BeanProperty<>("name", "name");
 
     /** type/implementation of the config */
-    public static final Property<SecurityNamedServiceConfig> TYPE =
-            new AbstractProperty<>("type") {
+    public static final Property<SecurityNamedServiceConfig> TYPE = new AbstractProperty<>("type") {
 
-                @Override
-                public Object getPropertyValue(SecurityNamedServiceConfig item) {
-                    // do a resource lookup
-                    return new ResourceModel(item.getClassName() + ".title", item.getClassName())
-                            .getObject();
-                }
-            };
+        @Override
+        public Object getPropertyValue(SecurityNamedServiceConfig item) {
+            // do a resource lookup
+            return new ResourceModel(item.getClassName() + ".title", item.getClassName()).getObject();
+        }
+    };
 
     @Override
     @SuppressWarnings("unchecked")
@@ -57,8 +54,7 @@ public abstract class SecurityNamedServiceProvider<T extends SecurityNamedServic
     }
 
     /** Bean property in which the value is looked up as resource key in the i18n file. */
-    public static class ResourceBeanProperty<T extends SecurityNamedServiceConfig>
-            extends BeanProperty<T> {
+    public static class ResourceBeanProperty<T extends SecurityNamedServiceConfig> extends BeanProperty<T> {
 
         public ResourceBeanProperty(String key, String propertyPath) {
             super(key, propertyPath);

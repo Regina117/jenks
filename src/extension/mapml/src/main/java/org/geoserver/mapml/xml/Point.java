@@ -38,10 +38,7 @@ import javax.xml.bind.annotation.XmlType;
 public class Point {
 
     @XmlMixed
-    @XmlElementRef(
-            name = "map-coordinates",
-            type = Coordinates.class,
-            namespace = "http://www.w3.org/1999/xhtml")
+    @XmlElementRef(name = "map-coordinates", type = Coordinates.class, namespace = "http://www.w3.org/1999/xhtml")
     protected List<Coordinates> coordinates;
 
     /**

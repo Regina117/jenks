@@ -78,8 +78,7 @@ public class MapMLURLBuilder {
     private static final double ORIGIN_DELTA = 0.1;
     private static final double SCALE_DELTA = 1E-5;
 
-    private static final List<String> GET_FEATURE_INFO_FORMATS =
-            Arrays.asList("text/mapml", "text/html", "text/plain");
+    private static final List<String> GET_FEATURE_INFO_FORMATS = Arrays.asList("text/mapml", "text/html", "text/plain");
 
     private static final Logger LOGGER = Logging.getLogger(MapMLURLBuilder.class);
     private final MapMLDocumentBuilder.MapMLLayerMetadata mapMLLayerMetadata;
@@ -113,11 +112,8 @@ public class MapMLURLBuilder {
         String urlTemplate = "";
         try {
             if (!canCascade(layerInfo)) {
-                urlTemplate =
-                        URLDecoder.decode(
-                                ResponseUtils.buildURL(
-                                        baseUrlPattern, path, params, URLMangler.URLType.SERVICE),
-                                "UTF-8");
+                urlTemplate = URLDecoder.decode(
+                        ResponseUtils.buildURL(baseUrlPattern, path, params, URLMangler.URLType.SERVICE), "UTF-8");
             } else {
                 urlTemplate = generateURL(path, params, layerInfo);
             }
@@ -144,14 +140,12 @@ public class MapMLURLBuilder {
             String request = params.get(REQUEST);
             if (storeInfo instanceof WMTSStoreInfo) {
                 if (GETMAP.equalsIgnoreCase(request)
-                        || (GETFEATUREINFO.equalsIgnoreCase(request)
-                                && WMS.equalsIgnoreCase(service))) {
+                        || (GETFEATUREINFO.equalsIgnoreCase(request) && WMS.equalsIgnoreCase(service))) {
                     return false;
                 }
             } else if (storeInfo instanceof WMSStoreInfo) {
                 if (GETTILE.equalsIgnoreCase(request)
-                        || (GETFEATUREINFO.equalsIgnoreCase(request)
-                                && WMTS.equalsIgnoreCase(service))) {
+                        || (GETFEATUREINFO.equalsIgnoreCase(request) && WMTS.equalsIgnoreCase(service))) {
                     return false;
                 }
             }
@@ -187,8 +181,7 @@ public class MapMLURLBuilder {
                 String tileMatrixSet = null;
                 StoreInfo storeInfo = resourceInfo.getStore();
                 String requestedCRS = isSupportedOutputCRS ? outputCRS : proj;
-                reason =
-                        "RequestedCRS " + requestedCRS + " is not supported by layer: " + layerName;
+                reason = "RequestedCRS " + requestedCRS + " is not supported by layer: " + layerName;
                 if (storeInfo instanceof WMSStoreInfo) {
                     WMSStoreInfo wmsStoreInfo = (WMSStoreInfo) storeInfo;
                     capabilitiesURL = wmsStoreInfo.getCapabilitiesURL();
@@ -201,18 +194,13 @@ public class MapMLURLBuilder {
                         if (GETFEATUREINFO.equalsIgnoreCase(params.get(REQUEST))) {
                             boolean isQueryable = isQueryable(layerList, layerName);
                             if (isQueryable) {
-                                isRemoteSupportingFormat =
-                                        isRemoteSupportingClientFormats(
-                                                capabilities.getRequest().getGetFeatureInfo(),
-                                                infoFormats,
-                                                remoteInfoFormats);
+                                isRemoteSupportingFormat = isRemoteSupportingClientFormats(
+                                        capabilities.getRequest().getGetFeatureInfo(), infoFormats, remoteInfoFormats);
                                 if (!isRemoteSupportingFormat) {
                                     reason = "Remote Server not supporting the client's infoFormat";
                                 }
                             }
-                            if (!isQueryable
-                                    || (!isRemoteSupportingFormat
-                                            && !isSupportedGML(remoteInfoFormats))) {
+                            if (!isQueryable || (!isRemoteSupportingFormat && !isSupportedGML(remoteInfoFormats))) {
                                 // remote server is not even supporting GML
                                 // so we are not generating featureInfo link at all
                                 LOGGER.fine(
@@ -224,14 +212,12 @@ public class MapMLURLBuilder {
                             version = "1.1.1";
                         }
 
-                        cascadeToRemote =
-                                isRemoteSupportingFormat
-                                        && isSupportedOutputCRS
-                                        && isSupportedCRS(layerList, layerName, requestedCRS);
+                        cascadeToRemote = isRemoteSupportingFormat
+                                && isSupportedOutputCRS
+                                && isSupportedCRS(layerList, layerName, requestedCRS);
 
                     } catch (IOException e) {
-                        reason =
-                                "Unable to extract the WMS remote capabilities. Cascading won't be performed";
+                        reason = "Unable to extract the WMS remote capabilities. Cascading won't be performed";
                         LOGGER.warning(reason + "due to:" + e);
                         cascadeToRemote = false;
                     }
@@ -247,18 +233,13 @@ public class MapMLURLBuilder {
                         if (GETFEATUREINFO.equalsIgnoreCase(params.get(REQUEST))) {
                             boolean isQueryable = isQueryable(layerList, layerName);
                             if (isQueryable) {
-                                isRemoteSupportingFormat =
-                                        isRemoteSupportingClientFormats(
-                                                capabilities.getRequest().getGetFeatureInfo(),
-                                                infoFormats,
-                                                remoteInfoFormats);
+                                isRemoteSupportingFormat = isRemoteSupportingClientFormats(
+                                        capabilities.getRequest().getGetFeatureInfo(), infoFormats, remoteInfoFormats);
                                 if (!isRemoteSupportingFormat) {
                                     reason = "Remote Server not supporting the client's infoFormat";
                                 }
                             }
-                            if (!isQueryable
-                                    || (!isRemoteSupportingFormat
-                                            && !isSupportedGML(remoteInfoFormats))) {
+                            if (!isQueryable || (!isRemoteSupportingFormat && !isSupportedGML(remoteInfoFormats))) {
                                 // remote server is not even supporting GML
                                 // so we are not generating featureInfo link at all
                                 LOGGER.fine(
@@ -266,17 +247,11 @@ public class MapMLURLBuilder {
                                 return null;
                             }
                         }
-                        tileMatrixSet =
-                                getSupportedTileMatrix(
-                                        layerList, layerName, requestedCRS, capabilities);
+                        tileMatrixSet = getSupportedTileMatrix(layerList, layerName, requestedCRS, capabilities);
 
-                        cascadeToRemote =
-                                isRemoteSupportingFormat
-                                        && isSupportedOutputCRS
-                                        && tileMatrixSet != null;
+                        cascadeToRemote = isRemoteSupportingFormat && isSupportedOutputCRS && tileMatrixSet != null;
                     } catch (IOException | FactoryException e) {
-                        reason =
-                                "Unable to extract the WMTS remote capabilities. Cascading won't be performed";
+                        reason = "Unable to extract the WMTS remote capabilities. Cascading won't be performed";
                         LOGGER.warning(reason + "due to:" + e);
                         cascadeToRemote = false;
                     }
@@ -288,8 +263,7 @@ public class MapMLURLBuilder {
                     baseUrl = baseUrlAndPath[0];
                     path = baseUrlAndPath[1];
                     urlType = URLMangler.URLType.EXTERNAL;
-                    updateRequestParams(
-                            params, layerName, version, requestedCRS, tileMatrixSet, infoFormats);
+                    updateRequestParams(params, layerName, version, requestedCRS, tileMatrixSet, infoFormats);
                 } else {
 
                     LOGGER.fine("Cascading won't be performed, due to: " + reason);
@@ -297,8 +271,7 @@ public class MapMLURLBuilder {
             }
         }
 
-        String urlTemplate =
-                URLDecoder.decode(ResponseUtils.buildURL(baseUrl, path, params, urlType), "UTF-8");
+        String urlTemplate = URLDecoder.decode(ResponseUtils.buildURL(baseUrl, path, params, urlType), "UTF-8");
         return urlTemplate;
     }
 
@@ -332,10 +305,7 @@ public class MapMLURLBuilder {
     }
 
     private String getSupportedTileMatrix(
-            List<WMTSLayer> layerList,
-            String layerName,
-            String requestedCRS,
-            WMTSCapabilities capabilities)
+            List<WMTSLayer> layerList, String layerName, String requestedCRS, WMTSCapabilities capabilities)
             throws FactoryException {
         // Let's check if the capabilities document has a matching layer
         // supporting a compatible CRS/GridSet
@@ -432,8 +402,7 @@ public class MapMLURLBuilder {
         Map<String, Object> formatOptions = req.getFormatOptions();
         if (formatOptions != null
                 && formatOptions.size() >= 1
-                && !formatOptions.containsKey(
-                        MapMLConstants.MAPML_WMS_MIME_TYPE_OPTION.toUpperCase())) {
+                && !formatOptions.containsKey(MapMLConstants.MAPML_WMS_MIME_TYPE_OPTION.toUpperCase())) {
             return true;
         }
 
@@ -465,14 +434,7 @@ public class MapMLURLBuilder {
             return true;
         }
 
-        if (hasProperty(
-                kvpMap,
-                "propertyName",
-                "bgcolor",
-                "tilesOrigin",
-                "palette",
-                "interpolations",
-                "clip")) {
+        if (hasProperty(kvpMap, "propertyName", "bgcolor", "tilesOrigin", "palette", "interpolations", "clip")) {
             return true;
         }
 
@@ -568,8 +530,8 @@ public class MapMLURLBuilder {
         return supportedSRS != null && supportedSRS.contains(srs);
     }
 
-    private String getSupportedWMTSGridSet(
-            WMTSLayer layer, String srs, WMTSCapabilities capabilities) throws FactoryException {
+    private String getSupportedWMTSGridSet(WMTSLayer layer, String srs, WMTSCapabilities capabilities)
+            throws FactoryException {
         TiledCRSParams inputCrs = TiledCRSConstants.lookupTCRS(srs);
         if (inputCrs == null) {
             return null;
@@ -583,8 +545,7 @@ public class MapMLURLBuilder {
             // First check: same CRS
             // Simpler name equality may not work (i.e. urn:ogc:def:crs:EPSG::3857 vs
             // urn:x-ogc:def:crs:EPSG:3857)
-            if (!CRS.isEquivalent(
-                    CRS.decode(inputCrs.getCode()), CRS.decode(tileMatrixSet.getCrs()))) {
+            if (!CRS.isEquivalent(CRS.decode(inputCrs.getCode()), CRS.decode(tileMatrixSet.getCrs()))) {
                 continue;
             }
 
@@ -597,8 +558,7 @@ public class MapMLURLBuilder {
             }
             TileMatrix level0 = tileMatrices.get(0);
             int tiledCRStileSize = inputCrs.getTILE_SIZE();
-            if (tiledCRStileSize != level0.getTileHeight()
-                    || tiledCRStileSize != level0.getTileWidth()) {
+            if (tiledCRStileSize != level0.getTileHeight() || tiledCRStileSize != level0.getTileWidth()) {
                 continue;
             }
 
@@ -606,8 +566,7 @@ public class MapMLURLBuilder {
             org.locationtech.jts.geom.Point origin = level0.getTopLeft();
             Point tCRSorigin = inputCrs.getOrigin();
 
-            double deltaCoordinate =
-                    tileMatrices.get(tileMatrices.size() - 1).getResolution() * ORIGIN_DELTA;
+            double deltaCoordinate = tileMatrices.get(tileMatrices.size() - 1).getResolution() * ORIGIN_DELTA;
             if (Math.abs(tCRSorigin.x - origin.getX()) > deltaCoordinate
                     || Math.abs(tCRSorigin.y - origin.getY()) > deltaCoordinate) {
                 continue;
@@ -615,8 +574,7 @@ public class MapMLURLBuilder {
 
             // check same scales
             for (int i = 0; i < tileMatrices.size(); i++) {
-                if (Math.abs(tileMatrices.get(i).getDenominator() - tiledCRSScales[i])
-                        > SCALE_DELTA) {
+                if (Math.abs(tileMatrices.get(i).getDenominator() - tiledCRSScales[i]) > SCALE_DELTA) {
                     continue;
                 }
             }

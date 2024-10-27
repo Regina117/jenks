@@ -84,10 +84,9 @@ public class SystemPropertyStatus implements ModuleStatus {
     @Override
     public Optional<String> getMessage() {
         if (!isShow()) {
-            var message =
-                    String.format(
-                            "Java system properties hidden for security reasons.  Set the environment variable '%s' to 'true' to see them.",
-                            SystemPropertyStatusEnabledEnvironmentVar);
+            var message = String.format(
+                    "Java system properties hidden for security reasons.  Set the environment variable '%s' to 'true' to see them.",
+                    SystemPropertyStatusEnabledEnvironmentVar);
             return Optional.of(message);
         }
         StringBuffer result = new StringBuffer();

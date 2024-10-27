@@ -54,12 +54,9 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class WMSVectorDimensionValidationTest extends WMSTestSupport {
 
-    private static final QName TIME_WITH_START_END =
-            new QName(SF_URI, "TimeWithStartEnd", SF_PREFIX);
-    private static final QName ELEVATION_WITH_START_END =
-            new QName(SF_URI, "ElevationWithStartEnd", SF_PREFIX);
-    private static final QName CUSTOM_DIM_WITH_START_END =
-            new QName(SF_URI, "CustomDimensionWithStartEnd", SF_PREFIX);
+    private static final QName TIME_WITH_START_END = new QName(SF_URI, "TimeWithStartEnd", SF_PREFIX);
+    private static final QName ELEVATION_WITH_START_END = new QName(SF_URI, "ElevationWithStartEnd", SF_PREFIX);
+    private static final QName CUSTOM_DIM_WITH_START_END = new QName(SF_URI, "CustomDimensionWithStartEnd", SF_PREFIX);
 
     private WMS wms;
 
@@ -72,14 +69,11 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
     protected void onSetUp(SystemTestData testData) throws Exception {
         super.onSetUp(testData);
         String testDataFileName = "TimeElevationWithStartEnd.properties";
-        testData.addVectorLayer(
-                TIME_WITH_START_END, emptyMap(), testDataFileName, getClass(), getCatalog());
+        testData.addVectorLayer(TIME_WITH_START_END, emptyMap(), testDataFileName, getClass(), getCatalog());
 
-        testData.addVectorLayer(
-                ELEVATION_WITH_START_END, emptyMap(), testDataFileName, getClass(), getCatalog());
+        testData.addVectorLayer(ELEVATION_WITH_START_END, emptyMap(), testDataFileName, getClass(), getCatalog());
 
-        testData.addVectorLayer(
-                CUSTOM_DIM_WITH_START_END, emptyMap(), testDataFileName, getClass(), getCatalog());
+        testData.addVectorLayer(CUSTOM_DIM_WITH_START_END, emptyMap(), testDataFileName, getClass(), getCatalog());
     }
 
     /**
@@ -99,8 +93,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         setValidationEnabled(true);
         // run validation and assert
         assertValidationSuccess(
-                setupStartEndDimension(
-                        getCatalog(), TIME_WITH_START_END, dimension, "startTime", "endTime"),
+                setupStartEndDimension(getCatalog(), TIME_WITH_START_END, dimension, "startTime", "endTime"),
                 request,
                 dimension,
                 dimensionValue,
@@ -121,8 +114,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         // create a map request
         GetMapRequest request = mapRequest(singletonList(dimensionValue), emptyList(), emptyMap());
         // set up a time dimension
-        setupStartEndDimension(
-                getCatalog(), TIME_WITH_START_END, dimension, "startTime", "endTime");
+        setupStartEndDimension(getCatalog(), TIME_WITH_START_END, dimension, "startTime", "endTime");
         // run validation and assert the content of the query
         assertQueryContent(TIME_WITH_START_END, request, "startTime");
     }
@@ -144,8 +136,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         setValidationEnabled(true);
         // run validation and assert
         assertValidationSuccess(
-                setupStartEndDimension(
-                        getCatalog(), TIME_WITH_START_END, dimension, "startTime", "endTime"),
+                setupStartEndDimension(getCatalog(), TIME_WITH_START_END, dimension, "startTime", "endTime"),
                 request,
                 dimension,
                 dimensionValue,
@@ -169,8 +160,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         setValidationEnabled(false);
         // run validation and assert
         assertValidationSuccess(
-                setupStartEndDimension(
-                        getCatalog(), TIME_WITH_START_END, dimension, "startTime", "endTime"),
+                setupStartEndDimension(getCatalog(), TIME_WITH_START_END, dimension, "startTime", "endTime"),
                 request,
                 dimension,
                 dimensionValue,
@@ -195,11 +185,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         // run validation and assert
         assertValidationSuccess(
                 setupStartEndDimension(
-                        getCatalog(),
-                        ELEVATION_WITH_START_END,
-                        dimension,
-                        "startElevation",
-                        "endElevation"),
+                        getCatalog(), ELEVATION_WITH_START_END, dimension, "startElevation", "endElevation"),
                 request,
                 dimension,
                 dimensionValue,
@@ -220,12 +206,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         // create a map request
         GetMapRequest request = mapRequest(emptyList(), singletonList(dimensionValue), emptyMap());
         // set up an elevation dimension
-        setupStartEndDimension(
-                getCatalog(),
-                ELEVATION_WITH_START_END,
-                dimension,
-                "startElevation",
-                "endElevation");
+        setupStartEndDimension(getCatalog(), ELEVATION_WITH_START_END, dimension, "startElevation", "endElevation");
         // run validation and assert the content of the query
         assertQueryContent(ELEVATION_WITH_START_END, request, "startElevation");
     }
@@ -248,11 +229,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         // run validation and assert
         assertValidationSuccess(
                 setupStartEndDimension(
-                        getCatalog(),
-                        ELEVATION_WITH_START_END,
-                        dimension,
-                        "startElevation",
-                        "endElevation"),
+                        getCatalog(), ELEVATION_WITH_START_END, dimension, "startElevation", "endElevation"),
                 request,
                 dimension,
                 dimensionValue,
@@ -266,8 +243,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
      * @throws IOException an unexpected IO exception is thrown
      */
     @Test
-    public void mismatchingElevationDimensionShouldValidateIfValidationIsDisabled()
-            throws IOException {
+    public void mismatchingElevationDimensionShouldValidateIfValidationIsDisabled() throws IOException {
         // the dimension and its value
         String dimension = "elevation";
         double dimensionValue = 5; // mismatching elevation
@@ -278,11 +254,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         // run validation and assert
         assertValidationSuccess(
                 setupStartEndDimension(
-                        getCatalog(),
-                        ELEVATION_WITH_START_END,
-                        dimension,
-                        "startElevation",
-                        "endElevation"),
+                        getCatalog(), ELEVATION_WITH_START_END, dimension, "startElevation", "endElevation"),
                 request,
                 dimension,
                 dimensionValue,
@@ -308,8 +280,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         setValidationEnabled(true);
         // run validation and assert
         assertValidationSuccess(
-                setupStartEndDimension(
-                        getCatalog(), CUSTOM_DIM_WITH_START_END, dimension, "startTime", "endTime"),
+                setupStartEndDimension(getCatalog(), CUSTOM_DIM_WITH_START_END, dimension, "startTime", "endTime"),
                 request,
                 dimension,
                 dimensionValue,
@@ -335,8 +306,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         setValidationEnabled(true);
         // run validation and assert
         assertValidationSuccess(
-                setupStartEndDimension(
-                        getCatalog(), CUSTOM_DIM_WITH_START_END, dimension, "startTime", "endTime"),
+                setupStartEndDimension(getCatalog(), CUSTOM_DIM_WITH_START_END, dimension, "startTime", "endTime"),
                 request,
                 dimension,
                 dimensionValue,
@@ -362,8 +332,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         setValidationEnabled(false);
         // run validation and assert
         assertValidationSuccess(
-                setupStartEndDimension(
-                        getCatalog(), CUSTOM_DIM_WITH_START_END, dimension, "startTime", "endTime"),
+                setupStartEndDimension(getCatalog(), CUSTOM_DIM_WITH_START_END, dimension, "startTime", "endTime"),
                 request,
                 dimension,
                 dimensionValue,
@@ -377,8 +346,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
      * @throws IOException an unexpected IO exception is thrown
      */
     @Test
-    public void customDimensionQueryShouldHaveOneAttributeAndLimitMaxFeaturesToOne()
-            throws IOException {
+    public void customDimensionQueryShouldHaveOneAttributeAndLimitMaxFeaturesToOne() throws IOException {
         // the dimension and its value
         String dimension = WMS.DIM_ + "reference_time";
         Instant dimensionValue = Instant.parse("2012-02-11T10:15:30.00Z");
@@ -387,8 +355,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         customDimensions.put(dimension.toUpperCase(), ISO_INSTANT.format(dimensionValue));
         GetMapRequest request = mapRequest(emptyList(), emptyList(), customDimensions);
         // set up a custom dimension
-        setupStartEndDimension(
-                getCatalog(), CUSTOM_DIM_WITH_START_END, dimension, "startTime", "endTime");
+        setupStartEndDimension(getCatalog(), CUSTOM_DIM_WITH_START_END, dimension, "startTime", "endTime");
         // run validation and assert the content of the query
         assertQueryContent(CUSTOM_DIM_WITH_START_END, request, "startTime");
     }
@@ -427,28 +394,26 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
             boolean shouldSucceed)
             throws IOException {
         try {
-            wms.validateVectorDimensions(
-                    request.getTime(), request.getElevation(), featureTypeInfo, request);
+            wms.validateVectorDimensions(request.getTime(), request.getElevation(), featureTypeInfo, request);
             if (!shouldSucceed) {
-                Assert.fail(
-                        "A validation exception is expected for vector dimension '"
-                                + dimension
-                                + "' with value: "
-                                + dimensionValue);
+                Assert.fail("A validation exception is expected for vector dimension '"
+                        + dimension
+                        + "' with value: "
+                        + dimensionValue);
             }
         } catch (ServiceException e) {
             if (shouldSucceed) {
                 e.printStackTrace(System.err);
-                Assert.fail(
-                        "Unexpected exception during validation of vector dimension '"
-                                + dimension
-                                + "' with value "
-                                + dimensionValue);
+                Assert.fail("Unexpected exception during validation of vector dimension '"
+                        + dimension
+                        + "' with value "
+                        + dimensionValue);
             }
         }
     }
 
-    @Captor ArgumentCaptor<Query> queryArgumentCaptor;
+    @Captor
+    ArgumentCaptor<Query> queryArgumentCaptor;
 
     /**
      * Assert the content of the Query that is passed to the feature source during validation. The
@@ -461,16 +426,14 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
      * @throws IOException should the feature source throw an exception (should not happen as we aer
      *     mocking the source)
      */
-    private void assertQueryContent(
-            QName featureTypeName, GetMapRequest request, String queryAttribute)
+    private void assertQueryContent(QName featureTypeName, GetMapRequest request, String queryAttribute)
             throws IOException {
 
         // enable validation
         setValidationEnabled(true);
 
         // spy the feature type
-        FeatureTypeInfo featureTypeInfoSpy =
-                spy((getCatalog().getFeatureTypeByName(featureTypeName.getLocalPart())));
+        FeatureTypeInfo featureTypeInfoSpy = spy((getCatalog().getFeatureTypeByName(featureTypeName.getLocalPart())));
 
         // mock the feature source
         FeatureSource<?, ?> featureSource = mock(FeatureSource.class);
@@ -479,8 +442,7 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         // call validation, but catch the service exception, 'cos as we mocked the
         // feature source, hence we won't likely be able to return the expected result
         try {
-            wms.validateVectorDimensions(
-                    request.getTime(), request.getElevation(), featureTypeInfoSpy, request);
+            wms.validateVectorDimensions(request.getTime(), request.getElevation(), featureTypeInfoSpy, request);
         } catch (ServiceException e) {
             // this one is expected, 'cos we mocked the feature source
         }
@@ -489,12 +451,11 @@ public class WMSVectorDimensionValidationTest extends WMSTestSupport {
         verify(featureSource).getFeatures(queryArgumentCaptor.capture());
         Query query = queryArgumentCaptor.getValue();
         // assert the query content
+        assertEquals("The query should have the maxFeature attribute set to 1", 1, query.getMaxFeatures());
         assertEquals(
-                "The query should have the maxFeature attribute set to 1",
+                "The query properties should have one entry only",
                 1,
-                query.getMaxFeatures());
-        assertEquals(
-                "The query properties should have one entry only", 1, query.getProperties().size());
+                query.getProperties().size());
         assertEquals(
                 "The query property should be for attribute: " + queryAttribute,
                 queryAttribute,

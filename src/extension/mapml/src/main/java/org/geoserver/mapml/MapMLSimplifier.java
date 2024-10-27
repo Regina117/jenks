@@ -40,29 +40,24 @@ class MapMLSimplifier {
     private final ScreenMap screenMap;
     private final ReferencedEnvelope renderingArea;
 
-    public MapMLSimplifier(WMSMapContent mapContent, CoordinateReferenceSystem sourceCrs)
-            throws FactoryException {
+    public MapMLSimplifier(WMSMapContent mapContent, CoordinateReferenceSystem sourceCrs) throws FactoryException {
         Rectangle paintArea = new Rectangle(mapContent.getMapWidth(), mapContent.getMapHeight());
         this.renderingArea = mapContent.getRenderingArea();
-        AffineTransform worldToScreen =
-                RendererUtilities.worldToScreenTransform(renderingArea, paintArea);
+        AffineTransform worldToScreen = RendererUtilities.worldToScreenTransform(renderingArea, paintArea);
 
         CoordinateReferenceSystem mapCrs = renderingArea.getCoordinateReferenceSystem();
         MathTransform sourceToTargetCrs = buildTransform(sourceCrs, mapCrs);
         MathTransform targetToScreen = ProjectiveTransform.create(worldToScreen);
-        MathTransform sourceToScreen =
-                ConcatenatedTransform.create(sourceToTargetCrs, targetToScreen);
+        MathTransform sourceToScreen = ConcatenatedTransform.create(sourceToTargetCrs, targetToScreen);
 
         double[] spans_sourceCRS;
         double[] spans_targetCRS;
         try {
             spans_sourceCRS =
-                    Decimator.computeGeneralizationDistances(
-                            sourceToScreen.inverse(), paintArea, PIXEL_TOLERANCE);
+                    Decimator.computeGeneralizationDistances(sourceToScreen.inverse(), paintArea, PIXEL_TOLERANCE);
 
             spans_targetCRS =
-                    Decimator.computeGeneralizationDistances(
-                            targetToScreen.inverse(), paintArea, PIXEL_TOLERANCE);
+                    Decimator.computeGeneralizationDistances(targetToScreen.inverse(), paintArea, PIXEL_TOLERANCE);
 
         } catch (TransformException e) {
             throw new RuntimeException(e);
@@ -101,14 +96,13 @@ class MapMLSimplifier {
                 if (screenMap.checkAndSet(env)) {
                     return null;
                 } else {
-                    result =
-                            screenMap.getSimplifiedShape(
-                                    env.getMinX(),
-                                    env.getMinY(),
-                                    env.getMaxX(),
-                                    env.getMaxY(),
-                                    result.getFactory(),
-                                    result.getClass());
+                    result = screenMap.getSimplifiedShape(
+                            env.getMinX(),
+                            env.getMinY(),
+                            env.getMaxX(),
+                            env.getMaxY(),
+                            result.getFactory(),
+                            result.getClass());
                 }
             } else if (dimension == 2) {
                 result = TopologyPreservingSimplifier.simplify(geom, this.simplificationDistance);
