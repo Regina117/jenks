@@ -48,13 +48,13 @@ public class DiscoveryClient {
     public void autofill(GeoServerOAuth2LoginFilterConfig conf) {
         Map response = restTemplate.getForObject(this.location, Map.class);
         Optional.ofNullable(response.get(AUTHORIZATION_ENDPOINT_ATTR_NAME))
-                .ifPresent(uri -> conf.setUserAuthorizationUri((String) uri));
+                .ifPresent(uri -> conf.setOidcAuthorizationUri((String) uri));
         Optional.ofNullable(response.get(TOKEN_ENDPOINT_ATTR_NAME))
-                .ifPresent(uri -> conf.setAccessTokenUri((String) uri));
+                .ifPresent(uri -> conf.setOidcTokenUri((String) uri));
         Optional.ofNullable(response.get(USERINFO_ENDPOINT_ATTR_NAME))
-                .ifPresent(uri -> conf.setCheckTokenEndpointUrl((String) uri));
+                .ifPresent(uri -> conf.setOidcUserInfoUri((String) uri));
         Optional.ofNullable(response.get(JWK_SET_URI_ATTR_NAME))
-                .ifPresent(uri -> conf.setJwkURI((String) uri));
+                .ifPresent(uri -> conf.setOidcJwkSetUri((String) uri));
         Optional.ofNullable(response.get(END_SESSION_ENDPONT))
                 .ifPresent(uri -> conf.setLogoutUri((String) uri));
         Optional.ofNullable(response.get(SCOPES_SUPPORTED))
@@ -62,7 +62,7 @@ public class DiscoveryClient {
                         s -> {
                             @SuppressWarnings("unchecked")
                             List<String> scopes = (List<String>) s;
-                            conf.setScopes(collectScopes(scopes));
+                            conf.setOidcScopes(collectScopes(scopes));
                         });
     }
 

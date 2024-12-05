@@ -179,7 +179,7 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
             } else {
                 context.publishEvent(disableButtonEvent(this, REG_ID_MICROSOFT));
             }
-            if (config.isEnabled()) {
+            if (config.isOidcEnabled()) {
                 lRegistrations.add(customProviderRegistration());
                 context.publishEvent(enableButtonEvent(this, REG_ID_OIDC));
             } else {
@@ -206,8 +206,8 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
                     .clientId(config.getGoogleClientId())
                     .clientSecret(config.getGoogleClientSecret())
                     .userNameAttributeName(config.getGoogleUserNameAttribute())
+                    .redirectUri(config.getGoogleRedirectUri())
                     .build();
-            // TODO: direct URI
         }
 
         private ClientRegistration gitHubClientRegistration() {
@@ -217,17 +217,20 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
                     .clientId(config.getGitHubClientId())
                     .clientSecret(config.getGitHubClientSecret())
                     .userNameAttributeName(config.getGitHubUserNameAttribute())
+                    .redirectUri(config.getGitHubRedirectUri())
                     .build();
         }
 
         private ClientRegistration microsoftClientRegistration() {
-            String lScopeTxt = "openid,profile,email"; // TODO AW config.getScopes();
-            String[] lScopes = lScopeTxt.trim().split("\\s*,\\s*");
+            String lScopeTxt = config.getMsScopes();
+            String[] lScopes = ScopeUtils.valueOf(lScopeTxt);
             return ClientRegistration
                     // registrationId is used in paths (login and authorization)
                     .withRegistrationId(REG_ID_MICROSOFT)
                     .clientId(config.getMsClientId())
                     .clientSecret(config.getMsClientSecret())
+                    .userNameAttributeName(config.getMsUserNameAttribute())
+                    .redirectUri(config.getMsRedirectUri())
                     .clientAuthenticationMethod(CLIENT_SECRET_BASIC)
                     .authorizationGrantType(AUTHORIZATION_CODE)
                     .scope(lScopes)
@@ -238,29 +241,28 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
                     .tokenUri("https://login.microsoftonline.com/common/oauth2/v2.0/token")
                     .userInfoUri("https://graph.microsoft.com/oidc/userinfo")
                     .jwkSetUri("https://login.microsoftonline.com/common/discovery/v2.0/keys")
-                    .userNameAttributeName("email")
-                    .redirectUri("http://localhost:8080/geoserver/login/oauth2/code/microsoft")
                     .clientName(REG_ID_MICROSOFT)
                     .build();
         }
 
         private ClientRegistration customProviderRegistration() {
-            String lScopeTxt = config.getScopes();
-            String[] lScopes = lScopeTxt.trim().split("\\s*,\\s*");
+            String lScopeTxt = config.getOidcScopes();
+            String[] lScopes = ScopeUtils.valueOf(lScopeTxt);
             return ClientRegistration
                     // registrationId is used in paths (login and authorization)
                     .withRegistrationId(REG_ID_OIDC)
-                    .clientId(config.getCliendId())
-                    .clientSecret(config.getClientSecret())
+                    .clientId(config.getOidcClientId())
+                    .clientSecret(config.getOidcClientSecret())
+                    .userNameAttributeName(config.getOidcUserNameAttribute())
+                    .redirectUri(config.getOidcRedirectUri())
                     .clientAuthenticationMethod(CLIENT_SECRET_BASIC)
                     .authorizationGrantType(AUTHORIZATION_CODE)
                     .scope(lScopes)
-                    .authorizationUri(config.getUserAuthorizationUri())
-                    .tokenUri(config.getAccessTokenUri())
-                    .userInfoUri(config.getCheckTokenEndpointUrl())
-                    .jwkSetUri(config.getJwkURI())
-                    .userNameAttributeName(config.getPrincipalKey())
-                    .redirectUri(config.getRedirectUri())
+                    .authorizationUri(config.getOidcAuthorizationUri())
+                    .tokenUri(config.getOidcTokenUri())
+                    .userInfoUri(config.getOidcUserInfoUri())
+                    .jwkSetUri(config.getOidcJwkSetUri())
+                    // TODO AW what about issuer uri?
                     .clientName(REG_ID_OIDC)
                     .build();
         }

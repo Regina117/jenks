@@ -4,535 +4,363 @@
    ~ application directory.
    ~
    -->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html
+    PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:wicket="http://wicket.apache.org/">
-  <body>
-    <wicket:head>
+
+<body>
+   <wicket:head>
       <style type="text/css">
-        ul.horizontal div {
-          display: inline;
-        }
-        
-        .checkLabelInline{
-            vertical-align: middle;
-		    line-height: 2em;
-		    display: flex;
-		    align-items: center;
-		    align-content: center;
-		    flex-wrap: wrap;
-		    
-		    label{
-		      padding: 0 5px;
-		    }
-        }
-      </style>
-    </wicket:head>
-    <wicket:extend>
+ul.horizontal div {
+	display: inline;
+}
+
+.checkLabelInline {
+	vertical-align: middle;
+	line-height: 2em;
+	display: flex;
+	align-items: center;
+	align-content: center;
+	flex-wrap: wrap;
+	label
+	{
+	padding
+	:
+	0
+	5px;
+}
+}
+</style>
+   </wicket:head>
+   <wicket:extend>
       <h3>
-        <wicket:message key="geoserverParameters"></wicket:message>
+         <wicket:message key="geoserverParameters"></wicket:message>
       </h3>
       <ul>
-        <li>
-          <fieldset>
-            <legend>
-              <span>
-                <wicket:message key="geoserverParameters"></wicket:message>
-              </span>
-              <a href="#" wicket:id="geoserverParametersHelp" class="help-link"></a>
-            </legend>
-            <ul>
-              <li>
-                <label for="baseRedirectUri">
+         <li>
+            <fieldset>
+               <legend>
                   <span>
-                    <wicket:message key="baseRedirectUri"></wicket:message>
+                     <wicket:message key="geoserverParameters"></wicket:message>
                   </span>
-                </label>
-                <input id="baseRedirectUri" wicket:id="baseRedirectUri" type="text" class="field text" />
-                <a href="#" wicket:id="baseRedirectUriHelp" class="help-link"></a>
-              </li>
+                  <a href="#" wicket:id="geoserverParametersHelp" class="help-link"></a>
+               </legend>
+               <ul>
+                  <li>
+                     <label for="baseRedirectUri">
+                        <span>
+                           <wicket:message key="baseRedirectUri"></wicket:message>
+                        </span>
+                     </label>
+                     <input id="baseRedirectUri" wicket:id="baseRedirectUri" type="text" class="field text" />
+                     <a href="#" wicket:id="baseRedirectUriHelp" class="help-link"></a>
+                  </li>
+               </ul>
+            </fieldset>
+         </li>
+      </ul>
+      <br />
+      <br />
+
+
+      <div wicket:id="prefixView">
+         <h3 wicket:id="providerHeadline"></h3>
+         <ul>
+            <li class="choiceItem">
+               <input wicket:id="enabled" type="checkbox" />
+               <label for="enabled">
+                  <span>
+                     <wicket:message key="enabled"></wicket:message>
+                  </span>
+               </label>
+            </li>
+         </ul>
+         <div wicket:id="settings">
+            <ul>
+               <li>
+                  <fieldset>
+                     <legend>
+                        <span wicket:id="infoFromProvider"> </span>
+                        <a href="#" wicket:id="connectionFromParametersHelp" class="help-link"></a>
+                     </legend>
+                     <ul>
+                        <li>
+                           <label for="clientId">
+                              <span>
+                                 <wicket:message key="cliendId"></wicket:message>
+                              </span>
+                           </label>
+                           <input id="clientId" wicket:id="clientId" type="text" class="field text" />
+                           <a href="#" wicket:id="clientIdHelp" class="help-link"></a>
+                        </li>
+                        <li>
+                           <label for="clientSecret">
+                              <span>
+                                 <wicket:message key="clientSecret"></wicket:message>
+                              </span>
+                           </label>
+                           <input id="clientSecret" wicket:id="clientSecret" type="text" class="field text" />
+                           <a href="#" wicket:id="clientSecretHelp" class="help-link"></a>
+                        </li>
+                     </ul>
+                  </fieldset>
+               </li>
             </ul>
-          </fieldset>
-        </li>
-      </ul>
-      <br />
-      <br />
-      <h3>
-        <wicket:message key="googleLogin"></wicket:message>
-      </h3>
-      <ul>
-        <li class="choiceItem">
-          <input id="googleEnabled" wicket:id="googleEnabled" type="checkbox" />
-          <label for="googleEnabled">
-            <span>
-              <wicket:message key="googleEnabled"></wicket:message>
-            </span>
-          </label>
-        </li>
-      </ul>
-      <div wicket:id="googleSettings">
-        <ul>
-          <li>
-            <fieldset>
-              <legend>
-                <span>
-                  <wicket:message key="googleConnectionFromParameters"></wicket:message>
-                </span>
-                <a href="#" wicket:id="googleConnectionFromParametersHelp" class="help-link"></a>
-              </legend>
-              <ul>
-                <li>
-                  <label for="googleClientId">
-                    <span>
-                      <wicket:message key="cliendId"></wicket:message>
-                    </span>
-                  </label>
-                  <input id="googleClientId" wicket:id="googleClientId" type="text" class="field text" />
-                  <a href="#" wicket:id="googleClientIdHelp" class="help-link"></a>
-                </li>
-                <li>
-                  <label for="googleClientSecret">
-                    <span>
-                      <wicket:message key="clientSecret"></wicket:message>
-                    </span>
-                  </label>
-                  <input id="googleClientSecret" wicket:id="googleClientSecret" type="text" class="field text" />
-                  <a href="#" wicket:id="googleClientSecretHelp" class="help-link"></a>
-                </li>
-              </ul>
-            </fieldset>
-          </li>
-        </ul>
-        <ul>
-          <li>
-            <fieldset>
-              <legend>
-                <span>
-                  <wicket:message key="googleConnectionForParameters"></wicket:message>
-                </span>
-                <a href="#" wicket:id="googleConnectionForParametersHelp" class="help-link"></a>
-              </legend>
-              <ul>
-                <li>
-                  <label for="googleRedirectUri">
-                    <span>
-                      <wicket:message key="redirectUri"></wicket:message>
-                    </span>
-                  </label>
-                  <input id="googleRedirectUri" wicket:id="googleRedirectUri" type="text" class="field text" />
-                  <a href="#" wicket:id="googleRedirectUriHelp" class="help-link"></a>
-                </li>
-              </ul>
-            </fieldset>
-          </li>
-        </ul>
-        <ul>
-          <li>
-            <fieldset>
-              <legend>
-                <span>
-                  <wicket:message key="googleProtocolSettings"></wicket:message>
-                </span>
-              </legend>
-              <ul>
-                <li>
-                  <label for="googleUserNameAttribute">
-                    <span>
-                      <wicket:message key="userNameAttribute"></wicket:message>
-                    </span>
-                  </label>
-                  <input
-                    id="googleUserNameAttribute"
-                    wicket:id="googleUserNameAttribute"
-                    type="text"
-                    class="field text"
-                  />
-                  <a href="#" wicket:id="googleUserNameAttributeHelp" class="help-link"></a>
-                </li>
-              </ul>
-            </fieldset>
-          </li>
-        </ul>
+            <ul>
+               <li>
+                  <fieldset>
+                     <legend>
+                        <span wicket:id="infoForProvider"> </span>
+                        <a href="#" wicket:id="connectionForParametersHelp" class="help-link"></a>
+                     </legend>
+                     <ul>
+                        <li>
+                           <label for="redirectUri">
+                              <span>
+                                 <wicket:message key="redirectUri"></wicket:message>
+                              </span>
+                           </label>
+                           <input id="redirectUri" wicket:id="redirectUri" type="text" class="field text" />
+                           <a href="#" wicket:id="redirectUriHelp" class="help-link"></a>
+                        </li>
+                     </ul>
+                  </fieldset>
+               </li>
+            </ul>
+            <ul>
+               <li>
+                  <fieldset>
+                     <legend>
+                        <span>
+                           <wicket:message key="protocolSettings"></wicket:message>
+                        </span>
+                     </legend>
+                     <ul>
+                        <li>
+                           <label for="userNameAttribute">
+                              <span>
+                                 <wicket:message key="userNameAttribute"></wicket:message>
+                              </span>
+                           </label>
+                           <input wicket:id="userNameAttribute" type="text" class="field text" />
+                           <a href="#" wicket:id="userNameAttributeHelp" class="help-link"></a>
+                        </li>
+                        
+                        <li wicket:id="displayOnScopeSupport">
+                           <label for="scopes">
+                              <span>
+                                 <wicket:message key="scopes"></wicket:message>
+                              </span>
+                           </label>
+                           <input wicket:id="scopes" type="text" class="field text" />
+                           <a href="#" wicket:id="scopesHelp" class="help-link"></a>
+                        </li>
+                     </ul>
+                     
+                     <ul wicket:id="displayOnOidc">
+                        <li>
+                           <div wicket:id="topPanel"></div>
+                        </li>
+                        <li class="choiceItem">
+                           <input id="oidcForceTokenUriHttps" wicket:id="oidcForceTokenUriHttps" type="checkbox" />
+                           <label for="oidcForceTokenUriHttps">
+                              <span>
+                                 <wicket:message key="oidcForceTokenUriHttps"></wicket:message>
+                              </span>
+                           </label>
+                        </li>
+                        <li>
+                           <label for="oidcTokenUri">
+                              <span>
+                                 <wicket:message key="oidcTokenUri"></wicket:message>
+                              </span>
+                           </label>
+                           <input id="oidcTokenUri" wicket:id="oidcTokenUri" type="text" class="field text" />
+                           <a href="#" wicket:id="oidcTokenUriHelp" class="help-link"></a>
+                        </li>
+                        <li class="choiceItem">
+                           <input id="oidcForceAuthorizationUriHttps" wicket:id="oidcForceAuthorizationUriHttps"
+                              type="checkbox"
+                           />
+                           <label for="oidcForceAuthorizationUriHttps">
+                              <span>
+                                 <wicket:message key="oidcForceAuthorizationUriHttps"></wicket:message>
+                              </span>
+                           </label>
+                        </li>
+                        <li>
+                           <label for="oidcAuthorizationUri">
+                              <span>
+                                 <wicket:message key="oidcAuthorizationUri"></wicket:message>
+                              </span>
+                           </label>
+                           <input id="oidcAuthorizationUri" wicket:id="oidcAuthorizationUri" class="field text" />
+                           <a href="#" wicket:id="oidcAuthorizationUriHelp" class="help-link"></a>
+                        </li>
+                        <li>
+                           <label for="oidcUserInfoUri">
+                              <span>
+                                 <wicket:message key="oidcUserInfoUri"></wicket:message>
+                              </span>
+                           </label>
+                           <input id="oidcUserInfoUri" wicket:id="oidcUserInfoUri" type="text" class="field text" />
+                           <a href="#" wicket:id="oidcUserInfoUriHelp" class="help-link"></a>
+                        </li>
+                        <li>
+                           <label for="oidcJwkSetUri">
+                              <span>
+                                 <wicket:message key="oidcJwkSetUri"></wicket:message>
+                              </span>
+                           </label>
+                           <input id="oidcJwkSetUri" wicket:id="oidcJwkSetUri" type="text" class="field text" />
+                           <a href="#" wicket:id="oidcJwkSetUriHelp" class="help-link"></a>
+                        </li>
+                     </ul>
+                  </fieldset>
+               </li>
+            </ul>
+         </div>
+
+         <br />
+         <br />
       </div>
-      <br />
-      <br />
-      <h3>
-        <wicket:message key="gitHubLogin"></wicket:message>
-      </h3>
+
+<h1>Settings below are not yet migrated, status unknown</h1>
       <ul>
-        <li>
-          <fieldset>
-            <legend>
-              <span>
-                <wicket:message key="gitHubConnectionParameters"></wicket:message>
-              </span>
-              <a href="#" wicket:id="gitHubConnectionParametersHelp" class="help-link"></a>
-            </legend>
-            <ul>
-              <li class="choiceItem">
-                <input id="gitHubEnabled" wicket:id="gitHubEnabled" type="checkbox" />
-                <label for="gitHubEnabled">
+         <li>
+            <fieldset>
+               <legend>
                   <span>
-                    <wicket:message key="gitHubEnabled"></wicket:message>
+                     <wicket:message key="connectionParameters"></wicket:message>
                   </span>
-                </label>
-                <a href="#" wicket:id="gitHubEnabledHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="gitHubClientId">
+                  <a href="#" wicket:id="connectionParametersHelp" class="help-link"></a>
+               </legend>
+               <ul>
+                  <li>
+                     <label for="logoutUri">
+                        <span>
+                           <wicket:message key="logoutUri"></wicket:message>
+                        </span>
+                     </label>
+                     <input id="logoutUri" wicket:id="logoutUri" type="text" class="field text" />
+                     <a href="#" wicket:id="logoutUriHelp" class="help-link"></a>
+                  </li>
+                  <li>
+                     <label for="enforceTokenValidation">
+                        <span>
+                           <wicket:message key="enforceTokenValidation"></wicket:message>
+                        </span>
+                     </label>
+                  </li>
+                  <li>
+                     <input id="enforceTokenValidation" wicket:id="enforceTokenValidation" type="checkbox" />
+                     <a href="#" wicket:id="enforceTokenValidationHelp" class="help-link"></a>
+                  </li>
+                  <li>
+                     <label for="responseMode">
+                        <span>
+                           <wicket:message key="responseMode"></wicket:message>
+                        </span>
+                     </label>
+                     <input id="responseMode" wicket:id="responseMode" type="text" class="field text" />
+                     <a href="#" wicket:id="responseModeHelp" class="help-link"></a>
+                  </li>
+                  <li>
+                     <label for="postLogoutRedirectUri">
+                        <span>
+                           <wicket:message key="postLogoutRedirectUri"></wicket:message>
+                        </span>
+                     </label>
+                     <input id="postLogoutRedirectUri" wicket:id="postLogoutRedirectUri" type="text" class="field text" />
+                     <a href="#" wicket:id="postLogoutRedirectUriHelp" class="help-link"></a>
+                  </li>
+                  <li>
+                     <label for="sendClientSecret">
+                        <span>
+                           <wicket:message key="sendClientSecret"></wicket:message>
+                        </span>
+                     </label>
+                  </li>
+                  <li>
+                     <input id="sendClientSecret" wicket:id="sendClientSecret" type="checkbox" />
+                     <a href="#" wicket:id="sendClientSecretHelp" class="help-link"></a>
+                  </li>
+               </ul>
+            </fieldset>
+         </li>
+         <li>
+            <fieldset>
+               <legend>
                   <span>
-                    <wicket:message key="cliendId"></wicket:message>
+                     <wicket:message key="PKCE">Proof Key of Code Exchange</wicket:message>
                   </span>
-                </label>
-                <input id="gitHubClientId" wicket:id="gitHubClientId" type="text" class="field text" />
-                <a href="#" wicket:id="cliendIdHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="gitHubClientSecret">
-                  <span>
-                    <wicket:message key="clientSecret"></wicket:message>
-                  </span>
-                </label>
-                <input id="gitHubClientSecret" wicket:id="gitHubClientSecret" type="text" class="field text" />
-                <a href="#" wicket:id="clientSecretHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="gitHubUserNameAttribute">
-                  <span>
-                    <wicket:message key="userNameAttribute"></wicket:message>
-                  </span>
-                </label>
-                <input
-                  id="gitHubUserNameAttribute"
-                  wicket:id="gitHubUserNameAttribute"
-                  type="text"
-                  class="field text"
-                />
-                <a href="#" wicket:id="userNameAttributeHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="gitHubRedirectUri">
-                  <span>
-                    <wicket:message key="redirectUri"></wicket:message>
-                  </span>
-                </label>
-                <input id="gitHubRedirectUri" wicket:id="gitHubRedirectUri" type="text" class="field text" />
-                <a href="#" wicket:id="redirectUriHelp" class="help-link"></a>
-              </li>
-            </ul>
-          </fieldset>
-        </li>
+                  <a href="#" wicket:id="PKCEHelp" class="help-link"></a>
+               </legend>
+               <ul>
+                  <li>
+                     <label for="usePKCE">
+                        <span>
+                           <wicket:message key="usePKCE"></wicket:message>
+                        </span>
+                     </label>
+                  </li>
+                  <li>
+                     <input id="usePKCE" wicket:id="usePKCE" type="checkbox" />
+                  </li>
+               </ul>
+            </fieldset>
+         </li>
       </ul>
       <br />
       <br />
       <h3>
-        <wicket:message key="msLogin"></wicket:message>
+         <wicket:message key="advancedSettings"></wicket:message>
       </h3>
       <ul>
-        <li>
-          <fieldset>
-            <legend>
-              <span>
-                <wicket:message key="msConnectionParameters"></wicket:message>
-              </span>
-              <a href="#" wicket:id="msConnectionParametersHelp" class="help-link"></a>
-            </legend>
-            <ul>
-              <li class="choiceItem">
-                <input id="msEnabled" wicket:id="msEnabled" type="checkbox" />
-                <label for="msEnabled">
+         <li>
+            <fieldset>
+               <legend>
                   <span>
-                    <wicket:message key="msEnabled"></wicket:message>
+                     <wicket:message key="connectionParameters"></wicket:message>
                   </span>
-                </label>
-                <a href="#" wicket:id="msEnabledHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="msClientId">
-                  <span>
-                    <wicket:message key="cliendId"></wicket:message>
-                  </span>
-                </label>
-                <input id="msClientId" wicket:id="msClientId" type="text" class="field text" />
-                <a href="#" wicket:id="cliendIdHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="msClientSecret">
-                  <span>
-                    <wicket:message key="clientSecret"></wicket:message>
-                  </span>
-                </label>
-                <input id="msClientSecret" wicket:id="msClientSecret" type="text" class="field text" />
-                <a href="#" wicket:id="clientSecretHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="msUserNameAttribute">
-                  <span>
-                    <wicket:message key="userNameAttribute"></wicket:message>
-                  </span>
-                </label>
-                <input id="msUserNameAttribute" wicket:id="msUserNameAttribute" type="text" class="field text" />
-                <a href="#" wicket:id="userNameAttributeHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="msRedirectUri">
-                  <span>
-                    <wicket:message key="redirectUri"></wicket:message>
-                  </span>
-                </label>
-                <input id="msRedirectUri" wicket:id="msRedirectUri" type="text" class="field text" />
-                <a href="#" wicket:id="redirectUriHelp" class="help-link"></a>
-              </li>
-            </ul>
-          </fieldset>
-        </li>
+                  <a href="#" wicket:id="connectionParametersHelp" class="help-link"></a>
+               </legend>
+               <ul>
+                  <li>
+                     <label for="enableRedirectAuthenticationEntryPoint">
+                        <span>
+                           <wicket:message key="enableRedirectAuthenticationEntryPoint"></wicket:message>
+                        </span>
+                     </label>
+                  </li>
+                  <li>
+                     <input id="enableRedirectAuthenticationEntryPoint"
+                        wicket:id="enableRedirectAuthenticationEntryPoint" type="checkbox"
+                     />
+                  </li>
+               </ul>
+               <ul>
+                  <li>
+                     <label for="allowUnSecureLogging">
+                        <span>
+                           <wicket:message key="allowUnSecureLogging"></wicket:message>
+                        </span>
+                     </label>
+                  </li>
+                  <li>
+                     <input id="allowUnSecureLogging" wicket:id="allowUnSecureLogging" type="checkbox" />
+                     <a href="#" wicket:id="allowUnSecureLoggingHelp" class="help-link"></a>
+                  </li>
+               </ul>
+            </fieldset>
+         </li>
       </ul>
       <br />
       <br />
       <h3>
-        <wicket:message key="oidcLogin"></wicket:message>
+         <wicket:message key="authorization"></wicket:message>
       </h3>
-      <ul>
-        <li>
-          <fieldset>
-            <legend>
-              <span>
-                <wicket:message key="connectionParameters"></wicket:message>
-              </span>
-              <a href="#" wicket:id="connectionParametersHelp" class="help-link"></a>
-            </legend>            
-            <ul>
-              <li class="choiceItem">
-                <input id="enabled" wicket:id="enabled" type="checkbox" />
-                <label for="enabled">
-                  <span>
-                    <wicket:message key="enabled"></wicket:message>
-                  </span>
-                </label>
-              </li>
-              <li>
-                <div wicket:id="topPanel"></div>
-              </li>
-              <li class="choiceItem">
-                <input id="forceAccessTokenUriHttps" wicket:id="forceAccessTokenUriHttps" type="checkbox" />
-                <label for="forceAccessTokenUriHttps">
-                  <span>
-                    <wicket:message key="forceAccessTokenUriHttps"></wicket:message>
-                  </span>
-                </label>
-              </li>
-              <li>
-                <label for="accessTokenUri">
-                  <span>
-                    <wicket:message key="accessTokenUri"></wicket:message>
-                  </span>
-                </label>
-                <input id="accessTokenUri" wicket:id="accessTokenUri" type="text" class="field text" />
-                <a href="#" wicket:id="accessTokenUriHelp" class="help-link"></a>
-              </li>
-              <li class="choiceItem">
-                <input id="forceUserAuthorizationUriHttps" wicket:id="forceUserAuthorizationUriHttps" type="checkbox" />
-                <label for="forceUserAuthorizationUriHttps">
-                  <span>
-                    <wicket:message key="forceUserAuthorizationUriHttps"></wicket:message>
-                  </span>
-                </label>
-              </li>
-              <li>
-                <label for="userAuthorizationUri">
-                  <span>
-                    <wicket:message key="userAuthorizationUri"></wicket:message>
-                  </span>
-                </label>
-                <input id="userAuthorizationUri" wicket:id="userAuthorizationUri" class="field text" />
-                <a href="#" wicket:id="userAuthorizationUriHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="redirectUri">
-                  <span>
-                    <wicket:message key="redirectUri"></wicket:message>
-                  </span>
-                </label>
-                <input id="redirectUri" wicket:id="redirectUri" type="text" class="field text" />
-                <a href="#" wicket:id="redirectUriHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="checkTokenEndpointUrl">
-                  <span>
-                    <wicket:message key="checkTokenEndpointUrl"></wicket:message>
-                  </span>
-                </label>
-                <input id="checkTokenEndpointUrl" wicket:id="checkTokenEndpointUrl" type="text" class="field text" />
-                <a href="#" wicket:id="checkTokenEndpointUrlHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="logoutUri">
-                  <span>
-                    <wicket:message key="logoutUri"></wicket:message>
-                  </span>
-                </label>
-                <input id="logoutUri" wicket:id="logoutUri" type="text" class="field text" />
-                <a href="#" wicket:id="logoutUriHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="scopes">
-                  <span>
-                    <wicket:message key="scopes"></wicket:message>
-                  </span>
-                </label>
-                <input id="scopes" wicket:id="scopes" type="text" class="field text" />
-                <a href="#" wicket:id="scopesHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="cliendId">
-                  <span>
-                    <wicket:message key="cliendId"></wicket:message>
-                  </span>
-                </label>
-                <input id="cliendId" wicket:id="cliendId" type="text" class="field text" />
-                <a href="#" wicket:id="cliendIdHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="clientSecret">
-                  <span>
-                    <wicket:message key="clientSecret"></wicket:message>
-                  </span>
-                </label>
-                <input id="clientSecret" wicket:id="clientSecret" type="text" class="field text" />
-                <a href="#" wicket:id="clientSecretHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="jwkURI">
-                  <span>
-                    <wicket:message key="jwkURI"></wicket:message>
-                  </span>
-                </label>
-                <input id="jwkURI" wicket:id="jwkURI" type="text" class="field text" />
-                <a href="#" wicket:id="jwkURIHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="enforceTokenValidation">
-                  <span>
-                    <wicket:message key="enforceTokenValidation"></wicket:message>
-                  </span>
-                </label>
-              </li>
-              <li>
-                <input id="enforceTokenValidation" wicket:id="enforceTokenValidation" type="checkbox" />
-                <a href="#" wicket:id="enforceTokenValidationHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="principalKey">
-                  <span>
-                    <wicket:message key="principalKey"></wicket:message>
-                  </span>
-                </label>
-                <input id="principalKey" wicket:id="principalKey" type="text" class="field text" />
-                <a href="#" wicket:id="principalKeyHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="responseMode">
-                  <span>
-                    <wicket:message key="responseMode"></wicket:message>
-                  </span>
-                </label>
-                <input id="responseMode" wicket:id="responseMode" type="text" class="field text" />
-                <a href="#" wicket:id="responseModeHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="postLogoutRedirectUri">
-                  <span>
-                    <wicket:message key="postLogoutRedirectUri"></wicket:message>
-                  </span>
-                </label>
-                <input id="postLogoutRedirectUri" wicket:id="postLogoutRedirectUri" type="text" class="field text" />
-                <a href="#" wicket:id="postLogoutRedirectUriHelp" class="help-link"></a>
-              </li>
-              <li>
-                <label for="sendClientSecret">
-                  <span>
-                    <wicket:message key="sendClientSecret"></wicket:message>
-                  </span>
-                </label>
-              </li>
-              <li>
-                <input id="sendClientSecret" wicket:id="sendClientSecret" type="checkbox" />
-                <a href="#" wicket:id="sendClientSecretHelp" class="help-link"></a>
-              </li>
-            </ul>
-          </fieldset>
-        </li>
-        <li>
-          <fieldset>
-            <legend>
-              <span>
-                <wicket:message key="PKCE">Proof Key of Code Exchange</wicket:message>
-              </span>
-              <a href="#" wicket:id="PKCEHelp" class="help-link"></a>
-            </legend>
-            <ul>
-              <li>
-                <label for="usePKCE">
-                  <span>
-                    <wicket:message key="usePKCE"></wicket:message>
-                  </span>
-                </label>
-              </li>
-              <li><input id="usePKCE" wicket:id="usePKCE" type="checkbox" /></li>
-            </ul>
-          </fieldset>
-        </li>
-      </ul>
-      <br />
-      <br />
-      <h3>
-        <wicket:message key="advancedSettings"></wicket:message>
-      </h3>
-      <ul>
-        <li>
-          <fieldset>
-            <legend>
-              <span>
-                <wicket:message key="connectionParameters"></wicket:message>
-              </span>
-              <a href="#" wicket:id="connectionParametersHelp" class="help-link"></a>
-            </legend>
-            <ul>
-              <li>
-                <label for="enableRedirectAuthenticationEntryPoint">
-                  <span>
-                    <wicket:message key="enableRedirectAuthenticationEntryPoint"></wicket:message>
-                  </span>
-                </label>
-              </li>
-              <li>
-                <input
-                  id="enableRedirectAuthenticationEntryPoint"
-                  wicket:id="enableRedirectAuthenticationEntryPoint"
-                  type="checkbox"
-                />
-              </li>
-            </ul>
-            <ul>
-              <li>
-                <label for="allowUnSecureLogging">
-                  <span>
-                    <wicket:message key="allowUnSecureLogging"></wicket:message>
-                  </span>
-                </label>
-              </li>
-              <li>
-                <input id="allowUnSecureLogging" wicket:id="allowUnSecureLogging" type="checkbox" />
-                <a href="#" wicket:id="allowUnSecureLoggingHelp" class="help-link"></a>
-              </li>
-            </ul>
-          </fieldset>
-        </li>
-      </ul>
-      <br />
-      <br />
-      <h3>
-        <wicket:message key="authorization"></wicket:message>
-      </h3>
-    </wicket:extend>
-  </body>
+   </wicket:extend>
+</body>
+
 </html>

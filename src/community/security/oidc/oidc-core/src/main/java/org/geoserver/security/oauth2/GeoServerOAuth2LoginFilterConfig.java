@@ -72,28 +72,33 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     private String msClientSecret;
     private String msUserNameAttribute = "sub";
     private String msRedirectUri;
+    private String msScopes = "openid profile email";
 
     // custom OpenID Connect
-    private boolean enabled;
-    private String cliendId;
-    private String clientSecret;
-    private String principalKey = "email";
-    private String redirectUri = "http://localhost:8080/geoserver"; // TODO AW
+    private boolean oidcEnabled;
+    private String oidcClientId;
+    private String oidcClientSecret;
+    private String oidcUserNameAttribute = "email";
+    private String oidcRedirectUri;
+    private String oidcScopes;
 
-    private String scopes;
+    // TODO AW: below is not yet migrated
     private String tokenRolesClaim;
     private String responseMode;
 
-    private String accessTokenUri;
-    private String userAuthorizationUri;
-    private String checkTokenEndpointUrl;
-    private String jwkURI;
+    private String oidcDiscoveryURL;
+    private String oidcTokenUri;
+    private String oidcAuthorizationUri;
+    private String oidcUserInfoUri;
+    private String oidcJwkSetUri;
+    // TODO AW
     private String logoutUri;
     private String postLogoutRedirectUri;
 
+    private Boolean oidcForceAuthorizationUriHttps;
+    private Boolean oidcForceTokenUriHttps;
+
     private Boolean enableRedirectAuthenticationEntryPoint;
-    private Boolean forceAccessTokenUriHttps;
-    private Boolean forceUserAuthorizationUriHttps;
     private boolean sendClientSecret = false;
     private boolean allowBearerTokens = true;
     private boolean usePKCE = false;
@@ -106,12 +111,12 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     private boolean allowUnSecureLogging = false;
 
     public GeoServerOAuth2LoginFilterConfig() {
-        this.redirectUri = baseRedirectUri();
+        this.oidcRedirectUri = baseRedirectUri();
         this.postLogoutRedirectUri = baseRedirectUri();
-        this.scopes = "user";
+        this.oidcScopes = "user";
         this.enableRedirectAuthenticationEntryPoint = false;
-        this.forceAccessTokenUriHttps = true;
-        this.forceUserAuthorizationUriHttps = true;
+        this.oidcForceTokenUriHttps = true;
+        this.oidcForceAuthorizationUriHttps = true;
         this.calculateredirectUris();
     };
 
@@ -119,7 +124,7 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
         this.googleRedirectUri = redirectUri(REG_ID_GOOGLE);
         this.gitHubRedirectUri = redirectUri(REG_ID_GIT_HUB);
         this.msRedirectUri = redirectUri(REG_ID_MICROSOFT);
-        this.redirectUri = redirectUri(REG_ID_OIDC);
+        this.oidcRedirectUri = redirectUri(REG_ID_OIDC);
     }
 
     /**
@@ -152,8 +157,8 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
         return GeoServerExtensions.getProperty(OPENID_TEST_GS_PROXY_BASE);
     }
 
-    public String getPrincipalKey() {
-        return principalKey == null ? "email" : principalKey;
+    public String getOidcUserNameAttribute() {
+        return oidcUserNameAttribute == null ? "email" : oidcUserNameAttribute;
     }
 
     public boolean providesAuthenticationEntryPoint() {
@@ -169,63 +174,63 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     }
 
     /** @return the cliendId */
-    public String getCliendId() {
-        return cliendId;
+    public String getOidcClientId() {
+        return oidcClientId;
     }
 
     /** @param cliendId the cliendId to set */
-    public void setCliendId(String cliendId) {
-        this.cliendId = cliendId;
+    public void setOidcClientId(String cliendId) {
+        this.oidcClientId = cliendId;
     }
 
     /** @return the clientSecret */
-    public String getClientSecret() {
-        return clientSecret;
+    public String getOidcClientSecret() {
+        return oidcClientSecret;
     }
 
     /** @param clientSecret the clientSecret to set */
-    public void setClientSecret(String clientSecret) {
-        this.clientSecret = clientSecret;
+    public void setOidcClientSecret(String clientSecret) {
+        this.oidcClientSecret = clientSecret;
     }
 
     /** @return the accessTokenUri */
-    public String getAccessTokenUri() {
-        return accessTokenUri;
+    public String getOidcTokenUri() {
+        return oidcTokenUri;
     }
 
     /** @param accessTokenUri the accessTokenUri to set */
-    public void setAccessTokenUri(String accessTokenUri) {
-        this.accessTokenUri = accessTokenUri;
+    public void setOidcTokenUri(String accessTokenUri) {
+        this.oidcTokenUri = accessTokenUri;
     }
 
     /** @return the userAuthorizationUri */
-    public String getUserAuthorizationUri() {
-        return userAuthorizationUri;
+    public String getOidcAuthorizationUri() {
+        return oidcAuthorizationUri;
     }
 
     /** @param userAuthorizationUri the userAuthorizationUri to set */
-    public void setUserAuthorizationUri(String userAuthorizationUri) {
-        this.userAuthorizationUri = userAuthorizationUri;
+    public void setOidcAuthorizationUri(String userAuthorizationUri) {
+        this.oidcAuthorizationUri = userAuthorizationUri;
     }
 
     /** @return the redirectUri */
-    public String getRedirectUri() {
-        return redirectUri;
+    public String getOidcRedirectUri() {
+        return oidcRedirectUri;
     }
 
     /** @param redirectUri the redirectUri to set */
-    public void setRedirectUri(String redirectUri) {
-        this.redirectUri = redirectUri;
+    public void setOidcRedirectUri(String redirectUri) {
+        this.oidcRedirectUri = redirectUri;
     }
 
     /** @return the checkTokenEndpointUrl */
-    public String getCheckTokenEndpointUrl() {
-        return checkTokenEndpointUrl;
+    public String getOidcUserInfoUri() {
+        return oidcUserInfoUri;
     }
 
     /** @param checkTokenEndpointUrl the checkTokenEndpointUrl to set */
-    public void setCheckTokenEndpointUrl(String checkTokenEndpointUrl) {
-        this.checkTokenEndpointUrl = checkTokenEndpointUrl;
+    public void setOidcUserInfoUri(String checkTokenEndpointUrl) {
+        this.oidcUserInfoUri = checkTokenEndpointUrl;
     }
 
     /** @return the logoutUri */
@@ -239,13 +244,13 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     }
 
     /** @return the scopes */
-    public String getScopes() {
-        return scopes;
+    public String getOidcScopes() {
+        return oidcScopes;
     }
 
     /** @param scopes the scopes to set */
-    public void setScopes(String scopes) {
-        this.scopes = scopes;
+    public void setOidcScopes(String scopes) {
+        this.oidcScopes = scopes;
     }
 
     /** @return the enableRedirectAuthenticationEntryPoint */
@@ -262,32 +267,32 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
         this.enableRedirectAuthenticationEntryPoint = enableRedirectAuthenticationEntryPoint;
     }
 
-    public Boolean getForceAccessTokenUriHttps() {
-        return forceAccessTokenUriHttps;
+    public Boolean getOidcForceTokenUriHttps() {
+        return oidcForceTokenUriHttps;
     }
 
-    public void setForceAccessTokenUriHttps(Boolean forceAccessTokenUriHttps) {
-        this.forceAccessTokenUriHttps = forceAccessTokenUriHttps;
+    public void setOidcForceTokenUriHttps(Boolean forceAccessTokenUriHttps) {
+        this.oidcForceTokenUriHttps = forceAccessTokenUriHttps;
     }
 
-    public Boolean getForceUserAuthorizationUriHttps() {
-        return forceUserAuthorizationUriHttps;
+    public Boolean getOidcForceAuthorizationUriHttps() {
+        return oidcForceAuthorizationUriHttps;
     }
 
-    public void setForceUserAuthorizationUriHttps(Boolean forceUserAuthorizationUriHttps) {
-        this.forceUserAuthorizationUriHttps = forceUserAuthorizationUriHttps;
+    public void setOidcForceAuthorizationUriHttps(Boolean forceUserAuthorizationUriHttps) {
+        this.oidcForceAuthorizationUriHttps = forceUserAuthorizationUriHttps;
     }
 
-    public void setPrincipalKey(String principalKey) {
-        this.principalKey = principalKey;
+    public void setOidcUserNameAttribute(String principalKey) {
+        this.oidcUserNameAttribute = principalKey;
     }
 
-    public String getJwkURI() {
-        return jwkURI;
+    public String getOidcJwkSetUri() {
+        return oidcJwkSetUri;
     }
 
-    public void setJwkURI(String jwkURI) {
-        this.jwkURI = jwkURI;
+    public void setOidcJwkSetUri(String jwkURI) {
+        this.oidcJwkSetUri = jwkURI;
     }
 
     public String getTokenRolesClaim() {
@@ -427,13 +432,13 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     }
 
     /** @return the enabled */
-    public boolean isEnabled() {
-        return enabled;
+    public boolean isOidcEnabled() {
+        return oidcEnabled;
     }
 
     /** @param pEnabled the enabled to set */
-    public void setEnabled(boolean pEnabled) {
-        enabled = pEnabled;
+    public void setOidcEnabled(boolean pEnabled) {
+        oidcEnabled = pEnabled;
     }
 
     /** @return the msEnabled */
@@ -514,5 +519,25 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     /** @param pMsRedirectUri the msRedirectUri to set */
     public void setMsRedirectUri(String pMsRedirectUri) {
         msRedirectUri = pMsRedirectUri;
+    }
+
+    /** @return the msScopes */
+    public String getMsScopes() {
+        return msScopes;
+    }
+
+    /** @param pMsScopes the msScopes to set */
+    public void setMsScopes(String pMsScopes) {
+        msScopes = pMsScopes;
+    }
+
+    /** @return the oidcDiscoveryURL */
+    public String getOidcDiscoveryURL() {
+        return oidcDiscoveryURL;
+    }
+
+    /** @param pOidcDiscoveryURL the oidcDiscoveryURL to set */
+    public void setOidcDiscoveryURL(String pOidcDiscoveryURL) {
+        oidcDiscoveryURL = pOidcDiscoveryURL;
     }
 }

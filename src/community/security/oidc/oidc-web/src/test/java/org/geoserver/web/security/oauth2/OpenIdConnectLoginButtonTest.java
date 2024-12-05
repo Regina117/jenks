@@ -29,11 +29,11 @@ public class OpenIdConnectLoginButtonTest extends GeoServerWicketTestSupport {
         GeoServerOAuth2LoginFilterConfig filterConfig = new GeoServerOAuth2LoginFilterConfig();
         filterConfig.setName("openidconnect");
         filterConfig.setClassName(GeoServerOAuth2LoginAuthenticationFilter.class.getName());
-        filterConfig.setCliendId("foo");
-        filterConfig.setClientSecret("bar");
-        filterConfig.setAccessTokenUri("https://www.connectid/fake/test");
-        filterConfig.setUserAuthorizationUri("https://www.connectid/fake/test");
-        filterConfig.setCheckTokenEndpointUrl("https://www.connectid/fake/test");
+        filterConfig.setOidcClientId("foo");
+        filterConfig.setOidcClientSecret("bar");
+        filterConfig.setOidcTokenUri("https://www.connectid/fake/test");
+        filterConfig.setOidcAuthorizationUri("https://www.connectid/fake/test");
+        filterConfig.setOidcUserInfoUri("https://www.connectid/fake/test");
         manager.saveFilter(filterConfig);
 
         SecurityManagerConfig config = manager.getSecurityConfig();

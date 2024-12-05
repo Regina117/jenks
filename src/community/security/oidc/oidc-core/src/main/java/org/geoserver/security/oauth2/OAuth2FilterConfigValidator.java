@@ -26,16 +26,16 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
     protected void validateCheckTokenEndpointUrl(GeoServerOAuth2LoginFilterConfig filterConfig)
             throws FilterConfigException {
         var oidcFilterConfig = (GeoServerOAuth2LoginFilterConfig) filterConfig;
-        if (StringUtils.hasLength(filterConfig.getCheckTokenEndpointUrl()) == false
-                && StringUtils.hasLength(oidcFilterConfig.getJwkURI()) == false) {
+        if (StringUtils.hasLength(filterConfig.getOidcUserInfoUri()) == false
+                && StringUtils.hasLength(oidcFilterConfig.getOidcJwkSetUri()) == false) {
             // One of checkTokenEndpointUrl or jwkURI is required
             throw new OpenIdConnectFilterConfigException(
                     OpenIdConnectFilterConfigException
                             .OAUTH2_CHECKTOKEN_OR_WKTS_ENDPOINT_URL_REQUIRED);
         }
-        if (StringUtils.hasLength(filterConfig.getCheckTokenEndpointUrl()) != false) {
+        if (StringUtils.hasLength(filterConfig.getOidcUserInfoUri()) != false) {
             try {
-                new URL(filterConfig.getCheckTokenEndpointUrl());
+                new URL(filterConfig.getOidcUserInfoUri());
             } catch (MalformedURLException ex) {
                 throw createFilterException(
                         OAuth2FilterConfigException.OAUTH2_CHECKTOKENENDPOINT_URL_MALFORMED);
@@ -56,7 +56,7 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
             return;
         }
 
-        if (!StringUtils.hasLength(filterConfig.getClientSecret())) {
+        if (!StringUtils.hasLength(filterConfig.getOidcClientSecret())) {
             throw createFilterException(OAuth2FilterConfigException.OAUTH2_CLIENT_SECRET_REQUIRED);
         }
     }
@@ -86,56 +86,56 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
 
         validateCheckTokenEndpointUrl(filterConfig);
 
-        if (StringUtils.hasLength(filterConfig.getAccessTokenUri())) {
+        if (StringUtils.hasLength(filterConfig.getOidcTokenUri())) {
             URL accessTokenUri = null;
             try {
-                accessTokenUri = new URL(filterConfig.getAccessTokenUri());
+                accessTokenUri = new URL(filterConfig.getOidcTokenUri());
             } catch (MalformedURLException ex) {
                 throw createFilterException(
                         OAuth2FilterConfigException.OAUTH2_ACCESSTOKENURI_MALFORMED);
             }
-            if (filterConfig.getForceAccessTokenUriHttps()
+            if (filterConfig.getOidcForceTokenUriHttps()
                     && "https".equalsIgnoreCase(accessTokenUri.getProtocol()) == false)
                 throw createFilterException(
                         OAuth2FilterConfigException.OAUTH2_ACCESSTOKENURI_NOT_HTTPS);
         }
 
-        if (StringUtils.hasLength(filterConfig.getUserAuthorizationUri())) {
+        if (StringUtils.hasLength(filterConfig.getOidcAuthorizationUri())) {
             URL userAuthorizationUri = null;
             try {
-                userAuthorizationUri = new URL(filterConfig.getUserAuthorizationUri());
+                userAuthorizationUri = new URL(filterConfig.getOidcAuthorizationUri());
             } catch (MalformedURLException ex) {
                 throw createFilterException(
                         OAuth2FilterConfigException.OAUTH2_USERAUTHURI_MALFORMED);
             }
-            if (filterConfig.getForceUserAuthorizationUriHttps()
+            if (filterConfig.getOidcForceAuthorizationUriHttps()
                     && "https".equalsIgnoreCase(userAuthorizationUri.getProtocol()) == false)
                 throw createFilterException(
                         OAuth2FilterConfigException.OAUTH2_USERAUTHURI_NOT_HTTPS);
         }
 
-        if (StringUtils.hasLength(filterConfig.getRedirectUri())) {
+        if (StringUtils.hasLength(filterConfig.getOidcRedirectUri())) {
             try {
-                new URL(filterConfig.getRedirectUri());
+                new URL(filterConfig.getOidcRedirectUri());
             } catch (MalformedURLException ex) {
                 throw createFilterException(
                         OAuth2FilterConfigException.OAUTH2_REDIRECT_URI_MALFORMED);
             }
         }
 
-        if (!StringUtils.hasLength(filterConfig.getCliendId())) {
+        if (!StringUtils.hasLength(filterConfig.getOidcClientId())) {
             throw createFilterException(OAuth2FilterConfigException.OAUTH2_CLIENT_ID_REQUIRED);
         }
 
         validateClientSecret(filterConfig);
 
-        if (!StringUtils.hasLength(filterConfig.getScopes())) {
+        if (!StringUtils.hasLength(filterConfig.getOidcScopes())) {
             throw createFilterException(OAuth2FilterConfigException.OAUTH2_SCOPE_REQUIRED);
         }
 
-        if (StringUtils.hasLength(filterConfig.getJwkURI()) != false) {
+        if (StringUtils.hasLength(filterConfig.getOidcJwkSetUri()) != false) {
             try {
-                new URL(filterConfig.getJwkURI());
+                new URL(filterConfig.getOidcJwkSetUri());
             } catch (MalformedURLException ex) {
                 throw new OpenIdConnectFilterConfigException(
                         OpenIdConnectFilterConfigException.OAUTH2_WKTS_URL_MALFORMED);

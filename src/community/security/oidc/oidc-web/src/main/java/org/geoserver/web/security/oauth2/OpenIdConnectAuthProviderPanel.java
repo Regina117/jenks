@@ -1,14 +1,12 @@
 /*
- * (c) 2018 Open Source Geospatial Foundation - all rights reserved
- * This code is licensed under the GPL 2.0 license, available at the root
- * application directory.
+ * (c) 2018 Open Source Geospatial Foundation - all rights reserved This code is licensed under the
+ * GPL 2.0 license, available at the root application directory.
  *
  */
 
 /*
- * (c) 2018 Open Source Geospatial Foundation - all rights reserved
- * This code is licensed under the GPL 2.0 license, available at the root
- * application directory.
+ * (c) 2018 Open Source Geospatial Foundation - all rights reserved This code is licensed under the
+ * GPL 2.0 license, available at the root application directory.
  *
  */
 package org.geoserver.web.security.oauth2;
@@ -23,11 +21,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.ajax.form.AjaxFormComponentUpdatingBehavior;
 import org.apache.wicket.ajax.markup.html.form.AjaxButton;
 import org.apache.wicket.ajax.markup.html.form.AjaxCheckBox;
 import org.apache.wicket.markup.html.WebMarkupContainer;
+import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
@@ -35,9 +36,11 @@ import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
 import org.apache.wicket.markup.html.panel.Panel;
+import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
 import org.apache.wicket.model.Model;
 import org.apache.wicket.model.PropertyModel;
+import org.apache.wicket.model.StringResourceModel;
 import org.geoserver.security.config.PreAuthenticatedUserNameFilterConfig.PreAuthenticatedUserNameRoleSource;
 import org.geoserver.security.config.RoleSource;
 import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
@@ -60,6 +63,18 @@ public class OpenIdConnectAuthProviderPanel
 
     /** serialVersionUID */
     private static final long serialVersionUID = -3025321797363970333L;
+
+    /** Prefix of Microsoft specific attributes */
+    private static final String PREFIX_MS = "ms";
+
+    /** Prefix of GitHub specific attributes */
+    private static final String PREFIX_GIT_HUB = "gitHub";
+
+    /** Prefix of Google specific attributes */
+    private static final String PREFIX_GOOGLE = "google";
+
+    /** Prefix of custom OIDC specific attributes */
+    private static final String PREFIX_OIDC = "oidc";
 
     /**
      * If they have chosen MSGraphAPI as the RoleProvider, we need to make sure that the userinfo
@@ -84,8 +99,7 @@ public class OpenIdConnectAuthProviderPanel
                 return;
             }
 
-            TextField userInfoTextField =
-                    (TextField) form.get("panel").get("checkTokenEndpointUrl");
+            TextField userInfoTextField = (TextField) form.get("panel").get("oidcUserInfoUri");
 
             String userInfoEndpointUrl = (String) userInfoTextField.getConvertedInput();
 
@@ -134,13 +148,13 @@ public class OpenIdConnectAuthProviderPanel
 
     private class DiscoveryPanel extends Panel {
 
-        String discoveryURL;
-
         public DiscoveryPanel(String panelId) {
             super(panelId);
 
             TextField<String> url =
-                    new TextField<>("discoveryURL", new PropertyModel<>(this, "discoveryURL"));
+                    new TextField<>(
+                            "discoveryURL",
+                            new PropertyModel<>(configModel.getObject(), "oidcDiscoveryURL"));
             add(url);
             add(
                     new AjaxButton("discover") {
@@ -178,6 +192,24 @@ public class OpenIdConnectAuthProviderPanel
         public TokenClaimPanel(String id) {
             super(id, new Model<>());
             add(new TextField<String>("tokenRolesClaim").setRequired(true));
+        }
+    }
+
+    private static final class AjaxCheckboxWithTarget extends AjaxCheckBox {
+        /** serialVersionUID */
+        private static final long serialVersionUID = -545275711746328975L;
+
+        private Component target;
+
+        /** @param pId */
+        public AjaxCheckboxWithTarget(String pId, IModel<Boolean> pModel, Component pTarget) {
+            super(pId, pModel);
+            target = pTarget;
+        }
+
+        @Override
+        protected void onUpdate(AjaxRequestTarget pTarget) {
+            pTarget.add(target);
         }
     }
 
@@ -226,83 +258,35 @@ public class OpenIdConnectAuthProviderPanel
         add(tf);
         add(new HelpLink("baseRedirectUriHelp", this).setDialog(dialog));
 
-        AjaxCheckBox cb =
-                new AjaxCheckBox("googleEnabled") {
-                    @Override
-                    protected void onUpdate(AjaxRequestTarget pTarget) {
-                        pTarget.add(OpenIdConnectAuthProviderPanel.this);
-                    }
-                };
-        add(cb);
+        RepeatingView prefixView = new RepeatingView("prefixView");
+        add(prefixView);
 
-        ShowHideWebMarkupContainer googleContainer =
-                new ShowHideWebMarkupContainer(
-                        "googleSettings", () -> configModel.getObject().isGoogleEnabled());
-        googleContainer.add(
-                new HelpLink("googleConnectionFromParametersHelp", this).setDialog(dialog));
-        add(googleContainer);
+        addProviderComponents(
+                prefixView,
+                PREFIX_GOOGLE,
+                "Google",
+                () -> configModel.getObject().isGoogleEnabled());
+        addProviderComponents(
+                prefixView,
+                PREFIX_GIT_HUB,
+                "GitHub",
+                () -> configModel.getObject().isGitHubEnabled());
+        addProviderComponents(
+                prefixView, PREFIX_MS, "Microsoft", () -> configModel.getObject().isMsEnabled());
 
-        googleContainer.add(new TextField<String>("googleClientId"));
-        googleContainer.add(new HelpLink("googleClientIdHelp", this).setDialog(dialog));
-        googleContainer.add(new TextField<String>("googleClientSecret"));
-        googleContainer.add(new HelpLink("googleClientSecretHelp", this).setDialog(dialog));
-        googleContainer.add(new TextField<String>("googleUserNameAttribute"));
-        googleContainer.add(new HelpLink("googleUserNameAttributeHelp", this).setDialog(dialog));
-        googleContainer.add(disabledTextField("googleRedirectUri"));
-
-        googleContainer.add(
-                new HelpLink("googleConnectionForParametersHelp", this).setDialog(dialog));
-        googleContainer.add(new HelpLink("googleRedirectUriHelp", this).setDialog(dialog));
-
-        add(new HelpLink("gitHubConnectionParametersHelp", this).setDialog(dialog));
-        add(new CheckBox("gitHubEnabled"));
-        add(new HelpLink("gitHubEnabledHelp", this).setDialog(dialog));
-        add(new TextField<String>("gitHubClientId"));
-        add(new TextField<String>("gitHubClientSecret"));
-        add(new TextField<String>("gitHubUserNameAttribute"));
-        add(disabledTextField("gitHubRedirectUri"));
-        add(new HelpLink("gitHubRedirectUriHelp", this).setDialog(dialog));
-
-        add(new HelpLink("msConnectionParametersHelp", this).setDialog(dialog));
-        add(new CheckBox("msEnabled"));
-        add(new HelpLink("msEnabledHelp", this).setDialog(dialog));
-        add(new TextField<String>("msClientId"));
-        add(new TextField<String>("msClientSecret"));
-        add(new TextField<String>("msUserNameAttribute"));
-        add(disabledTextField("msRedirectUri"));
-        add(new HelpLink("msRedirectUriHelp", this).setDialog(dialog));
-
-        add(new DiscoveryPanel("topPanel"));
+        addProviderComponents(
+                prefixView,
+                PREFIX_OIDC,
+                "OpenID Connect Provider",
+                () -> configModel.getObject().isOidcEnabled());
 
         add(new HelpLink("enableRedirectAuthenticationEntryPointHelp", this).setDialog(dialog));
         add(new HelpLink("connectionParametersHelp", this).setDialog(dialog));
-        add(new HelpLink("accessTokenUriHelp", this).setDialog(dialog));
-        add(new HelpLink("userAuthorizationUriHelp", this).setDialog(dialog));
-        add(new HelpLink("redirectUriHelp", this).setDialog(dialog));
-        add(new HelpLink("checkTokenEndpointUrlHelp", this).setDialog(dialog));
         add(new HelpLink("logoutUriHelp", this).setDialog(dialog));
-        add(new HelpLink("scopesHelp", this).setDialog(dialog));
-        add(new HelpLink("cliendIdHelp", this).setDialog(dialog));
-        add(new HelpLink("clientSecretHelp", this).setDialog(dialog));
 
-        add(new CheckBox("enabled"));
         add(new CheckBox("enableRedirectAuthenticationEntryPoint"));
-        add(new CheckBox("forceAccessTokenUriHttps"));
-        add(new CheckBox("forceUserAuthorizationUriHttps"));
-        add(new TextField<String>("accessTokenUri"));
-        add(new TextField<String>("userAuthorizationUri"));
-        add(new TextField<String>("checkTokenEndpointUrl"));
         add(new TextField<String>("logoutUri"));
-        add(new TextField<String>("scopes"));
-        add(new TextField<String>("cliendId"));
-        add(new TextField<String>("clientSecret"));
-        add(disabledTextField("redirectUri"));
 
-        add(new HelpLink("principalKeyHelp", this).setDialog(dialog));
-        add(new TextField<String>("principalKey"));
-
-        add(new HelpLink("jwkURIHelp", this).setDialog(dialog));
-        add(new TextField<String>("jwkURI"));
         add(new HelpLink("enforceTokenValidationHelp", this).setDialog(dialog));
         add(new CheckBox("enforceTokenValidation"));
 
@@ -322,6 +306,95 @@ public class OpenIdConnectAuthProviderPanel
 
         add(new HelpLink("PKCEHelp", this).setDialog(dialog));
         add(new CheckBox("usePKCE"));
+    }
+
+    private void addProviderComponents(
+            RepeatingView pView,
+            String pProviderKey,
+            String pProviderLabel,
+            Supplier<Boolean> pShowConfig) {
+        OpenIdConnectAuthProviderPanel lMainPanel = OpenIdConnectAuthProviderPanel.this;
+        WebMarkupContainer lContainer = new WebMarkupContainer(pView.newChildId());
+        pView.add(lContainer);
+
+        lContainer.add(createLabelResourceWithParams("providerHeadline", pProviderLabel));
+
+        IModel<Boolean> lModel =
+                new PropertyModel<>(configModel.getObject(), pProviderKey + "Enabled");
+        AjaxCheckBox cb = new AjaxCheckboxWithTarget("enabled", lModel, lMainPanel);
+        lContainer.add(cb);
+
+        WebMarkupContainer lSHContainer = new ShowHideWebMarkupContainer("settings", pShowConfig);
+        lContainer.add(lSHContainer);
+
+        lSHContainer.add(createLabelResourceWithParams("infoFromProvider", pProviderLabel));
+        lSHContainer.add(createLabelResourceWithParams("infoForProvider", pProviderLabel));
+        lSHContainer.add(new HelpLink("connectionFromParametersHelp", this).setDialog(dialog));
+        lSHContainer.add(createTextField("clientId", pProviderKey));
+        lSHContainer.add(new HelpLink("clientIdHelp", this).setDialog(dialog));
+        lSHContainer.add(createTextField("clientSecret", pProviderKey));
+        lSHContainer.add(new HelpLink("clientSecretHelp", this).setDialog(dialog));
+        lSHContainer.add(createTextField("userNameAttribute", pProviderKey));
+        lSHContainer.add(new HelpLink("userNameAttributeHelp", this).setDialog(dialog));
+        lSHContainer.add(createTextField("redirectUri", pProviderKey, false));
+
+        lSHContainer.add(new HelpLink("connectionForParametersHelp", this).setDialog(dialog));
+        lSHContainer.add(new HelpLink("redirectUriHelp", this).setDialog(dialog));
+
+        // -- Provider specifics --
+
+        boolean lSupportsScope = pProviderKey.equals(PREFIX_MS);
+        WebMarkupContainer lScopeContainer = new WebMarkupContainer("displayOnScopeSupport");
+        lSHContainer.add(lScopeContainer);
+        if (lSupportsScope) {
+            lScopeContainer.add(createTextField("scopes", pProviderKey));
+            lScopeContainer.add(new HelpLink("scopesHelp", this).setDialog(dialog));
+        } else {
+            lScopeContainer.setVisible(false);
+        }
+
+        boolean lOidc = pProviderKey.equals(PREFIX_OIDC);
+        WebMarkupContainer lOidcContainer = new WebMarkupContainer("displayOnOidc");
+        lSHContainer.add(lOidcContainer);
+        if (lOidc) {
+            lOidcContainer.add(new DiscoveryPanel("topPanel"));
+            lOidcContainer.add(new HelpLink("oidcTokenUriHelp", this).setDialog(dialog));
+            lOidcContainer.add(new HelpLink("oidcAuthorizationUriHelp", this).setDialog(dialog));
+            lOidcContainer.add(new HelpLink("oidcUserInfoUriHelp", this).setDialog(dialog));
+            lOidcContainer.add(new CheckBox("oidcForceAuthorizationUriHttps"));
+            lOidcContainer.add(new CheckBox("oidcForceTokenUriHttps"));
+            lOidcContainer.add(new TextField<String>("oidcTokenUri"));
+            lOidcContainer.add(new TextField<String>("oidcAuthorizationUri"));
+            lOidcContainer.add(new TextField<String>("oidcUserInfoUri"));
+            lOidcContainer.add(new HelpLink("oidcJwkSetUriHelp", this).setDialog(dialog));
+            lOidcContainer.add(new TextField<String>("oidcJwkSetUri"));
+        } else {
+            lOidcContainer.setVisible(false);
+        }
+    }
+
+    /**
+     * @param pKey
+     * @param pParams
+     * @return a {@link Label} with {@link StringResourceModel} and parameters set
+     */
+    private Label createLabelResourceWithParams(String pKey, Object... pParams) {
+        StringResourceModel lModel = new StringResourceModel(pKey);
+        lModel.setParameters(pParams);
+        Label lLabel = new Label(pKey, lModel);
+        return lLabel;
+    }
+
+    private TextField<String> createTextField(String pFieldName, String pProviderName) {
+        return createTextField(pFieldName, pProviderName, true);
+    }
+
+    private TextField<String> createTextField(String pAttr, String pProvider, boolean pEnabled) {
+        String lModelField = pProvider + StringUtils.capitalize(pAttr);
+        IModel<String> lModel = new PropertyModel<>(configModel.getObject(), lModelField);
+        TextField<String> lTextField = new TextField<>(pAttr, lModel);
+        lTextField.setEnabled(pEnabled);
+        return lTextField;
     }
 
     @Override
