@@ -21,8 +21,19 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 /**
- * Filter configuration for OpenId Connect. This is completely freeform, so adding only the basic
- * bits in here.
+ * Filter configuration for OAuth2 and OpenID Connect.
+ *
+ * <h3>Historical considerations</h3>
+ *
+ * This module was largely rewritten as part of the migration to spring-security 5.8. Previously
+ * spring-securit-oauth was used, which is now replaced by OAuth2 support in spring-security itself.
+ *
+ * <p>Some noteworthy aspects regarding the available configuration:
+ *
+ * <ul>
+ *   <li>TODO AW
+ *   <li>
+ * </ul>
  */
 public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFilterConfig
         implements SecurityAuthFilterConfig {
@@ -82,27 +93,26 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     private String oidcRedirectUri;
     private String oidcScopes;
 
-    // TODO AW: below is not yet migrated
-    private String tokenRolesClaim;
-    private String responseMode;
-
-    private String oidcDiscoveryURL;
+    private String oidcDiscoveryUri;
     private String oidcTokenUri;
     private String oidcAuthorizationUri;
     private String oidcUserInfoUri;
     private String oidcJwkSetUri;
-    // TODO AW
-    private String logoutUri;
-    private String postLogoutRedirectUri;
 
     private Boolean oidcForceAuthorizationUriHttps;
     private Boolean oidcForceTokenUriHttps;
+    private String oidcResponseMode;
+    private boolean oidcEnforceTokenValidation = true;
+    private boolean oidcAuthenticationMethodPostSecret = false;
+
+    // TODO AW: below is not yet migrated
+    private String logoutUri;
+    private String postLogoutRedirectUri;
+    private String tokenRolesClaim;
 
     private Boolean enableRedirectAuthenticationEntryPoint;
-    private boolean sendClientSecret = false;
     private boolean allowBearerTokens = true;
-    private boolean usePKCE = false;
-    private boolean enforceTokenValidation = true;
+    private boolean oidcUsePKCE = false;
 
     /**
      * Add extra logging. NOTE: this might spill confidential information to the log - do not turn
@@ -303,20 +313,20 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
         this.tokenRolesClaim = tokenRolesClaim;
     }
 
-    public String getResponseMode() {
-        return responseMode;
+    public String getOidcResponseMode() {
+        return oidcResponseMode;
     }
 
-    public void setResponseMode(String responseMode) {
-        this.responseMode = responseMode;
+    public void setOidcResponseMode(String responseMode) {
+        this.oidcResponseMode = responseMode;
     }
 
-    public boolean isSendClientSecret() {
-        return sendClientSecret;
+    public boolean isOidcAuthenticationMethodPostSecret() {
+        return oidcAuthenticationMethodPostSecret;
     }
 
-    public void setSendClientSecret(boolean sendClientSecret) {
-        this.sendClientSecret = sendClientSecret;
+    public void setOidcAuthenticationMethodPostSecret(boolean sendClientSecret) {
+        this.oidcAuthenticationMethodPostSecret = sendClientSecret;
     }
 
     public boolean isAllowBearerTokens() {
@@ -335,20 +345,20 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
         this.postLogoutRedirectUri = postLogoutRedirectUri;
     }
 
-    public boolean isUsePKCE() {
-        return usePKCE;
+    public boolean isOidcUsePKCE() {
+        return oidcUsePKCE;
     }
 
-    public void setUsePKCE(boolean usePKCE) {
-        this.usePKCE = usePKCE;
+    public void setOidcUsePKCE(boolean usePKCE) {
+        this.oidcUsePKCE = usePKCE;
     }
 
-    public boolean isEnforceTokenValidation() {
-        return enforceTokenValidation;
+    public boolean isOidcEnforceTokenValidation() {
+        return oidcEnforceTokenValidation;
     }
 
-    public void setEnforceTokenValidation(boolean enforceTokenValidation) {
-        this.enforceTokenValidation = enforceTokenValidation;
+    public void setOidcEnforceTokenValidation(boolean enforceTokenValidation) {
+        this.oidcEnforceTokenValidation = enforceTokenValidation;
     }
 
     /** @return the googleEnabled */
@@ -532,12 +542,12 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     }
 
     /** @return the oidcDiscoveryURL */
-    public String getOidcDiscoveryURL() {
-        return oidcDiscoveryURL;
+    public String getOidcDiscoveryUri() {
+        return oidcDiscoveryUri;
     }
 
     /** @param pOidcDiscoveryURL the oidcDiscoveryURL to set */
-    public void setOidcDiscoveryURL(String pOidcDiscoveryURL) {
-        oidcDiscoveryURL = pOidcDiscoveryURL;
+    public void setOidcDiscoveryUri(String pOidcDiscoveryURL) {
+        oidcDiscoveryUri = pOidcDiscoveryURL;
     }
 }

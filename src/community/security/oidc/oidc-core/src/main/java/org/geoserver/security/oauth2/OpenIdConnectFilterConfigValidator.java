@@ -11,6 +11,7 @@ import org.geoserver.security.validation.FilterConfigException;
 import org.springframework.util.StringUtils;
 
 // TODO AW: review & complete for new fields
+// TODO AW: ensure only one filter instance exists, see singleton comment in filter provider
 public class OpenIdConnectFilterConfigValidator extends OAuth2FilterConfigValidator {
 
     public OpenIdConnectFilterConfigValidator(GeoServerSecurityManager securityManager) {
@@ -57,7 +58,7 @@ public class OpenIdConnectFilterConfigValidator extends OAuth2FilterConfigValida
     protected void validateClientSecret(GeoServerOAuth2LoginFilterConfig filterConfig)
             throws FilterConfigException {
         var oidcFilterConfig = (GeoServerOAuth2LoginFilterConfig) filterConfig;
-        if (!oidcFilterConfig.isUsePKCE()) {
+        if (!oidcFilterConfig.isOidcUsePKCE()) {
             super.validateClientSecret(filterConfig);
         }
     }

@@ -19,4 +19,5 @@ public class OpenIdConnectFilterConfigException extends FilterConfigException {
     public static final String OAUTH2_WKTS_URL_MALFORMED = "OAUTH2_WKTS_URL_MALFORMED";
     public static final String OAUTH2_CHECKTOKEN_OR_WKTS_ENDPOINT_URL_REQUIRED =
             "OAUTH2_CHECKTOKEN_OR_WKTS_ENDPOINT_URL_REQUIRED";
+    public static final String OAUTH2_SCOPE_DELIMITER_MIXED = "OAUTH2_SCOPE_DELIMITER_MIXED";
 }

@@ -10,11 +10,14 @@ import static org.geoserver.security.oauth2.GeoServerOAuth2UserServices.oauth2Us
 import static org.geoserver.security.oauth2.GeoServerOAuth2UserServices.oidcUserService;
 import static org.geoserver.security.oauth2.OAuth2LoginButtonEnablementEvent.disableButtonEvent;
 import static org.geoserver.security.oauth2.OAuth2LoginButtonEnablementEvent.enableButtonEvent;
+import static org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI;
 import static org.springframework.security.oauth2.core.AuthorizationGrantType.AUTHORIZATION_CODE;
 import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.CLIENT_SECRET_BASIC;
+import static org.springframework.security.oauth2.core.ClientAuthenticationMethod.CLIENT_SECRET_POST;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import javax.servlet.Filter;
 import org.geoserver.config.GeoServer;
@@ -32,6 +35,8 @@ import org.geoserver.security.filter.GeoServerCompositeFilter;
 import org.geoserver.security.filter.GeoServerRoleResolvers;
 import org.geoserver.security.filter.GeoServerRoleResolvers.ResolverContext;
 import org.geoserver.security.filter.GeoServerSecurityFilter;
+import org.geoserver.security.oauth2.spring.GeoServerAuthorizationRequestCustomizer;
+import org.geoserver.security.oauth2.spring.GeoServerOidcIdTokenDecoderFactory;
 import org.geoserver.security.validation.SecurityConfigValidator;
 import org.geotools.util.logging.Logging;
 import org.springframework.context.ApplicationContext;
@@ -48,15 +53,31 @@ import org.springframework.security.oauth2.client.registration.InMemoryClientReg
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.client.web.AuthenticatedPrincipalOAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.savedrequest.RequestCacheAwareFilter;
 
-/** */
+/**
+ * Creates a {@link GeoServerOAuth2LoginAuthenticationFilter} which supports OAuth2 and OpenID
+ * Connect login by delegating to Spring's respective filters.
+ *
+ * <p>This provider uses the Spring public API ({@link HttpSecurity}) to setup the required Spring
+ * filters. Advantage: It's a hopefully future proof way of settings up the filters and their
+ * related objects. Disadvantage: Spring API is not designed to support changing of configuration in
+ * running applications. Effect: When saving changes via the admin UI, some then obsolete instances
+ * remain in the Spring factories as "disposableBeans". However, the memory footprint of these
+ * classes is small and no negative impact on the application has been identified, as the objects
+ * are no longer used. The advantages of this approach seem to outweigh the disadvantages.
+ *
+ * @see https://github.com/spring-projects/spring-security/issues/7449 (currently in status "open")
+ *     regarding more flexible configuration
+ */
 public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterProvider
         implements ApplicationListener<ApplicationEvent> {
 
@@ -76,15 +97,25 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
 
         private GeoServerOAuth2LoginFilterConfig config;
         private HttpSecurity http;
+        private GeoServerOidcIdTokenDecoderFactory tokenDecoderFactory;
+        /** Might be used for customizations. */
+        private Consumer<HttpSecurity> customizer = (h) -> {};
 
         /**
          * @param pConfig
          * @param pHttpSecurity
+         * @param pDecoderFactory
          */
-        public FilterBuilder(GeoServerOAuth2LoginFilterConfig pConfig, HttpSecurity pHttpSecurity) {
+        public FilterBuilder(
+                GeoServerOAuth2LoginFilterConfig pConfig,
+                HttpSecurity pHttpSecurity,
+                GeoServerOidcIdTokenDecoderFactory pDecoderFactory,
+                Consumer<HttpSecurity> pCustomizer) {
             super();
             config = pConfig;
             http = pHttpSecurity;
+            tokenDecoderFactory = pDecoderFactory;
+            customizer = pCustomizer;
         }
 
         private List<Filter> createFilters() {
@@ -105,8 +136,17 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
             ClientRegistrationRepository lCRR = clientRegistrationRepository();
             OAuth2AuthorizedClientService lACS = authorizedClientService(lCRR);
             OAuth2AuthorizedClientRepository lACR = authorizedClientRepository(lACS);
+            DefaultOAuth2AuthorizationRequestResolver lResolver;
+            String lAuthBaseUri = DEFAULT_AUTHORIZATION_REQUEST_BASE_URI;
+            lResolver = new DefaultOAuth2AuthorizationRequestResolver(lCRR, lAuthBaseUri);
+            lResolver.setAuthorizationRequestCustomizer(
+                    new GeoServerAuthorizationRequestCustomizer(config));
 
-            if (redirectAuto) {
+            // Attention: Singleton uses this config. If multiple instances of this filter shall
+            // be allowed in the future, adjust this accordingly.
+            tokenDecoderFactory.setGeoServerOAuth2LoginFilterConfig(config);
+
+            if (config.getEnableRedirectAuthenticationEntryPoint()) {
                 http.authorizeHttpRequests(authorize -> authorize.anyRequest().authenticated());
             }
             http.oauth2Login(
@@ -116,27 +156,12 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
                         oauthConfig.authorizedClientService(lACS);
                         oauthConfig.userInfoEndpoint().userService(lOAuth2UserService);
                         oauthConfig.userInfoEndpoint().oidcUserService(lOidcUserService);
+                        oauthConfig.authorizationEndpoint().authorizationRequestResolver(lResolver);
                     });
 
+            customizer.accept(http);
             SecurityFilterChain lChain = http.build();
             List<Filter> lFilters = lChain.getFilters();
-            // Chain consists of the following filters, created for a typical spring app:
-            // org.springframework.security.web.session.DisableEncodeUrlFilter
-            // org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter
-            // org.springframework.security.web.context.SecurityContextPersistenceFilter
-            // org.springframework.security.web.header.HeaderWriterFilter
-            // org.springframework.security.web.csrf.CsrfFilter
-            // org.springframework.security.web.authentication.logout.LogoutFilter
-            // org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter
-            // org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter
-            // org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter
-            // org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter
-            // org.springframework.security.web.savedrequest.RequestCacheAwareFilter
-            // org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
-            // org.springframework.security.web.authentication.AnonymousAuthenticationFilter
-            // org.springframework.security.web.session.SessionManagementFilter
-            // org.springframework.security.web.access.ExceptionTranslationFilter
-
             lFilters =
                     lFilters.stream()
                             .filter(f -> REQ_FILTER_TYPES.contains(f.getClass()))
@@ -248,6 +273,11 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
         private ClientRegistration customProviderRegistration() {
             String lScopeTxt = config.getOidcScopes();
             String[] lScopes = ScopeUtils.valueOf(lScopeTxt);
+            ClientAuthenticationMethod lAuthMethod =
+                    config.isOidcAuthenticationMethodPostSecret()
+                            ? CLIENT_SECRET_POST
+                            : CLIENT_SECRET_BASIC;
+
             return ClientRegistration
                     // registrationId is used in paths (login and authorization)
                     .withRegistrationId(REG_ID_OIDC)
@@ -255,7 +285,7 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
                     .clientSecret(config.getOidcClientSecret())
                     .userNameAttributeName(config.getOidcUserNameAttribute())
                     .redirectUri(config.getOidcRedirectUri())
-                    .clientAuthenticationMethod(CLIENT_SECRET_BASIC)
+                    .clientAuthenticationMethod(lAuthMethod)
                     .authorizationGrantType(AUTHORIZATION_CODE)
                     .scope(lScopes)
                     .authorizationUri(config.getOidcAuthorizationUri())
@@ -273,7 +303,9 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
 
     private GeoServerSecurityManager securityManager;
     private ApplicationContext context;
-    private boolean redirectAuto = false;
+
+    /** Might be used for customizations. */
+    private Consumer<HttpSecurity> httpSecurityCustomizer = (h) -> {};
 
     public GeoServerOAuth2LoginAuthenticationProvider(GeoServerSecurityManager pSecurityManager) {
         this.securityManager = pSecurityManager;
@@ -295,12 +327,16 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
     public GeoServerSecurityFilter createFilter(SecurityNamedServiceConfig config) {
         GeoServerOAuth2LoginFilterConfig lConfig = (GeoServerOAuth2LoginFilterConfig) config;
         HttpSecurity httpSecurity = context.getBean(HttpSecurity.class);
+        GeoServerOidcIdTokenDecoderFactory lDecoderFactory =
+                context.getBean(GeoServerOidcIdTokenDecoderFactory.class);
 
-        FilterBuilder lBuilder = new FilterBuilder(lConfig, httpSecurity);
+        FilterBuilder lBuilder =
+                new FilterBuilder(lConfig, httpSecurity, lDecoderFactory, httpSecurityCustomizer);
         List<Filter> lFilters = lBuilder.createFilters();
 
         GeoServerCompositeFilter filter = new GeoServerOAuth2LoginAuthenticationFilter();
         filter.setNestedFilters(lFilters);
+
         return filter;
     }
 
@@ -323,5 +359,10 @@ public class GeoServerOAuth2LoginAuthenticationProvider extends AbstractFilterPr
             GeoServerResourceLoader loader = geoserver.getCatalog().getResourceLoader();
             LoggingUtils.checkBuiltInLoggingConfiguration(loader, "OIDC_LOGGING");
         }
+    }
+
+    /** @param pHttpSecurityCustomizer the httpSecurityCustomizer to set */
+    public void setHttpSecurityCustomizer(Consumer<HttpSecurity> pHttpSecurityCustomizer) {
+        httpSecurityCustomizer = pHttpSecurityCustomizer;
     }
 }

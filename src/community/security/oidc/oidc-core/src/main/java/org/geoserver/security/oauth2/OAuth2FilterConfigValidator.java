@@ -6,6 +6,7 @@ package org.geoserver.security.oauth2;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import org.geoserver.security.GeoServerSecurityManager;
 import org.geoserver.security.config.SecurityNamedServiceConfig;
 import org.geoserver.security.validation.FilterConfigException;
@@ -52,7 +53,7 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
     protected void validateClientSecret(GeoServerOAuth2LoginFilterConfig filterConfig)
             throws FilterConfigException {
 
-        if (filterConfig.isUsePKCE()) {
+        if (filterConfig.isOidcUsePKCE()) {
             return;
         }
 
@@ -139,6 +140,24 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
             } catch (MalformedURLException ex) {
                 throw new OpenIdConnectFilterConfigException(
                         OpenIdConnectFilterConfigException.OAUTH2_WKTS_URL_MALFORMED);
+            }
+        }
+
+        validateScopes(filterConfig.getOidcScopes());
+        validateScopes(filterConfig.getMsScopes());
+    }
+
+    /**
+     * @param pScopeList
+     * @throws OpenIdConnectFilterConfigException
+     */
+    private void validateScopes(String pScopeList) throws OpenIdConnectFilterConfigException {
+        if (StringUtils.hasLength(pScopeList)) {
+            String[] lScopes = ScopeUtils.valueOf(pScopeList);
+            boolean lMix = Arrays.stream(lScopes).anyMatch(s -> s.contains(" "));
+            if (lMix) {
+                throw new OpenIdConnectFilterConfigException(
+                        OpenIdConnectFilterConfigException.OAUTH2_SCOPE_DELIMITER_MIXED);
             }
         }
     }

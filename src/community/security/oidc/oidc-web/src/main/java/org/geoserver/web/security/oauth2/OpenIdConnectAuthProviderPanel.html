@@ -215,6 +215,59 @@ ul.horizontal div {
                            <input id="oidcJwkSetUri" wicket:id="oidcJwkSetUri" type="text" class="field text" />
                            <a href="#" wicket:id="oidcJwkSetUriHelp" class="help-link"></a>
                         </li>
+                        <li>
+                           <label for="oidcEnforceTokenValidation">
+                              <span>
+                                 <wicket:message key="oidcEnforceTokenValidation"></wicket:message>
+                              </span>
+                           </label>
+                        </li>
+                        <li>
+                           <input id="oidcEnforceTokenValidation" wicket:id="oidcEnforceTokenValidation" type="checkbox" />
+                           <a href="#" wicket:id="oidcEnforceTokenValidationHelp" class="help-link"></a>
+                        </li>                        
+                        <li>
+                           <label for="oidcResponseMode">
+                              <span>
+                                 <wicket:message key="oidcResponseMode"></wicket:message>
+                              </span>
+                           </label>
+                           <input id="oidcResponseMode" wicket:id="oidcResponseMode" type="text" class="field text" />
+                           <a href="#" wicket:id="oidcResponseModeHelp" class="help-link"></a>
+                        </li>
+                        <li>
+                            <label for="oidcAuthenticationMethodPostSecret">
+                              <span>
+                                 <wicket:message key="oidcAuthenticationMethodPostSecret"></wicket:message>
+                              </span>
+                           </label>
+                        </li>
+                        <li>
+                           <input id="oidcAuthenticationMethodPostSecret" wicket:id="oidcAuthenticationMethodPostSecret" type="checkbox" />
+                           <a href="#" wicket:id="oidcAuthenticationMethodPostSecretHelp" class="help-link"></a>
+                        </li>
+                        <li>
+                           <fieldset>
+                              <legend>
+                                 <span>
+                                    <wicket:message key="oidcUsePKCE">Proof Key of Code Exchange</wicket:message>
+                                 </span>
+                                 <a href="#" wicket:id="oidcUsePKCEHelp" class="help-link"></a>
+                              </legend>
+                              <ul>
+                                 <li>
+                                    <label for="oidcUsePKCE">
+                                       <span>
+                                          <wicket:message key="oidcUsePKCE"></wicket:message>
+                                       </span>
+                                    </label>
+                                 </li>
+                                 <li>
+                                    <input id="oidcUsePKCE" wicket:id="oidcUsePKCE" type="checkbox" />
+                                 </li>
+                              </ul>
+                           </fieldset>
+                        </li>
                      </ul>
                   </fieldset>
                </li>
@@ -245,26 +298,8 @@ ul.horizontal div {
                      <input id="logoutUri" wicket:id="logoutUri" type="text" class="field text" />
                      <a href="#" wicket:id="logoutUriHelp" class="help-link"></a>
                   </li>
-                  <li>
-                     <label for="enforceTokenValidation">
-                        <span>
-                           <wicket:message key="enforceTokenValidation"></wicket:message>
-                        </span>
-                     </label>
-                  </li>
-                  <li>
-                     <input id="enforceTokenValidation" wicket:id="enforceTokenValidation" type="checkbox" />
-                     <a href="#" wicket:id="enforceTokenValidationHelp" class="help-link"></a>
-                  </li>
-                  <li>
-                     <label for="responseMode">
-                        <span>
-                           <wicket:message key="responseMode"></wicket:message>
-                        </span>
-                     </label>
-                     <input id="responseMode" wicket:id="responseMode" type="text" class="field text" />
-                     <a href="#" wicket:id="responseModeHelp" class="help-link"></a>
-                  </li>
+
+
                   <li>
                      <label for="postLogoutRedirectUri">
                         <span>
@@ -274,42 +309,10 @@ ul.horizontal div {
                      <input id="postLogoutRedirectUri" wicket:id="postLogoutRedirectUri" type="text" class="field text" />
                      <a href="#" wicket:id="postLogoutRedirectUriHelp" class="help-link"></a>
                   </li>
-                  <li>
-                     <label for="sendClientSecret">
-                        <span>
-                           <wicket:message key="sendClientSecret"></wicket:message>
-                        </span>
-                     </label>
-                  </li>
-                  <li>
-                     <input id="sendClientSecret" wicket:id="sendClientSecret" type="checkbox" />
-                     <a href="#" wicket:id="sendClientSecretHelp" class="help-link"></a>
-                  </li>
                </ul>
             </fieldset>
          </li>
-         <li>
-            <fieldset>
-               <legend>
-                  <span>
-                     <wicket:message key="PKCE">Proof Key of Code Exchange</wicket:message>
-                  </span>
-                  <a href="#" wicket:id="PKCEHelp" class="help-link"></a>
-               </legend>
-               <ul>
-                  <li>
-                     <label for="usePKCE">
-                        <span>
-                           <wicket:message key="usePKCE"></wicket:message>
-                        </span>
-                     </label>
-                  </li>
-                  <li>
-                     <input id="usePKCE" wicket:id="usePKCE" type="checkbox" />
-                  </li>
-               </ul>
-            </fieldset>
-         </li>
+         
       </ul>
       <br />
       <br />

@@ -153,8 +153,8 @@ public class OpenIdConnectAuthProviderPanel
 
             TextField<String> url =
                     new TextField<>(
-                            "discoveryURL",
-                            new PropertyModel<>(configModel.getObject(), "oidcDiscoveryURL"));
+                            "oidcDiscoveryUri",
+                            new PropertyModel<>(configModel.getObject(), "oidcDiscoveryUri"));
             add(url);
             add(
                     new AjaxButton("discover") {
@@ -170,7 +170,7 @@ public class OpenIdConnectAuthProviderPanel
                             discover(url.getInput(), target);
                         }
                     });
-            add(new HelpLink("discoveryURLKeyHelp", this).setDialog(dialog));
+            add(new HelpLink("oidcDiscoveryUriKeyHelp", this).setDialog(dialog));
         }
 
         private void discover(String discoveryURL, AjaxRequestTarget target) {
@@ -272,7 +272,10 @@ public class OpenIdConnectAuthProviderPanel
                 "GitHub",
                 () -> configModel.getObject().isGitHubEnabled());
         addProviderComponents(
-                prefixView, PREFIX_MS, "Microsoft", () -> configModel.getObject().isMsEnabled());
+                prefixView,
+                PREFIX_MS,
+                "Microsoft Azure",
+                () -> configModel.getObject().isMsEnabled());
 
         addProviderComponents(
                 prefixView,
@@ -287,25 +290,14 @@ public class OpenIdConnectAuthProviderPanel
         add(new CheckBox("enableRedirectAuthenticationEntryPoint"));
         add(new TextField<String>("logoutUri"));
 
-        add(new HelpLink("enforceTokenValidationHelp", this).setDialog(dialog));
-        add(new CheckBox("enforceTokenValidation"));
-
         add(new HelpLink("postLogoutRedirectUriHelp", this).setDialog(dialog));
         add(new TextField<String>("postLogoutRedirectUri"));
-
-        add(new HelpLink("responseModeHelp", this).setDialog(dialog));
-        add(new TextField<String>("responseMode"));
-        add(new HelpLink("sendClientSecretHelp", this).setDialog(dialog));
-        add(new CheckBox("sendClientSecret"));
 
         add(new HelpLink("allowUnSecureLoggingHelp", this).setDialog(dialog));
         add(new CheckBox("allowUnSecureLogging"));
 
         add(new HelpLink("allowBearerTokensHelp", this).setDialog(dialog));
         add(new CheckBox("allowBearerTokens"));
-
-        add(new HelpLink("PKCEHelp", this).setDialog(dialog));
-        add(new CheckBox("usePKCE"));
     }
 
     private void addProviderComponents(
@@ -343,7 +335,7 @@ public class OpenIdConnectAuthProviderPanel
 
         // -- Provider specifics --
 
-        boolean lSupportsScope = pProviderKey.equals(PREFIX_MS);
+        boolean lSupportsScope = pProviderKey.equals(PREFIX_MS) || pProviderKey.equals(PREFIX_OIDC);
         WebMarkupContainer lScopeContainer = new WebMarkupContainer("displayOnScopeSupport");
         lSHContainer.add(lScopeContainer);
         if (lSupportsScope) {
@@ -368,6 +360,18 @@ public class OpenIdConnectAuthProviderPanel
             lOidcContainer.add(new TextField<String>("oidcUserInfoUri"));
             lOidcContainer.add(new HelpLink("oidcJwkSetUriHelp", this).setDialog(dialog));
             lOidcContainer.add(new TextField<String>("oidcJwkSetUri"));
+            lOidcContainer.add(new HelpLink("oidcResponseModeHelp", this).setDialog(dialog));
+            lOidcContainer.add(new TextField<String>("oidcResponseMode"));
+            lOidcContainer.add(
+                    new HelpLink("oidcEnforceTokenValidationHelp", this).setDialog(dialog));
+            lOidcContainer.add(new CheckBox("oidcEnforceTokenValidation"));
+
+            lOidcContainer.add(
+                    new HelpLink("oidcAuthenticationMethodPostSecretHelp", this).setDialog(dialog));
+            lOidcContainer.add(new CheckBox("oidcAuthenticationMethodPostSecret"));
+
+            lOidcContainer.add(new HelpLink("oidcUsePKCEHelp", this).setDialog(dialog));
+            lOidcContainer.add(new CheckBox("oidcUsePKCE"));
         } else {
             lOidcContainer.setVisible(false);
         }

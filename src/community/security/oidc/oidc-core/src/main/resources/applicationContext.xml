@@ -54,4 +54,6 @@
 		class="org.springframework.security.config.annotation.configuration.ObjectPostProcessorConfiguration" />
 	<bean id="oidcAuthenticationConfiguration"
 		class="org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration" />
+		
+	<bean id="oidcIdTokenDecoderFactory" class="org.geoserver.security.oauth2.spring.GeoServerOidcIdTokenDecoderFactory"/>
 </beans>
