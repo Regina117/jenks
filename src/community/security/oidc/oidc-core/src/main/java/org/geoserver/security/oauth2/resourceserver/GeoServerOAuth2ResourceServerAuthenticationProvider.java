@@ -2,13 +2,12 @@
  * (c) 2024 Open Source Geospatial Foundation - all rights reserved This code is licensed under the
  * GPL 2.0 license, available at the root application directory.
  */
-package org.geoserver.security.oauth2;
+package org.geoserver.security.oauth2.resourceserver;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 import java.util.List;
-import java.util.logging.Logger;
 import javax.servlet.Filter;
 import org.geoserver.config.GeoServer;
 import org.geoserver.config.util.XStreamPersister;
@@ -25,8 +24,8 @@ import org.geoserver.security.filter.GeoServerCompositeFilter;
 import org.geoserver.security.filter.GeoServerRoleResolvers;
 import org.geoserver.security.filter.GeoServerRoleResolvers.ResolverContext;
 import org.geoserver.security.filter.GeoServerSecurityFilter;
+import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfigValidator;
 import org.geoserver.security.validation.SecurityConfigValidator;
-import org.geotools.util.logging.Logging;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
@@ -40,7 +39,14 @@ import org.springframework.security.oauth2.jwt.JwtDecoders;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
-/** */
+/**
+ * Provider for {@link GeoServerOAuth2ResourceServerAuthenticationFilter}.
+ *
+ * <p>Used for the "Resource Server" use case. Implementation is unfinished, because a different GS
+ * extension supports this case already. Filter is not offered in UI. This code is never executed.
+ *
+ * @author awaterme
+ */
 public class GeoServerOAuth2ResourceServerAuthenticationProvider extends AbstractFilterProvider
         implements ApplicationListener<ApplicationEvent> {
 
@@ -90,20 +96,6 @@ public class GeoServerOAuth2ResourceServerAuthenticationProvider extends Abstrac
 
             SecurityFilterChain lChain = http.build();
             List<Filter> lFilters = lChain.getFilters();
-            // Chain consists of the following filters, created for a typical spring app:
-            // org.springframework.security.web.session.DisableEncodeUrlFilter
-            // org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter
-            // org.springframework.security.web.context.SecurityContextPersistenceFilter
-            // org.springframework.security.web.header.HeaderWriterFilter
-            // org.springframework.security.web.csrf.CsrfFilter
-            // org.springframework.security.web.authentication.logout.LogoutFilter
-            // org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter
-            // org.springframework.security.web.savedrequest.RequestCacheAwareFilter
-            // org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
-            // org.springframework.security.web.authentication.AnonymousAuthenticationFilter
-            // org.springframework.security.web.session.SessionManagementFilter
-            // org.springframework.security.web.access.ExceptionTranslationFilter
-
             lFilters =
                     lFilters.stream()
                             .filter(f -> REQ_FILTER_TYPES.contains(f.getClass()))
@@ -126,9 +118,6 @@ public class GeoServerOAuth2ResourceServerAuthenticationProvider extends Abstrac
                     config.getRoleSource());
         }
     }
-
-    private static final Logger LOGGER =
-            Logging.getLogger(GeoServerOAuth2ResourceServerAuthenticationProvider.class);
 
     private GeoServerSecurityManager securityManager;
     private ApplicationContext context;
@@ -172,7 +161,7 @@ public class GeoServerOAuth2ResourceServerAuthenticationProvider extends Abstrac
     @Override
     public SecurityConfigValidator createConfigurationValidator(
             GeoServerSecurityManager securityManager) {
-        return new OpenIdConnectFilterConfigValidator(securityManager);
+        return new GeoServerOAuth2LoginFilterConfigValidator(securityManager);
     }
 
     /**

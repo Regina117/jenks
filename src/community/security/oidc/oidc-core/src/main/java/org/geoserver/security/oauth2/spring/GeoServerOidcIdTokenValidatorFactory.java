@@ -4,9 +4,10 @@
  */
 package org.geoserver.security.oauth2.spring;
 
+import static org.geoserver.security.oauth2.login.GeoServerOAuth2ClientRegistrationId.REG_ID_OIDC;
+
 import java.util.function.Function;
-import org.geoserver.security.oauth2.GeoServerOAuth2LoginAuthenticationProvider;
-import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
+import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig;
 import org.springframework.security.oauth2.client.oidc.authentication.OidcIdTokenValidator;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
@@ -39,7 +40,7 @@ public class GeoServerOidcIdTokenValidatorFactory
                         new JwtTimestampValidator(), new OidcIdTokenValidator(pClientReg));
 
         String pRegId = pClientReg.getRegistrationId();
-        if (!GeoServerOAuth2LoginAuthenticationProvider.REG_ID_OIDC.equals(pRegId)) {
+        if (!REG_ID_OIDC.equals(pRegId)) {
             return lDefaultValidator;
         }
 

@@ -2,14 +2,14 @@
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
  */
-package org.geoserver.web.security.oauth2;
+package org.geoserver.web.security.oauth2.login;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.geoserver.ows.util.ResponseUtils;
-import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
+import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig;
 import org.geotools.util.SuppressFBWarnings;
 import org.springframework.web.client.RestTemplate;
 
@@ -56,7 +56,7 @@ public class DiscoveryClient {
         Optional.ofNullable(response.get(JWK_SET_URI_ATTR_NAME))
                 .ifPresent(uri -> conf.setOidcJwkSetUri((String) uri));
         Optional.ofNullable(response.get(END_SESSION_ENDPONT))
-                .ifPresent(uri -> conf.setLogoutUri((String) uri));
+                .ifPresent(uri -> conf.setOidcLogoutUri((String) uri));
         Optional.ofNullable(response.get(SCOPES_SUPPORTED))
                 .ifPresent(
                         s -> {

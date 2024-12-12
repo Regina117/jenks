@@ -2,14 +2,12 @@
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
  */
-package org.geoserver.security.oauth2;
+package org.geoserver.security.oauth2.login;
 
 import static java.util.Optional.ofNullable;
-import static org.geoserver.security.oauth2.GeoServerOAuth2LoginAuthenticationProvider.REG_ID_GIT_HUB;
-import static org.geoserver.security.oauth2.GeoServerOAuth2LoginAuthenticationProvider.REG_ID_GOOGLE;
-import static org.geoserver.security.oauth2.GeoServerOAuth2LoginAuthenticationProvider.REG_ID_MICROSOFT;
-import static org.geoserver.security.oauth2.GeoServerOAuth2LoginAuthenticationProvider.REG_ID_OIDC;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.geoserver.config.GeoServer;
 import org.geoserver.platform.GeoServerExtensions;
@@ -23,20 +21,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 /**
  * Filter configuration for OAuth2 and OpenID Connect.
  *
- * <h3>Historical considerations</h3>
- *
- * This module was largely rewritten as part of the migration to spring-security 5.8. Previously
- * spring-securit-oauth was used, which is now replaced by OAuth2 support in spring-security itself.
- *
- * <p>Some noteworthy aspects regarding the available configuration:
- *
- * <ul>
- *   <li>TODO AW
- *   <li>
- * </ul>
+ * @author awaterme
  */
 public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFilterConfig
-        implements SecurityAuthFilterConfig {
+        implements SecurityAuthFilterConfig, GeoServerOAuth2ClientRegistrationId {
 
     private static final long serialVersionUID = -8581346584859849804L;
 
@@ -77,7 +65,7 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     private String gitHubUserNameAttribute = "id";
     private String gitHubRedirectUri;
 
-    // Microsoft
+    // Microsoft Azure
     private boolean msEnabled;
     private String msClientId;
     private String msClientSecret;
@@ -98,53 +86,64 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     private String oidcAuthorizationUri;
     private String oidcUserInfoUri;
     private String oidcJwkSetUri;
+    private String oidcLogoutUri;
 
     private Boolean oidcForceAuthorizationUriHttps;
     private Boolean oidcForceTokenUriHttps;
-    private String oidcResponseMode;
     private boolean oidcEnforceTokenValidation = true;
+    private boolean oidcUsePKCE = false;
+    private String oidcResponseMode;
     private boolean oidcAuthenticationMethodPostSecret = false;
 
-    // TODO AW: below is not yet migrated
-    private String logoutUri;
-    private String postLogoutRedirectUri;
     private String tokenRolesClaim;
-
+    private String postLogoutRedirectUri;
+    // TODO AW: validate
     private Boolean enableRedirectAuthenticationEntryPoint;
-    private boolean allowBearerTokens = true;
-    private boolean oidcUsePKCE = false;
-
-    /**
-     * Add extra logging. NOTE: this might spill confidential information to the log - do not turn
-     * on in normal operation!
-     */
-    private boolean allowUnSecureLogging = false;
 
     public GeoServerOAuth2LoginFilterConfig() {
-        this.oidcRedirectUri = baseRedirectUri();
         this.postLogoutRedirectUri = baseRedirectUri();
         this.oidcScopes = "user";
         this.enableRedirectAuthenticationEntryPoint = false;
         this.oidcForceTokenUriHttps = true;
         this.oidcForceAuthorizationUriHttps = true;
-        this.calculateredirectUris();
+        this.calculateRedirectUris();
     };
 
-    public void calculateredirectUris() {
+    public void calculateRedirectUris() {
         this.googleRedirectUri = redirectUri(REG_ID_GOOGLE);
         this.gitHubRedirectUri = redirectUri(REG_ID_GIT_HUB);
         this.msRedirectUri = redirectUri(REG_ID_MICROSOFT);
         this.oidcRedirectUri = redirectUri(REG_ID_OIDC);
     }
 
-    /**
-     * @param pRegId
-     * @return
-     */
     private String redirectUri(String pRegId) {
-        String lBase =
-                ofNullable(baseRedirectUri).map(s -> s.endsWith("/") ? s : s + "/").orElse("/");
+        String lBase = baseRedirectUriNormalized();
         return lBase + "login/oauth2/code/" + pRegId;
+    }
+
+    private String baseRedirectUriNormalized() {
+        return ofNullable(baseRedirectUri).map(s -> s.endsWith("/") ? s : s + "/").orElse("/");
+    }
+
+    public String getAuthenticationEntryPointRedirectUri() {
+        List<String> lRegIds = new ArrayList<>();
+        if (isGoogleEnabled()) {
+            lRegIds.add(REG_ID_GOOGLE);
+        }
+        if (isGitHubEnabled()) {
+            lRegIds.add(REG_ID_GIT_HUB);
+        }
+        if (isMsEnabled()) {
+            lRegIds.add(REG_ID_MICROSOFT);
+        }
+        if (isOidcEnabled()) {
+            lRegIds.add(REG_ID_OIDC);
+        }
+        if (lRegIds.isEmpty() || 1 < lRegIds.size()) {
+            return null;
+        }
+        String lBase = baseRedirectUriNormalized();
+        return lBase + "oauth2/authorization/" + lRegIds.get(0);
     }
 
     /**
@@ -172,15 +171,7 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     }
 
     public boolean providesAuthenticationEntryPoint() {
-        return true; // TODO AW
-    }
-
-    public boolean isAllowUnSecureLogging() {
-        return allowUnSecureLogging;
-    }
-
-    public void setAllowUnSecureLogging(boolean allowUnSecureLogging) {
-        this.allowUnSecureLogging = allowUnSecureLogging;
+        return false;
     }
 
     /** @return the cliendId */
@@ -244,13 +235,13 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     }
 
     /** @return the logoutUri */
-    public String getLogoutUri() {
-        return logoutUri;
+    public String getOidcLogoutUri() {
+        return oidcLogoutUri;
     }
 
     /** @param logoutUri the logoutUri to set */
-    public void setLogoutUri(String logoutUri) {
-        this.logoutUri = logoutUri;
+    public void setOidcLogoutUri(String logoutUri) {
+        this.oidcLogoutUri = logoutUri;
     }
 
     /** @return the scopes */
@@ -327,14 +318,6 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
 
     public void setOidcAuthenticationMethodPostSecret(boolean sendClientSecret) {
         this.oidcAuthenticationMethodPostSecret = sendClientSecret;
-    }
-
-    public boolean isAllowBearerTokens() {
-        return allowBearerTokens;
-    }
-
-    public void setAllowBearerTokens(boolean allowBearerTokens) {
-        this.allowBearerTokens = allowBearerTokens;
     }
 
     public String getPostLogoutRedirectUri() {

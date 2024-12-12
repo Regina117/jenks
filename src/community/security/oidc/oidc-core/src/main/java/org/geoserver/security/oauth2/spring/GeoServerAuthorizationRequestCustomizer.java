@@ -4,21 +4,25 @@
  */
 package org.geoserver.security.oauth2.spring;
 
-import static org.geoserver.security.oauth2.GeoServerOAuth2LoginAuthenticationProvider.REG_ID_OIDC;
+import static org.geoserver.security.oauth2.login.GeoServerOAuth2ClientRegistrationId.REG_ID_OIDC;
 import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.REGISTRATION_ID;
 
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
-import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
+import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig;
 import org.geotools.util.logging.Logging;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestCustomizers;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest.Builder;
 
 /**
- * Adapts {@link OAuth2AuthorizationRequest}s to specific needs. Currently used to handle
- * "response_mode" special case.
+ * Adapts {@link OAuth2AuthorizationRequest}s to specific needs. Currently:
+ *
+ * <ul>
+ *   <li>"response_mode" special case
+ *   <li>PKCE
+ * </ul>
  *
  * @author awaterme
  */

@@ -9,15 +9,15 @@ import static java.util.stream.Collectors.joining;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
+import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig;
 import org.geotools.util.logging.Logging;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
 import org.springframework.security.oauth2.jwt.Jwt;
 
 /**
- * This {@link OAuth2TokenValidator} implementation uses a {@link #delegate} for token validation.
- * If OIDC token validation is configured to be non-enforcing, the validation result will always be
+ * {@link OAuth2TokenValidator} implementation uses a {@link #delegate} for token validation. If
+ * OIDC token validation is configured to be non-enforcing, the validation result will always be
  * "success." In such cases, if the delegate validation fails, only a warning message will be
  * logged.
  *

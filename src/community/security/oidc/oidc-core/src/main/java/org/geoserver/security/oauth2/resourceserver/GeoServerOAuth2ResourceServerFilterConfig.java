@@ -2,12 +2,19 @@
  * (c) 2018 Open Source Geospatial Foundation - all rights reserved This code is licensed under the
  * GPL 2.0 license, available at the root application directory.
  */
-package org.geoserver.security.oauth2;
+package org.geoserver.security.oauth2.resourceserver;
 
 import org.geoserver.security.config.PreAuthenticatedUserNameFilterConfig;
 import org.geoserver.security.config.SecurityAuthFilterConfig;
 
-/** @author Alessio Fabiani, GeoSolutions S.A.S. */
+/**
+ * Configuration for {@link GeoServerOAuth2ResourceServerAuthenticationFilter}.
+ *
+ * <p>Used for the "Resource Server" use case. Implementation is unfinished, because a different GS
+ * extension supports this case already. Filter is not offered in UI. This code is never executed.
+ *
+ * @author awaterme
+ */
 public class GeoServerOAuth2ResourceServerFilterConfig extends PreAuthenticatedUserNameFilterConfig
         implements SecurityAuthFilterConfig {
 

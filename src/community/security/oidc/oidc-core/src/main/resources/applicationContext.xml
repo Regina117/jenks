@@ -33,15 +33,26 @@
 
 	<bean id="oauth2LoginAuthenticationProvider"
 		depends-on="oidcHttpSecurityConfiguration"
-		class="org.geoserver.security.oauth2.GeoServerOAuth2LoginAuthenticationProvider">
+		class="org.geoserver.security.oauth2.login.GeoServerOAuth2LoginAuthenticationProvider">
 		<constructor-arg ref="authenticationManager" />
 	</bean>
 	
+	<bean id="geoServerOAuth2LoginAuthenticationFilterBuilder" 
+	       class="org.geoserver.security.oauth2.login.GeoServerOAuth2LoginAuthenticationFilterBuilder" scope="prototype">
+	           <property name="tokenDecoderFactory" ref="oidcIdTokenDecoderFactory"/>
+	           <property name="http" ref="org.springframework.security.config.annotation.web.configuration.HttpSecurityConfiguration.httpSecurity"/>
+	</bean>
+	
+	<!-- 
+        Used for the "Resource Server" use case. Implementation is unfinished, because a different GS
+        extension supports this case already. Filter is not offered in UI. This code is never executed.
+
 	<bean id="oauth2ResourceServerAuthenticationProvider"
         depends-on="oidcHttpSecurityConfiguration"
-        class="org.geoserver.security.oauth2.GeoServerOAuth2ResourceServerAuthenticationProvider">
+        class="org.geoserver.security.oauth2.resourceserver.GeoServerOAuth2ResourceServerAuthenticationProvider">
         <constructor-arg ref="authenticationManager" />
     </bean>
+     -->
 
 	<bean id="oidcHttpSecurityConfiguration"
 		class="org.springframework.security.config.annotation.web.configuration.HttpSecurityConfiguration"

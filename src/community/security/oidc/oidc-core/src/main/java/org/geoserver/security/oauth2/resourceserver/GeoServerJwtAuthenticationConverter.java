@@ -2,7 +2,7 @@
  * (c) 2024 Open Source Geospatial Foundation - all rights reserved This code is licensed under the
  * GPL 2.0 license, available at the root application directory.
  */
-package org.geoserver.security.oauth2;
+package org.geoserver.security.oauth2.resourceserver;
 
 import java.util.Collection;
 import org.geoserver.security.filter.GeoServerRoleResolvers;
@@ -14,7 +14,14 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
-/** */
+/**
+ * {@link Jwt} converter considering GeoServer basic role sources for authorization.
+ *
+ * <p>Used for the "Resource Server" use case. Implementation is unfinished, because a different GS
+ * extension supports this case already. Filter is not offered in UI. This code is never executed.
+ *
+ * @author awaterme
+ */
 public class GeoServerJwtAuthenticationConverter
         implements Converter<Jwt, AbstractAuthenticationToken> {
 

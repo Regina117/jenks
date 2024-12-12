@@ -276,13 +276,13 @@ public class GeoServerRoleResolvers {
      */
     public static final RoleResolver HTTP_HEADER_RESOLVER =
             p -> {
-                if (p.request == null) {
+                if (p.getRequest() == null) {
                     throw new GeoServerRuntimException(
                             "Resolving roles from HTTP headers failed. Request not available.");
                 }
                 Collection<GeoServerRole> roles = new ArrayList<>();
 
-                String rolesString = p.request.getHeader(p.getRolesHeaderAttribute());
+                String rolesString = p.getRequest().getHeader(p.getRolesHeaderAttribute());
                 if (rolesString == null || rolesString.trim().length() == 0) {
                     LOGGER.log(
                             Level.WARNING,
@@ -318,16 +318,12 @@ public class GeoServerRoleResolvers {
                 } else if (PreAuthenticatedUserNameRoleSource.Header.equals(rs)) {
                     roles = HTTP_HEADER_RESOLVER.convert(p);
                 } else {
-                    throw new RuntimeException(
-                            "Couldn't determine roles based on the specified role source ["
-                                    + rs
-                                    + "].");
+                    String lMsg = "Couldn't determine roles based on the specified role source %s.";
+                    throw new RuntimeException(String.format(lMsg, rs));
                 }
 
-                LOGGER.log(
-                        Level.FINE,
-                        "Got roles {0} from {1} for principal {2}",
-                        new Object[] {roles, rs, p.principal});
+                String lMsg = "Got roles {0} from {1} for principal {2}";
+                LOGGER.log(Level.FINE, lMsg, new Object[] {roles, rs, p.principal});
 
                 return roles;
             };

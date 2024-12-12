@@ -11,7 +11,7 @@
  * application directory.
  *
  */
-package org.geoserver.web.security.oauth2;
+package org.geoserver.web.security.oauth2.resourceserver;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,8 +23,8 @@ import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.model.IModel;
 import org.geoserver.security.config.PreAuthenticatedUserNameFilterConfig.PreAuthenticatedUserNameRoleSource;
 import org.geoserver.security.config.RoleSource;
-import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource;
-import org.geoserver.security.oauth2.GeoServerOAuth2ResourceServerFilterConfig;
+import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource;
+import org.geoserver.security.oauth2.resourceserver.GeoServerOAuth2ResourceServerFilterConfig;
 import org.geoserver.security.web.auth.PreAuthenticatedUserNameFilterPanel;
 import org.geoserver.security.web.auth.RoleSourceChoiceRenderer;
 import org.geoserver.web.wicket.GeoServerDialog;

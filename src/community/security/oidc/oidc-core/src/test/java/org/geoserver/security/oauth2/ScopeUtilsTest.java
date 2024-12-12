@@ -6,6 +6,7 @@ package org.geoserver.security.oauth2;
 
 import static org.junit.Assert.*;
 
+import org.geoserver.security.oauth2.login.ScopeUtils;
 import org.junit.Test;
 
 /** Tests for {@link ScopeUtils}. */

@@ -2,13 +2,15 @@
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
  */
-package org.geoserver.security.oauth2;
+package org.geoserver.security.oauth2.login;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import org.geoserver.security.GeoServerSecurityManager;
 import org.geoserver.security.config.SecurityNamedServiceConfig;
+import org.geoserver.security.oauth2.common.GeoServerOAuth2FilterConfigException;
+import org.geoserver.security.oauth2.common.OAuth2FilterConfigException;
 import org.geoserver.security.validation.FilterConfigException;
 import org.geoserver.security.validation.FilterConfigValidator;
 import org.springframework.util.StringUtils;
@@ -17,9 +19,12 @@ import org.springframework.util.StringUtils;
  * @author Alessio Fabiani, GeoSolutions S.A.S.
  *     <p>Validates {@link OAuth2FilterConfig} objects.
  */
-public class OAuth2FilterConfigValidator extends FilterConfigValidator {
 
-    public OAuth2FilterConfigValidator(GeoServerSecurityManager securityManager) {
+// TODO AW: review & complete for new fields
+// TODO AW: ensure only one filter instance exists, see singleton comment in filter provider
+public class GeoServerOAuth2LoginFilterConfigValidator extends FilterConfigValidator {
+
+    public GeoServerOAuth2LoginFilterConfigValidator(GeoServerSecurityManager securityManager) {
         super(securityManager);
     }
 
@@ -30,8 +35,8 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
         if (StringUtils.hasLength(filterConfig.getOidcUserInfoUri()) == false
                 && StringUtils.hasLength(oidcFilterConfig.getOidcJwkSetUri()) == false) {
             // One of checkTokenEndpointUrl or jwkURI is required
-            throw new OpenIdConnectFilterConfigException(
-                    OpenIdConnectFilterConfigException
+            throw new GeoServerOAuth2FilterConfigException(
+                    GeoServerOAuth2FilterConfigException
                             .OAUTH2_CHECKTOKEN_OR_WKTS_ENDPOINT_URL_REQUIRED);
         }
         if (StringUtils.hasLength(filterConfig.getOidcUserInfoUri()) != false) {
@@ -75,9 +80,9 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
 
     public void validateOAuth2FilterConfig(GeoServerOAuth2LoginFilterConfig filterConfig)
             throws FilterConfigException {
-        if (StringUtils.hasLength(filterConfig.getLogoutUri())) {
+        if (StringUtils.hasLength(filterConfig.getOidcLogoutUri())) {
             try {
-                new URL(filterConfig.getLogoutUri());
+                new URL(filterConfig.getOidcLogoutUri());
             } catch (MalformedURLException ex) {
                 throw createFilterException(
                         OAuth2FilterConfigException.OAUTH2_URL_IN_LOGOUT_URI_MALFORMED);
@@ -138,8 +143,17 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
             try {
                 new URL(filterConfig.getOidcJwkSetUri());
             } catch (MalformedURLException ex) {
-                throw new OpenIdConnectFilterConfigException(
-                        OpenIdConnectFilterConfigException.OAUTH2_WKTS_URL_MALFORMED);
+                throw new GeoServerOAuth2FilterConfigException(
+                        GeoServerOAuth2FilterConfigException.OAUTH2_WKTS_URL_MALFORMED);
+            }
+        }
+
+        if (StringUtils.hasLength(filterConfig.getOidcJwkSetUri()) != false) {
+            try {
+                new URL(filterConfig.getOidcJwkSetUri());
+            } catch (MalformedURLException ex) {
+                throw new GeoServerOAuth2FilterConfigException(
+                        GeoServerOAuth2FilterConfigException.OAUTH2_WKTS_URL_MALFORMED);
             }
         }
 
@@ -149,15 +163,15 @@ public class OAuth2FilterConfigValidator extends FilterConfigValidator {
 
     /**
      * @param pScopeList
-     * @throws OpenIdConnectFilterConfigException
+     * @throws GeoServerOAuth2FilterConfigException
      */
-    private void validateScopes(String pScopeList) throws OpenIdConnectFilterConfigException {
+    private void validateScopes(String pScopeList) throws GeoServerOAuth2FilterConfigException {
         if (StringUtils.hasLength(pScopeList)) {
             String[] lScopes = ScopeUtils.valueOf(pScopeList);
             boolean lMix = Arrays.stream(lScopes).anyMatch(s -> s.contains(" "));
             if (lMix) {
-                throw new OpenIdConnectFilterConfigException(
-                        OpenIdConnectFilterConfigException.OAUTH2_SCOPE_DELIMITER_MIXED);
+                throw new GeoServerOAuth2FilterConfigException(
+                        GeoServerOAuth2FilterConfigException.OAUTH2_SCOPE_DELIMITER_MIXED);
             }
         }
     }

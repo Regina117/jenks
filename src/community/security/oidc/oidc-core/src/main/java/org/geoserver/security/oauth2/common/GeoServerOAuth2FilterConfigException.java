@@ -2,17 +2,20 @@
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
  */
-package org.geoserver.security.oauth2;
+package org.geoserver.security.oauth2.common;
 
 import org.geoserver.security.validation.FilterConfigException;
 
-public class OpenIdConnectFilterConfigException extends FilterConfigException {
+public class GeoServerOAuth2FilterConfigException extends FilterConfigException {
 
-    public OpenIdConnectFilterConfigException(String errorId, Object... args) {
+    /** serialVersionUID */
+    private static final long serialVersionUID = -3686715589371356406L;
+
+    public GeoServerOAuth2FilterConfigException(String errorId, Object... args) {
         super(errorId, args);
     }
 
-    public OpenIdConnectFilterConfigException(String errorId, String message, Object... args) {
+    public GeoServerOAuth2FilterConfigException(String errorId, String message, Object... args) {
         super(errorId, message, args);
     }
 

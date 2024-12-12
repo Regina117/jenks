@@ -2,9 +2,13 @@
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
  */
-package org.geoserver.security.oauth2;
+package org.geoserver.security.oauth2.login;
 
-/** Provides scope related utils. */
+/**
+ * Provides scope related utilities.
+ *
+ * @author awaterme
+ */
 public class ScopeUtils {
 
     /**

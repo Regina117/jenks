@@ -2,7 +2,7 @@
  * This code is licensed under the GPL 2.0 license, available at the root
  * application directory.
  */
-package org.geoserver.security.oauth2;
+package org.geoserver.security.oauth2.common;
 
 import org.geoserver.security.validation.FilterConfigException;
 

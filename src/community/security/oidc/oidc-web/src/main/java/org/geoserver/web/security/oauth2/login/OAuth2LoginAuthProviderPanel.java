@@ -9,13 +9,14 @@
  * GPL 2.0 license, available at the root application directory.
  *
  */
-package org.geoserver.web.security.oauth2;
+package org.geoserver.web.security.oauth2.login;
 
-import static org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.AccessToken;
-import static org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.IdToken;
-import static org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.MSGraphAPI;
-import static org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.UserInfo;
+import static org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.AccessToken;
+import static org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.IdToken;
+import static org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.MSGraphAPI;
+import static org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.UserInfo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -43,8 +44,8 @@ import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.model.StringResourceModel;
 import org.geoserver.security.config.PreAuthenticatedUserNameFilterConfig.PreAuthenticatedUserNameRoleSource;
 import org.geoserver.security.config.RoleSource;
-import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
-import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource;
+import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig;
+import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource;
 import org.geoserver.security.web.auth.PreAuthenticatedUserNameFilterPanel;
 import org.geoserver.security.web.auth.RoleSourceChoiceRenderer;
 import org.geoserver.web.GeoServerBasePage;
@@ -58,7 +59,7 @@ import org.geotools.util.logging.Logging;
  *
  * @author Alessio Fabiani, GeoSolutions S.A.S.
  */
-public class OpenIdConnectAuthProviderPanel
+public class OAuth2LoginAuthProviderPanel
         extends PreAuthenticatedUserNameFilterPanel<GeoServerOAuth2LoginFilterConfig> {
 
     /** serialVersionUID */
@@ -75,6 +76,10 @@ public class OpenIdConnectAuthProviderPanel
 
     /** Prefix of custom OIDC specific attributes */
     private static final String PREFIX_OIDC = "oidc";
+
+    /** Must be serializable in order for Wicket to work */
+    @FunctionalInterface
+    private interface VisibleSupplier extends Supplier<Boolean>, Serializable {}
 
     /**
      * If they have chosen MSGraphAPI as the RoleProvider, we need to make sure that the userinfo
@@ -99,50 +104,18 @@ public class OpenIdConnectAuthProviderPanel
                 return;
             }
 
-            TextField userInfoTextField = (TextField) form.get("panel").get("oidcUserInfoUri");
-
-            String userInfoEndpointUrl = (String) userInfoTextField.getConvertedInput();
-
-            if (!userInfoEndpointUrl.startsWith("https://graph.microsoft.com/")) {
-                form.error(form.getString("OpenIdConnectAuthProviderPanel.invalidMSGraphURL"));
-            }
-        }
-    }
-
-    /**
-     * Attached Bearer Tokens are NOT compatible with ID Tokens roles source. This is because there
-     * isn't an ID Token available when the Access Token is attached to the HTTP request. User
-     * should choose a different role Source (which may require setting up the IDP to put roles in a
-     * different location).
-     */
-    class BearerTokenNoIDTokensValidator extends AbstractFormValidator {
-
-        @Override
-        public FormComponent<?>[] getDependentFormComponents() {
-            return null;
-        }
-
-        /**
-         * if Bearer Tokens are on, and role source is ID Token, then give an error message
-         *
-         * @param form
-         */
-        @Override
-        public void validate(Form<?> form) {
-            CheckBox allowBearerTokensCheckbox =
-                    (CheckBox) form.get("panel").get("allowBearerTokens");
-            if (allowBearerTokensCheckbox == null) {
-                return; // this happens when the "discovery" button is pressed
-            }
-            if (!allowBearerTokensCheckbox.getConvertedInput())
-                return; // bearer tokens not allowed -> no issues
-
-            DropDownChoice roleSource = (DropDownChoice) form.get("panel").get("roleSource");
-
-            if (IdToken.equals(roleSource.getConvertedInput())) {
-                form.error(
-                        form.getString("OpenIdConnectAuthProviderPanel.invalidBearerRoleSource"));
-            }
+            // TODO AW
+            return;
+            //            TextField userInfoTextField = (TextField)
+            // form.get("panel").get("oidcUserInfoUri");
+            //
+            //            String userInfoEndpointUrl = (String)
+            // userInfoTextField.getConvertedInput();
+            //
+            //            if (!userInfoEndpointUrl.startsWith("https://graph.microsoft.com/")) {
+            //
+            // form.error(form.getString("OAuth2LoginAuthProviderPanel.invalidMSGraphURL"));
+            //            }
         }
     }
 
@@ -176,10 +149,10 @@ public class OpenIdConnectAuthProviderPanel
         private void discover(String discoveryURL, AjaxRequestTarget target) {
             GeoServerOAuth2LoginFilterConfig model =
                     (GeoServerOAuth2LoginFilterConfig)
-                            OpenIdConnectAuthProviderPanel.this.getForm().getModelObject();
+                            OAuth2LoginAuthProviderPanel.this.getForm().getModelObject();
             try {
                 new DiscoveryClient(discoveryURL).autofill(model);
-                target.add(OpenIdConnectAuthProviderPanel.this);
+                target.add(OAuth2LoginAuthProviderPanel.this);
                 ((GeoServerBasePage) getPage()).addFeedbackPanels(target);
             } catch (Exception e) {
                 error(new ParamResourceModel("discoveryError", this, e.getMessage()).getString());
@@ -230,15 +203,14 @@ public class OpenIdConnectAuthProviderPanel
         }
     }
 
-    private static Logger LOGGER = Logging.getLogger(OpenIdConnectAuthProviderPanel.class);
+    private static Logger LOGGER = Logging.getLogger(OAuth2LoginAuthProviderPanel.class);
 
     private GeoServerDialog dialog;
 
     @SuppressWarnings("serial")
-    public OpenIdConnectAuthProviderPanel(
-            String id, IModel<GeoServerOAuth2LoginFilterConfig> model) {
+    public OAuth2LoginAuthProviderPanel(String id, IModel<GeoServerOAuth2LoginFilterConfig> model) {
         super(id, model);
-
+        GeoServerOAuth2LoginFilterConfig config = model.getObject();
         this.dialog = (GeoServerDialog) get("dialog");
 
         add(new HelpLink("userNameAttributeHelp", this).setDialog(dialog));
@@ -250,8 +222,8 @@ public class OpenIdConnectAuthProviderPanel
 
                     @Override
                     protected void onUpdate(AjaxRequestTarget pTarget) {
-                        configModel.getObject().calculateredirectUris();
-                        pTarget.add(OpenIdConnectAuthProviderPanel.this);
+                        configModel.getObject().calculateRedirectUris();
+                        pTarget.add(OAuth2LoginAuthProviderPanel.this);
                     }
                 });
 
@@ -261,43 +233,22 @@ public class OpenIdConnectAuthProviderPanel
         RepeatingView prefixView = new RepeatingView("prefixView");
         add(prefixView);
 
-        addProviderComponents(
-                prefixView,
-                PREFIX_GOOGLE,
-                "Google",
-                () -> configModel.getObject().isGoogleEnabled());
-        addProviderComponents(
-                prefixView,
-                PREFIX_GIT_HUB,
-                "GitHub",
-                () -> configModel.getObject().isGitHubEnabled());
-        addProviderComponents(
-                prefixView,
-                PREFIX_MS,
-                "Microsoft Azure",
-                () -> configModel.getObject().isMsEnabled());
-
-        addProviderComponents(
-                prefixView,
-                PREFIX_OIDC,
-                "OpenID Connect Provider",
-                () -> configModel.getObject().isOidcEnabled());
+        VisibleSupplier isGoogleVisible = () -> config.isGoogleEnabled();
+        VisibleSupplier isGitHubVisible = () -> config.isGitHubEnabled();
+        VisibleSupplier isMsVisible = () -> config.isMsEnabled();
+        VisibleSupplier isOidcVisible = () -> config.isOidcEnabled();
+        addProviderComponents(prefixView, PREFIX_GOOGLE, "Google", isGoogleVisible);
+        addProviderComponents(prefixView, PREFIX_GIT_HUB, "GitHub", isGitHubVisible);
+        addProviderComponents(prefixView, PREFIX_MS, "Microsoft Azure", isMsVisible);
+        addProviderComponents(prefixView, PREFIX_OIDC, "OpenID Connect Provider", isOidcVisible);
 
         add(new HelpLink("enableRedirectAuthenticationEntryPointHelp", this).setDialog(dialog));
-        add(new HelpLink("connectionParametersHelp", this).setDialog(dialog));
-        add(new HelpLink("logoutUriHelp", this).setDialog(dialog));
-
         add(new CheckBox("enableRedirectAuthenticationEntryPoint"));
-        add(new TextField<String>("logoutUri"));
+
+        add(new HelpLink("connectionParametersHelp", this).setDialog(dialog));
 
         add(new HelpLink("postLogoutRedirectUriHelp", this).setDialog(dialog));
         add(new TextField<String>("postLogoutRedirectUri"));
-
-        add(new HelpLink("allowUnSecureLoggingHelp", this).setDialog(dialog));
-        add(new CheckBox("allowUnSecureLogging"));
-
-        add(new HelpLink("allowBearerTokensHelp", this).setDialog(dialog));
-        add(new CheckBox("allowBearerTokens"));
     }
 
     private void addProviderComponents(
@@ -305,7 +256,7 @@ public class OpenIdConnectAuthProviderPanel
             String pProviderKey,
             String pProviderLabel,
             Supplier<Boolean> pShowConfig) {
-        OpenIdConnectAuthProviderPanel lMainPanel = OpenIdConnectAuthProviderPanel.this;
+        OAuth2LoginAuthProviderPanel lMainPanel = OAuth2LoginAuthProviderPanel.this;
         WebMarkupContainer lContainer = new WebMarkupContainer(pView.newChildId());
         pView.add(lContainer);
 
@@ -333,7 +284,7 @@ public class OpenIdConnectAuthProviderPanel
         lSHContainer.add(new HelpLink("connectionForParametersHelp", this).setDialog(dialog));
         lSHContainer.add(new HelpLink("redirectUriHelp", this).setDialog(dialog));
 
-        // -- Provider specifics --
+        // -- Provider specifics below --
 
         boolean lSupportsScope = pProviderKey.equals(PREFIX_MS) || pProviderKey.equals(PREFIX_OIDC);
         WebMarkupContainer lScopeContainer = new WebMarkupContainer("displayOnScopeSupport");
@@ -372,6 +323,13 @@ public class OpenIdConnectAuthProviderPanel
 
             lOidcContainer.add(new HelpLink("oidcUsePKCEHelp", this).setDialog(dialog));
             lOidcContainer.add(new CheckBox("oidcUsePKCE"));
+
+            lOidcContainer.add(new HelpLink("oidcLogoutUriHelp", this).setDialog(dialog));
+            lOidcContainer.add(new TextField<String>("oidcLogoutUri"));
+
+            lOidcContainer.add(new HelpLink("oidcAdvancedSettingsHelp", this).setDialog(dialog));
+            lOidcContainer.add(new HelpLink("oidcProviderSettingsHelp", this).setDialog(dialog));
+
         } else {
             lOidcContainer.setVisible(false);
         }
@@ -404,7 +362,6 @@ public class OpenIdConnectAuthProviderPanel
     @Override
     protected void onInitialize() {
         super.onInitialize();
-        getForm().add(new BearerTokenNoIDTokensValidator());
         getForm().add(new MSGraphRoleProviderOnlyWithMSGraphSystem());
     }
 
@@ -421,11 +378,5 @@ public class OpenIdConnectAuthProviderPanel
         List<RoleSource> sources = new ArrayList<>(Arrays.asList(OpenIdRoleSource.values()));
         sources.addAll(Arrays.asList(PreAuthenticatedUserNameRoleSource.values()));
         return new DropDownChoice<>("roleSource", sources, new RoleSourceChoiceRenderer());
-    }
-
-    private TextField<String> disabledTextField(String pName) {
-        TextField<String> lField = new TextField<String>(pName);
-        lField.setEnabled(false);
-        return lField;
     }
 }

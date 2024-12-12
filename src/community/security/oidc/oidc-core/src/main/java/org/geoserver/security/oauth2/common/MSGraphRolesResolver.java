@@ -1,8 +1,8 @@
-/* (c) 2022 Open Source Geospatial Foundation - all rights reserved
- * This code is licensed under the GPL 2.0 license, available at the root
- * application directory.
+/*
+ * (c) 2022 Open Source Geospatial Foundation - all rights reserved This code is licensed under the
+ * GPL 2.0 license, available at the root application directory.
  */
-package org.geoserver.security.oauth2;
+package org.geoserver.security.oauth2.common;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -71,17 +71,14 @@ public class MSGraphRolesResolver {
      * @throws IOException
      */
     private String resolveUrl(String accessToken) throws IOException {
-        HttpURLConnection http = null;
 
-        try {
-            http = createHTTPRequest(accessToken);
-            String result =
-                    new BufferedReader(new InputStreamReader(http.getInputStream()))
-                            .lines()
-                            .collect(Collectors.joining("\n"));
+        HttpURLConnection http = createHTTPRequest(accessToken);
+        try (BufferedReader lReader =
+                new BufferedReader(new InputStreamReader(http.getInputStream()))) {
+            String result = lReader.lines().collect(Collectors.joining("\n"));
             return result;
         } finally {
-            if (http != null) http.disconnect();
+            http.disconnect();
         }
     }
 
@@ -105,15 +102,11 @@ public class MSGraphRolesResolver {
      *
      * @param accessToken - access token (from MS azure ad)
      * @return list of groups (guid strings) the user is a member of
-     * @throws Exception
+     * @throws IOException
      */
-    public List<String> resolveRoles(String accessToken) throws Exception {
-        try {
-            String jsonStr = resolveUrl(accessToken);
-            List<String> result = parseJson(jsonStr);
-            return result;
-        } catch (Exception e) {
-            throw e;
-        }
+    public List<String> resolveRoles(String accessToken) throws IOException {
+        String jsonStr = resolveUrl(accessToken);
+        List<String> result = parseJson(jsonStr);
+        return result;
     }
 }

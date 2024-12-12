@@ -7,12 +7,14 @@ package org.geoserver.web.security.oauth2;
 
 import org.apache.wicket.Component;
 import org.apache.wicket.model.Model;
-import org.geoserver.security.oauth2.GeoServerOAuth2LoginFilterConfig;
+import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig;
 import org.geoserver.security.web.AbstractSecurityNamedServicePanelTest;
 import org.geoserver.security.web.AbstractSecurityPage;
 import org.geoserver.security.web.SecurityNamedServiceNewPage;
 import org.geoserver.security.web.auth.AuthenticationPage;
 import org.geoserver.web.FormTestPage;
+import org.geoserver.web.security.oauth2.login.OAuth2LoginAuthProviderPanel;
+import org.geoserver.web.security.oauth2.login.OAuth2LoginAuthProviderPanelInfo;
 import org.junit.Test;
 
 public class OpenIdConnectAuthProviderPanelTest extends AbstractSecurityNamedServicePanelTest {
@@ -21,8 +23,7 @@ public class OpenIdConnectAuthProviderPanelTest extends AbstractSecurityNamedSer
     public void smokeTest() {
         Model<GeoServerOAuth2LoginFilterConfig> model =
                 new Model<>(new GeoServerOAuth2LoginFilterConfig());
-        FormTestPage testPage =
-                new FormTestPage(id -> new OpenIdConnectAuthProviderPanel(id, model));
+        FormTestPage testPage = new FormTestPage(id -> new OAuth2LoginAuthProviderPanel(id, model));
         tester.startPage(testPage);
     }
 
@@ -135,7 +136,7 @@ public class OpenIdConnectAuthProviderPanelTest extends AbstractSecurityNamedSer
 
     @Override
     protected Class<? extends Component> getNamedServicesClass() {
-        return OpenIdConnectAuthProviderPanel.class;
+        return OAuth2LoginAuthProviderPanel.class;
     }
 
     @Override
@@ -152,7 +153,7 @@ public class OpenIdConnectAuthProviderPanelTest extends AbstractSecurityNamedSer
         clickAddNew();
 
         tester.assertRenderedPage(SecurityNamedServiceNewPage.class);
-        setSecurityConfigClassName(OpenIdConnectAuthProviderPanelInfo.class);
+        setSecurityConfigClassName(OAuth2LoginAuthProviderPanelInfo.class);
 
         newFormTester();
         setSecurityConfigName(name);
