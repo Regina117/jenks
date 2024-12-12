@@ -1,6 +1,6 @@
-/* (c) 2018 Open Source Geospatial Foundation - all rights reserved
- * This code is licensed under the GPL 2.0 license, available at the root
- * application directory.
+/*
+ * (c) 2018 Open Source Geospatial Foundation - all rights reserved This code is licensed under the
+ * GPL 2.0 license, available at the root application directory.
  */
 package org.geoserver.security.oauth2.login;
 
@@ -88,8 +88,8 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     private String oidcJwkSetUri;
     private String oidcLogoutUri;
 
-    private Boolean oidcForceAuthorizationUriHttps;
-    private Boolean oidcForceTokenUriHttps;
+    private boolean oidcForceAuthorizationUriHttps;
+    private boolean oidcForceTokenUriHttps;
     private boolean oidcEnforceTokenValidation = true;
     private boolean oidcUsePKCE = false;
     private String oidcResponseMode;
@@ -97,8 +97,7 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
 
     private String tokenRolesClaim;
     private String postLogoutRedirectUri;
-    // TODO AW: validate
-    private Boolean enableRedirectAuthenticationEntryPoint;
+    private boolean enableRedirectAuthenticationEntryPoint;
 
     public GeoServerOAuth2LoginFilterConfig() {
         this.postLogoutRedirectUri = baseRedirectUri();
@@ -167,11 +166,19 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     }
 
     public String getOidcUserNameAttribute() {
-        return oidcUserNameAttribute == null ? "email" : oidcUserNameAttribute;
+        return oidcUserNameAttribute;
     }
 
     public boolean providesAuthenticationEntryPoint() {
         return false;
+    }
+
+    public int getActiveProviderCount() {
+        int lActiveCount = isGoogleEnabled() ? 1 : 0;
+        lActiveCount += isGitHubEnabled() ? 1 : 0;
+        lActiveCount += isMsEnabled() ? 1 : 0;
+        lActiveCount += isOidcEnabled() ? 1 : 0;
+        return lActiveCount;
     }
 
     /** @return the cliendId */
@@ -255,7 +262,7 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     }
 
     /** @return the enableRedirectAuthenticationEntryPoint */
-    public Boolean getEnableRedirectAuthenticationEntryPoint() {
+    public boolean getEnableRedirectAuthenticationEntryPoint() {
         return enableRedirectAuthenticationEntryPoint;
     }
 
@@ -264,23 +271,23 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
      *     set
      */
     public void setEnableRedirectAuthenticationEntryPoint(
-            Boolean enableRedirectAuthenticationEntryPoint) {
+            boolean enableRedirectAuthenticationEntryPoint) {
         this.enableRedirectAuthenticationEntryPoint = enableRedirectAuthenticationEntryPoint;
     }
 
-    public Boolean getOidcForceTokenUriHttps() {
+    public boolean getOidcForceTokenUriHttps() {
         return oidcForceTokenUriHttps;
     }
 
-    public void setOidcForceTokenUriHttps(Boolean forceAccessTokenUriHttps) {
+    public void setOidcForceTokenUriHttps(boolean forceAccessTokenUriHttps) {
         this.oidcForceTokenUriHttps = forceAccessTokenUriHttps;
     }
 
-    public Boolean getOidcForceAuthorizationUriHttps() {
+    public boolean getOidcForceAuthorizationUriHttps() {
         return oidcForceAuthorizationUriHttps;
     }
 
-    public void setOidcForceAuthorizationUriHttps(Boolean forceUserAuthorizationUriHttps) {
+    public void setOidcForceAuthorizationUriHttps(boolean forceUserAuthorizationUriHttps) {
         this.oidcForceAuthorizationUriHttps = forceUserAuthorizationUriHttps;
     }
 

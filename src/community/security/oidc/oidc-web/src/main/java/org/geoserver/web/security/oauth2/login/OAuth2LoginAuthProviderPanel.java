@@ -13,7 +13,6 @@ package org.geoserver.web.security.oauth2.login;
 
 import static org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.AccessToken;
 import static org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.IdToken;
-import static org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.MSGraphAPI;
 import static org.geoserver.security.oauth2.login.GeoServerOAuth2LoginFilterConfig.OpenIdRoleSource.UserInfo;
 
 import java.io.Serializable;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.Component;
 import org.apache.wicket.ajax.AjaxRequestTarget;
@@ -33,9 +31,7 @@ import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.DropDownChoice;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.FormComponent;
 import org.apache.wicket.markup.html.form.TextField;
-import org.apache.wicket.markup.html.form.validation.AbstractFormValidator;
 import org.apache.wicket.markup.html.panel.Panel;
 import org.apache.wicket.markup.repeater.RepeatingView;
 import org.apache.wicket.model.IModel;
@@ -52,7 +48,6 @@ import org.geoserver.web.GeoServerBasePage;
 import org.geoserver.web.wicket.GeoServerDialog;
 import org.geoserver.web.wicket.HelpLink;
 import org.geoserver.web.wicket.ParamResourceModel;
-import org.geotools.util.logging.Logging;
 
 /**
  * Configuration panel for {@link GeoServerOAuthAuthenticationFilter}.
@@ -80,44 +75,6 @@ public class OAuth2LoginAuthProviderPanel
     /** Must be serializable in order for Wicket to work */
     @FunctionalInterface
     private interface VisibleSupplier extends Supplier<Boolean>, Serializable {}
-
-    /**
-     * If they have chosen MSGraphAPI as the RoleProvider, we need to make sure that the userinfo
-     * endpoint is also an MS Graph URL. If not, they've probably made a misconfiguration - the
-     * bearer token is from another IDP and this will cause issues access the MS graph endpoint.
-     * Let's fail early.
-     */
-    class MSGraphRoleProviderOnlyWithMSGraphSystem extends AbstractFormValidator {
-
-        @Override
-        public FormComponent<?>[] getDependentFormComponents() {
-            return null;
-        }
-
-        @Override
-        public void validate(Form<?> form) {
-            DropDownChoice roleSource = (DropDownChoice) form.get("panel").get("roleSource");
-            if (roleSource == null) {
-                return;
-            }
-            if (!MSGraphAPI.equals(roleSource.getConvertedInput())) {
-                return;
-            }
-
-            // TODO AW
-            return;
-            //            TextField userInfoTextField = (TextField)
-            // form.get("panel").get("oidcUserInfoUri");
-            //
-            //            String userInfoEndpointUrl = (String)
-            // userInfoTextField.getConvertedInput();
-            //
-            //            if (!userInfoEndpointUrl.startsWith("https://graph.microsoft.com/")) {
-            //
-            // form.error(form.getString("OAuth2LoginAuthProviderPanel.invalidMSGraphURL"));
-            //            }
-        }
-    }
 
     private class DiscoveryPanel extends Panel {
 
@@ -202,8 +159,6 @@ public class OAuth2LoginAuthProviderPanel
             return visibleSupplier.get();
         }
     }
-
-    private static Logger LOGGER = Logging.getLogger(OAuth2LoginAuthProviderPanel.class);
 
     private GeoServerDialog dialog;
 
@@ -357,12 +312,6 @@ public class OAuth2LoginAuthProviderPanel
         TextField<String> lTextField = new TextField<>(pAttr, lModel);
         lTextField.setEnabled(pEnabled);
         return lTextField;
-    }
-
-    @Override
-    protected void onInitialize() {
-        super.onInitialize();
-        getForm().add(new MSGraphRoleProviderOnlyWithMSGraphSystem());
     }
 
     @Override

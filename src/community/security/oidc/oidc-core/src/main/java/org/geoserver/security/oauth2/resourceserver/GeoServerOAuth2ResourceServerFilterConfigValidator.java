@@ -5,7 +5,7 @@
 package org.geoserver.security.oauth2.resourceserver;
 
 import org.geoserver.security.GeoServerSecurityManager;
-import org.geoserver.security.oauth2.common.OAuth2FilterConfigException;
+import org.geoserver.security.oauth2.common.GeoServerOAuth2FilterConfigException;
 import org.geoserver.security.validation.FilterConfigValidator;
 
 /**
@@ -22,7 +22,8 @@ public class GeoServerOAuth2ResourceServerFilterConfigValidator extends FilterCo
     }
 
     @Override
-    protected OAuth2FilterConfigException createFilterException(String errorid, Object... args) {
-        return new OAuth2FilterConfigException(errorid, args);
+    protected GeoServerOAuth2FilterConfigException createFilterException(
+            String errorid, Object... args) {
+        return new GeoServerOAuth2FilterConfigException(errorid, args);
     }
 }
