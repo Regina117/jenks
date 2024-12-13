@@ -28,6 +28,9 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
  * with Google" or "Login with GitHub". OAuth 2.0 Login is implemented by using the Authorization
  * Code Grant, as specified in the OAuth 2.0 Authorization Framework and OpenID Connect Core 1.0.
  *
+ * <p>Documentation: A class diagram exists in gs-sec-oidc/doc/diagrams showing how to pieces belong
+ * together.
+ *
  * @see GeoServerOAuth2LoginAuthenticationProvider containing the setup
  * @author awaterme
  */

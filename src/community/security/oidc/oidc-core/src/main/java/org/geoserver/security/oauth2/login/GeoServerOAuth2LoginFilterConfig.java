@@ -79,7 +79,7 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     private String oidcClientSecret;
     private String oidcUserNameAttribute = "email";
     private String oidcRedirectUri;
-    private String oidcScopes;
+    private String oidcScopes = "openid";
 
     private String oidcDiscoveryUri;
     private String oidcTokenUri;
@@ -94,14 +94,18 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     private boolean oidcUsePKCE = false;
     private String oidcResponseMode;
     private boolean oidcAuthenticationMethodPostSecret = false;
+    /**
+     * Add extra logging. NOTE: this might spill confidential information to the log - do not turn
+     * on in normal operation!
+     */
+    boolean oidcAllowUnSecureLogging = false;
 
     private String tokenRolesClaim;
     private String postLogoutRedirectUri;
     private boolean enableRedirectAuthenticationEntryPoint;
 
     public GeoServerOAuth2LoginFilterConfig() {
-        this.postLogoutRedirectUri = baseRedirectUri();
-        this.oidcScopes = "user";
+        this.postLogoutRedirectUri = createPostLogoutRedirectUri();
         this.enableRedirectAuthenticationEntryPoint = false;
         this.oidcForceTokenUriHttps = true;
         this.oidcForceAuthorizationUriHttps = true;
@@ -120,6 +124,15 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
         return lBase + "login/oauth2/code/" + pRegId;
     }
 
+    private String createPostLogoutRedirectUri() {
+        String lBase = baseRedirectUri();
+        if (!lBase.endsWith("/web/")) {
+            lBase += "web/";
+        }
+        return lBase;
+    }
+
+    /** @return an URI ending with "/" */
     private String baseRedirectUriNormalized() {
         return ofNullable(baseRedirectUri).map(s -> s.endsWith("/") ? s : s + "/").orElse("/");
     }
@@ -539,5 +552,15 @@ public class GeoServerOAuth2LoginFilterConfig extends PreAuthenticatedUserNameFi
     /** @param pOidcDiscoveryURL the oidcDiscoveryURL to set */
     public void setOidcDiscoveryUri(String pOidcDiscoveryURL) {
         oidcDiscoveryUri = pOidcDiscoveryURL;
+    }
+
+    /** @return the allowUnSecureLogging */
+    public boolean isOidcAllowUnSecureLogging() {
+        return oidcAllowUnSecureLogging;
+    }
+
+    /** @param pAllowUnSecureLogging the allowUnSecureLogging to set */
+    public void setOidcAllowUnSecureLogging(boolean pAllowUnSecureLogging) {
+        oidcAllowUnSecureLogging = pAllowUnSecureLogging;
     }
 }

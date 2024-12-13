@@ -1,6 +1,6 @@
-/* (c) 2024 Open Source Geospatial Foundation - all rights reserved
- * This code is licensed under the GPL 2.0 license, available at the root
- * application directory.
+/*
+ * (c) 2024 Open Source Geospatial Foundation - all rights reserved This code is licensed under the
+ * GPL 2.0 license, available at the root application directory.
  */
 package org.geoserver.security.oauth2.login;
 
@@ -27,10 +27,12 @@ import org.geoserver.security.GeoServerSecurityManager;
 import org.geoserver.security.config.PreAuthenticatedUserNameFilterConfig.PreAuthenticatedUserNameRoleSource;
 import org.geoserver.security.filter.GeoServerRoleResolvers;
 import org.geoserver.security.filter.GeoServerRoleResolvers.ResolverContext;
+import org.geoserver.security.oauth2.common.ConfidentialLogger;
 import org.geoserver.security.oauth2.common.HttpServletRequestSupplier;
 import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginCustomizers.ClientRegistrationCustomizer;
 import org.geoserver.security.oauth2.login.GeoServerOAuth2LoginCustomizers.HttpSecurityCustomizer;
 import org.geoserver.security.oauth2.spring.GeoServerAuthorizationRequestCustomizer;
+import org.geoserver.security.oauth2.spring.GeoServerOAuth2AccessTokenResponseClient;
 import org.geoserver.security.oauth2.spring.GeoServerOidcIdTokenDecoderFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationTrustResolver;
@@ -41,6 +43,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.endpoint.DefaultAuthorizationCodeTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AccessTokenResponseClient;
+import org.springframework.security.oauth2.client.endpoint.OAuth2AuthorizationCodeGrantRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -66,6 +71,7 @@ import org.springframework.util.Assert;
 /**
  * Builder for {@link GeoServerOAuth2LoginAuthenticationFilter}.
  *
+ * @see GeoServerOAuth2LoginAuthenticationFilter for further information and docs.
  * @author awaterme
  */
 public class GeoServerOAuth2LoginAuthenticationFilterBuilder
@@ -92,6 +98,8 @@ public class GeoServerOAuth2LoginAuthenticationFilterBuilder
     private OAuth2AuthorizedClientService authorizedClientService;
     private OAuth2AuthorizedClientRepository authorizedClientRepository;
     private DefaultOAuth2AuthorizationRequestResolver authorizationRequestResolver;
+    private OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest>
+            accessTokenResponseClient;
     private LogoutSuccessHandler logoutSuccessHandler;
     private Filter redirectToProviderFilter;
 
@@ -121,6 +129,8 @@ public class GeoServerOAuth2LoginAuthenticationFilterBuilder
         filter.setLogoutSuccessHandler(getLogoutSuccessHandler());
         List<Filter> lFilters = createNestedFilters();
         filter.setNestedFilters(lFilters);
+
+        ConfidentialLogger.setEnabled(configuration.isOidcAllowUnSecureLogging());
         return filter;
     }
 
@@ -156,6 +166,9 @@ public class GeoServerOAuth2LoginAuthenticationFilterBuilder
                     oauthConfig
                             .authorizationEndpoint()
                             .authorizationRequestResolver(getAuthorizationRequestResolver());
+                    oauthConfig
+                            .tokenEndpoint()
+                            .accessTokenResponseClient(getAccessTokenResponseClient());
                 });
 
         httpSecurityCustomizer.accept(http);
@@ -471,6 +484,24 @@ public class GeoServerOAuth2LoginAuthenticationFilterBuilder
                             lMatcher, configuration.getAuthenticationEntryPointRedirectUri());
         }
         return redirectToProviderFilter;
+    }
+
+    /** @return the accessTokenResponseClient */
+    public OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest>
+            getAccessTokenResponseClient() {
+        if (accessTokenResponseClient == null) {
+            accessTokenResponseClient =
+                    new GeoServerOAuth2AccessTokenResponseClient(
+                            new DefaultAuthorizationCodeTokenResponseClient(), tokenDecoderFactory);
+        }
+        return accessTokenResponseClient;
+    }
+
+    /** @param pAccessTokenResponseClient the accessTokenResponseClient to set */
+    public void setAccessTokenResponseClient(
+            OAuth2AccessTokenResponseClient<OAuth2AuthorizationCodeGrantRequest>
+                    pAccessTokenResponseClient) {
+        accessTokenResponseClient = pAccessTokenResponseClient;
     }
 
     /** @return the httpSecurityCustomizer */

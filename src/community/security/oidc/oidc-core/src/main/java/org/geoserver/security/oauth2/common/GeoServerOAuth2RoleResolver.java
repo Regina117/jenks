@@ -9,6 +9,8 @@ import static java.util.logging.Level.SEVERE;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static org.geoserver.security.filter.GeoServerRoleResolvers.PRE_AUTH_ROLE_SOURCE_RESOLVER;
+import static org.geoserver.security.impl.GeoServerUser.ADMIN_USERNAME;
+import static org.geoserver.security.impl.GeoServerUser.ROOT_USERNAME;
 import static org.geoserver.security.oauth2.login.GeoServerOAuth2ClientRegistrationId.REG_ID_MICROSOFT;
 
 import java.io.IOException;
@@ -81,8 +83,15 @@ public class GeoServerOAuth2RoleResolver implements RoleResolver {
             throw new IllegalArgumentException(
                     OAuth2ResolverParam.class.getSimpleName() + " required");
         }
-        RoleSource rs = pParam.getContext().getRoleSource();
         Collection<GeoServerRole> result = new ArrayList<>();
+        String lPrincipal = pParam.getPrincipal();
+        if (ADMIN_USERNAME.equals(lPrincipal) || ROOT_USERNAME.equals(lPrincipal)) {
+            // avoid unintentional match with pre-existing administrator
+            String lMsg = "Potentially harmful OAuth2 user '%s' detected. Granting no roles.";
+            LOGGER.log(Level.WARNING, format(lMsg, lPrincipal));
+            return result;
+        }
+        RoleSource rs = pParam.getContext().getRoleSource();
         if (rs == null) {
             LOGGER.log(SEVERE, "Role assignment failed. Role source unspecified.");
         } else if (rs instanceof OpenIdRoleSource) {
@@ -118,7 +127,7 @@ public class GeoServerOAuth2RoleResolver implements RoleResolver {
         }
         calc.addMappedSystemRoles(result);
         if (LOGGER.isLoggable(Level.FINE)) {
-            String lUser = pParam.getPrincipal();
+            String lUser = lPrincipal;
             String lSrc = rs == null ? null : rs.toString();
             String lRoles = result.stream().map(r -> r.getAuthority()).collect(joining(","));
             LOGGER.fine(

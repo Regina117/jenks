@@ -279,6 +279,10 @@ public class OAuth2LoginAuthProviderPanel
             lOidcContainer.add(new HelpLink("oidcUsePKCEHelp", this).setDialog(dialog));
             lOidcContainer.add(new CheckBox("oidcUsePKCE"));
 
+            lOidcContainer.add(
+                    new HelpLink("oidcAllowUnSecureLoggingHelp", this).setDialog(dialog));
+            lOidcContainer.add(new CheckBox("oidcAllowUnSecureLogging"));
+
             lOidcContainer.add(new HelpLink("oidcLogoutUriHelp", this).setDialog(dialog));
             lOidcContainer.add(new TextField<String>("oidcLogoutUri"));
 
