@@ -100,18 +100,6 @@
       </modules>
     </profile>
     <profile>
-      <id>webservice</id>
-      <modules>
-        <module>app-schema</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>app-schema</id>
-      <modules>
-        <module>app-schema</module>
-      </modules>
-    </profile>
-    <profile>
       <id>programming-guide</id>
       <modules>
         <module>programming-guide</module>
@@ -150,7 +138,6 @@
         <module>solr</module>
         <module>elasticsearch</module>
         <module>wps-remote</module>
-        <module>gwc-distributed</module>
         <module>jdbcstore</module>
         <module>gdal</module>
         <module>gwc-azure-blob</module>
@@ -303,18 +290,6 @@
       <id>hz-cluster</id>
       <modules>
         <module>hz-cluster</module>
-      </modules>
-    </profile>
-    <profile>
-      <id>gwc-distributed</id>
-      <activation>
-        <property>
-          <name>all</name>
-          <value>true</value>
-        </property>
-      </activation>
-      <modules>
-        <module>gwc-distributed</module>
       </modules>
     </profile>
     <profile>
