@@ -8,6 +8,7 @@ pipeline {
         FULL_IMAGE = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
         REPO_URL = 'https://github.com/Regina117/jenks.git'
         DEPLOY_SERVER = '84.201.170.10'
+        SSH_KEY_PATH = '/root/.ssh/id_rsa' // Путь к ключу на Jenkins-сервере
     }
 
     stages {
@@ -60,14 +61,15 @@ pipeline {
         stage('Run Docker on slave') {
             steps {
                 script {
+                    // Перед запуском команд на удаленном сервере, указываем ключ для SSH
                     sh '''
                     ssh-keyscan -H ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
-                    ssh root@${DEPLOY_SERVER} << EOF
+                    ssh -i ${SSH_KEY_PATH} root@${DEPLOY_SERVER} << EOF
                         sudo docker login ${DOCKER_REGISTRY} -u admin -p "Dm59JTErVdXaKaN"
                         sudo docker pull ${FULL_IMAGE}
-                        sudo docker stop $IMAGE_NAME || true
-                        sudo docker rm $IMAGE_NAME || true
-                        sudo docker run -d --name $IMAGE_NAME -p 8080:80 $FULL_IMAGE
+                        sudo docker stop ${IMAGE_NAME} || true
+                        sudo docker rm ${IMAGE_NAME} || true
+                        sudo docker run -d --name ${IMAGE_NAME} -p 8080:80 ${FULL_IMAGE}
                     EOF
                     '''
                 }

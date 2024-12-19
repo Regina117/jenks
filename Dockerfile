@@ -5,10 +5,6 @@ WORKDIR /app/src
 # build maven
 RUN mvn clean package -DskipTests
 FROM tomcat:9-jdk11-openjdk-slim
-# Configure SSH client
-COPY id_rsa /root/.ssh/id_rsa
-RUN chmod 600 /root/.ssh/id_rsa && \
-    echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
 #install workdir for tomcat
 WORKDIR /usr/local/tomcat9/webapps/
 #copy war
