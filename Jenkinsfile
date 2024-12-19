@@ -21,7 +21,7 @@ pipeline {
             steps {
                 script {
                     dir('src') { 
-                        sh 'mvn mvn clean package -DskipTests || { echo "Maven build failed"; exit 1; }'
+                        sh 'mvn clean package -DskipTests || { echo "Maven build failed"; exit 1; }'
                     }
                 }
             }
