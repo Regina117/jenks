@@ -63,9 +63,11 @@ pipeline {
                     sh '''
                     ssh-keyscan -H ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
                     ssh root@${DEPLOY_SERVER} << EOF
+                        sudo docker login ${DOCKER_REGISTRY} -u admin -p "Dm59JTErVdXaKaN"
                         sudo docker pull ${FULL_IMAGE}
-                        cd /etc/shop/docker
-                        sudo docker-compose up -d
+                        sudo docker stop $IMAGE_NAME || true
+                        sudo docker rm $IMAGE_NAME || true
+                        sudo docker run -d --name $IMAGE_NAME -p 8080:80 $FULL_IMAGE
                     EOF
                     '''
                 }
