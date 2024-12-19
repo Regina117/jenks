@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = 'http://51.250.41.177:8123/repository/mydockerrepo'  
+        DOCKER_REGISTRY = 'http://158.160.156.100/:8123/repository/mydockerrepo'  
         IMAGE_NAME = 'geoserver'                             
         IMAGE_TAG = "${IMAGE_TAG:-v1.0.1}"               
         REPO_URL = 'https://github.com/Regina117/jenks.git'  
-        DEPLOY_SERVER = '158.160.151.164'                
+        DEPLOY_SERVER = 'http://84.201.170.10'                
     }
 
     stages {
