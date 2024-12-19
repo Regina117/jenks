@@ -61,7 +61,7 @@ pipeline {
         stage('Run Docker on slave') {
             steps {
                 script {
-                    // Перед запуском команд на удаленном сервере, указываем ключ для SSH
+                    deploy adapters: [tomcat9(credentialsId: 'dd79bb68-ab91-4d6a-9530-bd0f093c8020', path: '', url: 'http://84.201.170.10:8080')], contextPath: 'geoserver', war: 'geoserver.war'
                     sh '''
                     ssh-keyscan -H ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
                     ssh -i ${SSH_KEY_PATH} root@${DEPLOY_SERVER} << EOF
