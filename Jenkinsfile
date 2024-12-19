@@ -17,6 +17,16 @@ pipeline {
             }
         }
 
+          stage('Build Project with Maven') {
+            steps {
+                script {
+                    dir('src') { 
+                        sh 'mvn clean install || { echo "Maven build failed"; exit 1; }'
+                    }
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 script {
