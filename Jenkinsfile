@@ -61,7 +61,7 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 script {
-                    deploy adapters: [tomcat9(credentialsId: 'dd79bb68-ab91-4d6a-9530-bd0f093c8020', path: '', url: 'http://84.201.170.10:8080')], contextPath: 'geoserver', war: 'target/geoserver.war'
+                    deploy adapters: [tomcat9(credentialsId: 'dd79bb68-ab91-4d6a-9530-bd0f093c8020', path: '', url: 'http://84.201.170.10:8080')], contextPath: 'geoserver', war: '**/*.war'
                 }
             }
         }
@@ -69,18 +69,16 @@ pipeline {
         stage('Run Docker on slave') {
             steps {
                 script {
-                     sshagent(['deploy-server-key']) {
-                        sh '''
-                        ssh-keyscan -H ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
-                        ssh root@${DEPLOY_SERVER} << EOF
-                            sudo docker login ${DOCKER_REGISTRY} -u admin -p "Dm59JTErVdXaKaN"
-                            sudo docker pull ${FULL_IMAGE}
-                            sudo docker stop ${IMAGE_NAME} || true
-                            sudo docker rm ${IMAGE_NAME} || true
-                            sudo docker run -d --name ${IMAGE_NAME} -p 8080:80 ${FULL_IMAGE}
-                        EOF
-                        '''
-                    }
+                    sh '''
+                    ssh-keyscan -H ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
+                    ssh root@${DEPLOY_SERVER} << EOF
+                        sudo docker login ${DOCKER_REGISTRY} -u admin -p "Dm59JTErVdXaKaN"
+                        sudo docker pull ${FULL_IMAGE}
+                        sudo docker stop ${IMAGE_NAME} || true
+                        sudo docker rm ${IMAGE_NAME} || true
+                        sudo docker run -d --name ${IMAGE_NAME} -p 8080:80 ${FULL_IMAGE}
+                    EOF
+                    '''
                 }
             }
         }
@@ -95,6 +93,4 @@ pipeline {
         }
     }
 }
-
-
 
