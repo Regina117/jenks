@@ -1,0 +1,48 @@
+pipeline {
+    agent {
+        docker { 
+            image '158.160.129.106:8123/java-builder:v1.0.3'
+            args '-v /var/run/docker.sock:/var/run/docker.sock -v /etc/group:/etc/group:ro'
+        }
+    }
+    environment {
+        DOCKER_CONFIG = "/tmp/.docker"
+        DOCKER_REGISTRY = '158.160.129.106:8123'
+        IMAGE_NAME = 'webapp'
+        IMAGE_TAG = 'v1.0.0'
+        CREDENTIALS_ID = 'nexus'
+    }
+    stages {
+        stage('Clone Repository') {
+            steps {
+                sh 'git clone https://github.com/Johnny10inches/demoBuild.git'
+            }
+        }
+        stage('Build Project') {
+            steps {
+                dir('demoBuild') {
+                    sh 'mvn clean package'
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                dir('demoBuild') {
+                    sh '''
+                        mkdir -p $DOCKER_CONFIG
+                        docker build -t $DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG .
+                    '''
+                }
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    withDockerRegistry([ credentialsId: env.CREDENTIALS_ID, url: "http://$DOCKER_REGISTRY" ]) {
+                        sh "docker push $DOCKER_REGISTRY/$IMAGE_NAME:$IMAGE_TAG"
+                    }
+                }
+            }
+        }
+    }
+}
