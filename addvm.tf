@@ -33,7 +33,7 @@ resource "yandex_compute_instance" "master" {
   }
 
   metadata = {
-    ssh-keys= "regina:${file("home/regina/.ssh/id_rsa.pub")}"
+    ssh-keys= "regina:${file("/home/regina/.ssh/id_rsa.pub")}"
     user-data = <<-EOT
       #cloud-config
       runcmd:
@@ -64,6 +64,7 @@ resource "yandex_compute_instance" "build_node" {
   }
 
   metadata = {
+    ssh-keys= "regina:${file("/home/regina/.ssh/id_rsa.pub")}"
     user-data = <<-EOT
       #cloud-config
       runcmd:
@@ -92,6 +93,7 @@ resource "yandex_compute_instance" "prod_node" {
   }
 
   metadata = {
+    ssh-keys= "regina:${file("/home/regina/.ssh/id_rsa.pub")}"
     user-data = <<-EOT
       #cloud-config
       runcmd:
@@ -120,6 +122,7 @@ resource "yandex_compute_instance" "nexus" {
   }
 
   metadata = {
+    ssh-keys= "regina:${file("/home/regina/.ssh/id_rsa.pub")}"
     user-data = <<-EOT
       #cloud-config
       runcmd:
