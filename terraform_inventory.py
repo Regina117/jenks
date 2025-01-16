@@ -12,7 +12,7 @@ def generate_inventory():
     inventory = {
         "all": {
             "children": {
-                "master": {
+                "master-jenkins": {
                     "hosts": {
                         "master-jenkins": {
                             "ansible_host": get_terraform_output("master_ip"),
