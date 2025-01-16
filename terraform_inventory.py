@@ -43,10 +43,12 @@ def generate_inventory():
 
 def main():
     inventory = generate_inventory()
+    # Выводим результат в формате JSON с отступами
     print(json.dumps(inventory, indent=2))
 
 if __name__ == "__main__":
     main()
+
 
 
 
