@@ -14,14 +14,14 @@
         - docker.io
         - jenkins
         - git
-      when: "'jenkins' in group_names"
+      when: "'master-jenkins' in group_names"
 
     - name: Enable and start Jenkins
       systemd:
         name: jenkins
         state: started
         enabled: yes
-      when: "'jenkins' in group_names"
+      when: "'master-jenkins' in group_names"
 
     - name: Install Docker on Nexus server
       apt:
