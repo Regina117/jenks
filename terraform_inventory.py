@@ -30,10 +30,10 @@ def generate_inventory():
         "all": {
             "children": {
                 "master-jenkins": {
-                    "ansible_host": ["master_ip"]
+                    "hosts": [master_ip]
                 },
                 "nexus": {
-                    "ansible_host": ["nexus_ip"]
+                    "hosts": [nexus_ip]
                 }
             }
         }
