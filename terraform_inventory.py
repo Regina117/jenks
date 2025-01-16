@@ -29,7 +29,7 @@ def generate_inventory():
         },
         "all": {
             "children": {
-                "master-jenkins": {
+                "master": {
                     "hosts": ["master"]
                 },
                 "nexus": {
