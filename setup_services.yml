@@ -1,0 +1,41 @@
+---
+- name: Setup Jenkins and Nexus
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install Java and required packages on Jenkins server
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - openjdk-11-jdk
+        - maven
+        - docker.io
+        - jenkins
+        - ansible
+      when: "'jenkins' in group_names"
+
+    - name: Enable and start Jenkins
+      systemd:
+        name: jenkins
+        state: started
+        enabled: yes
+      when: "'jenkins' in group_names"
+
+    - name: Install Docker on Nexus server
+      apt:
+        name: docker.io
+        state: present
+        update_cache: yes
+      when: "'nexus' in group_names"
+
+    - name: Run Nexus container
+      docker_container:
+        name: nexus
+        image: sonatype/nexus3
+        state: started
+        ports:
+          - "8081:8081"
+        restart_policy: always
+      when: "'nexus' in group_names"
