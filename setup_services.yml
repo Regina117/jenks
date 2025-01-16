@@ -1,5 +1,5 @@
 - name: Setup Jenkins on master
-  hosts: master-jenkins
+  hosts: master
   become: yes
   tasks:
     - name: Install Java and required packages on Jenkins server
