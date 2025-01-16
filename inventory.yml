@@ -4,11 +4,11 @@ all:
       hosts:
         master-jenkins:
           ansible_host: 158.160.161.68  # IP адрес для машины с Jenkins
-          ansible_user: regina
-          ansible_ssh_private_key_file: /path/to/private/key
+          ansible_user: root
+          ansible_ssh_private_key_file: /root/.ssh/id_rsa.pub
     nexus:
       hosts:
         nexus:
           ansible_host: 158.160.165.3  # IP адрес для машины с Nexus
-          ansible_user: regina
-          ansible_ssh_private_key_file: /home/regina/.ssh/id_rsa.pub
+          ansible_user: root
+          ansible_ssh_private_key_file: /root/.ssh/id_rsa.pub
