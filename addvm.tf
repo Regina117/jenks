@@ -33,6 +33,7 @@ resource "yandex_compute_instance" "master" {
   }
 
   metadata = {
+    ssh-keys= "regina:${file("~/.ssh/authorized_keys")}"
     user-data = <<-EOT
       #cloud-config
       runcmd:
@@ -45,8 +46,7 @@ resource "yandex_compute_instance" "master" {
 }
 
 resource "yandex_compute_instance" "build_node" {
-  count       = 2
-  name        = "build-node-${count.index + 1}"
+  name        = "build-node"
   platform_id = "standard-v2"
   resources {
     cores  = 4
