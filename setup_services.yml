@@ -1,3 +1,7 @@
+- name: Check connectivity to master-jenkins
+  ping:
+  when: "'master-jenkins' in group_names"
+  
 - name: Setup Jenkins and Nexus
   hosts: master-jenkins
   become: yes
