@@ -1,5 +1,5 @@
 - name: Setup Jenkins and Nexus
-  hosts: master-jenkins
+  hosts: master
   become: yes
   tasks:
     - name: Install Java and required packages on Jenkins server
@@ -13,14 +13,14 @@
         - docker.io
         - jenkins
         - git
-      when: "'master-jenkins' in group_names"
+      when: "'master' in group_names"
 
     - name: Enable and start Jenkins
       systemd:
         name: jenkins
         state: started
         enabled: yes
-      when: "'master-jenkins' in group_names"
+      when: "'master' in group_names"
 
 - name: Install Docker on Nexus server
   hosts: nexus  
