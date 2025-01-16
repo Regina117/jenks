@@ -13,7 +13,7 @@
         - maven
         - docker.io
         - jenkins
-        - ansible
+        - git
       when: "'jenkins' in group_names"
 
     - name: Enable and start Jenkins

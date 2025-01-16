@@ -1,14 +1,19 @@
 all:
   children:
-    jenkins:
+    master:
       hosts:
         master-jenkins:
-          ansible_host: 158.160.161.68  # IP адрес для машины с Jenkins
-          ansible_user: root
-          ansible_ssh_private_key_file: /root/.ssh/id_rsa.pub
+          ansible_host: "{{ terraform_output.master_ip }}"
     nexus:
       hosts:
         nexus:
-          ansible_host: 158.160.165.3  # IP адрес для машины с Nexus
-          ansible_user: root
-          ansible_ssh_private_key_file: /root/.ssh/id_rsa.pub
+          ansible_host: "{{ terraform_output.nexus_ip }}"
+    build_node:
+      hosts:
+        build-node:
+          ansible_host: "{{ terraform_output.build_nodes_ips }}"
+    prod_node:
+      hosts:
+        prod-node:
+          ansible_host: "{{ terraform_output.prod_node_ip }}"
+
