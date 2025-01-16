@@ -15,7 +15,7 @@ def generate_inventory():
     inventory = {
         "_meta": {
             "hostvars": {
-                "master-jenkins": {
+                "master": {
                     "ansible_host": master_ip,
                     "ansible_user": "root",
                     "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
@@ -29,7 +29,7 @@ def generate_inventory():
         },
         "all": {
             "children": {
-                "master-jenkins": {
+                "master": {
                     "hosts": [master_ip]
                 },
                 "nexus": {
