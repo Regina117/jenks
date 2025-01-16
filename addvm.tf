@@ -33,7 +33,7 @@ resource "yandex_compute_instance" "master" {
   }
 
   metadata = {
-    ssh-keys= "regina:${file("~/.ssh/authorized_keys")}"
+    ssh-keys= "regina:${file("~/.ssh/id_ed25519.pub")}"
     user-data = <<-EOT
       #cloud-config
       runcmd:
