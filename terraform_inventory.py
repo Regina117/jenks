@@ -9,26 +9,31 @@ def get_terraform_output(output_name):
     return result.stdout.strip()
 
 def generate_inventory():
+    master_ip = get_terraform_output("master_ip")
+    nexus_ip = get_terraform_output("nexus_ip")
+    
     inventory = {
+        "_meta": {
+            "hostvars": {
+                "master-jenkins": {
+                    "ansible_host": master_ip,
+                    "ansible_user": "root",
+                    "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
+                },
+                "nexus": {
+                    "ansible_host": nexus_ip,
+                    "ansible_user": "root",
+                    "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
+                }
+            }
+        },
         "all": {
             "children": {
                 "master-jenkins": {
-                    "hosts": {
-                        "master-jenkins": {
-                            "ansible_host": get_terraform_output("master_ip"),
-                            "ansible_user": "root",
-                            "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
-                        }
-                    }
+                    "hosts": ["master-jenkins"]
                 },
                 "nexus": {
-                    "hosts": {
-                        "nexus": {
-                            "ansible_host": get_terraform_output("nexus_ip"),
-                            "ansible_user": "root",
-                            "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
-                        }
-                    }
+                    "hosts": ["nexus"]
                 }
             }
         }
@@ -42,3 +47,8 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+
+
+
