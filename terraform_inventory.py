@@ -16,8 +16,8 @@ def generate_inventory():
                     "hosts": {
                         "master-jenkins": {
                             "ansible_host": get_terraform_output("master_ip"),
-                            "ansible_user": "regina",
-                            "ansible_ssh_private_key_file": "/home/regina/.ssh/id_rsa"
+                            "ansible_user": "root",
+                            "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
                         }
                     }
                 },
@@ -25,8 +25,8 @@ def generate_inventory():
                     "hosts": {
                         "nexus": {
                             "ansible_host": get_terraform_output("nexus_ip"),
-                            "ansible_user": "regina",
-                            "ansible_ssh_private_key_file": "/home/regina/.ssh/id_rsa"
+                            "ansible_user": "root",
+                            "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
                         }
                     }
                 }
