@@ -1,4 +1,4 @@
-- name: Setup Jenkins and Nexus
+- name: Setup Jenkins on master
   hosts: master
   become: yes
   tasks:
@@ -13,17 +13,15 @@
         - docker.io
         - jenkins
         - git
-      when: "'master' in group_names"
 
     - name: Enable and start Jenkins
       systemd:
         name: jenkins
         state: started
         enabled: yes
-      when: "'master' in group_names"
 
-- name: Install Docker on Nexus server
-  hosts: nexus  
+- name: Setup Nexus on nexus
+  hosts: nexus
   become: yes
   tasks:
     - name: Install Docker on Nexus server
@@ -31,7 +29,6 @@
         name: docker.io
         state: present
         update_cache: yes
-      when: "'nexus' in group_names"
 
     - name: Run Nexus container
       docker_container:
@@ -41,5 +38,5 @@
         ports:
           - "8081:8081"
         restart_policy: always
-      when: "'nexus' in group_names"
+
 
