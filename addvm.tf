@@ -36,6 +36,12 @@ resource "yandex_compute_instance" "master" {
     ssh-keys= "regina:${file("/home/regina/.ssh/id_rsa.pub")}"
     user-data = <<-EOT
       #cloud-config
+      users:
+      - name: regina
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        groups: sudo
+        ssh_authorized_keys:
+          - ${file("/home/regina/.ssh/id_rsa.pub")}
       runcmd:
         - apt update && apt upgrade -y
         - apt install -y openjdk-11-jdk maven docker.io
@@ -67,6 +73,12 @@ resource "yandex_compute_instance" "build_node" {
     ssh-keys= "regina:${file("/home/regina/.ssh/id_rsa.pub")}"
     user-data = <<-EOT
       #cloud-config
+      users:
+      - name: regina
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        groups: sudo
+        ssh_authorized_keys:
+          - ${file("/home/regina/.ssh/id_rsa.pub")}
       runcmd:
         - apt update && apt upgrade -y
         - apt install -y openjdk-11-jdk maven
@@ -96,6 +108,12 @@ resource "yandex_compute_instance" "prod_node" {
     ssh-keys= "regina:${file("/home/regina/.ssh/id_rsa.pub")}"
     user-data = <<-EOT
       #cloud-config
+      users:
+      - name: regina
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        groups: sudo
+        ssh_authorized_keys:
+          - ${file("/home/regina/.ssh/id_rsa.pub")}
       runcmd:
         - apt update && apt upgrade -y
         - apt install -y openjdk-11-jdk
@@ -125,6 +143,12 @@ resource "yandex_compute_instance" "nexus" {
     ssh-keys= "regina:${file("/home/regina/.ssh/id_rsa.pub")}"
     user-data = <<-EOT
       #cloud-config
+      users:
+      - name: regina
+        sudo: ALL=(ALL) NOPASSWD:ALL
+        groups: sudo
+        ssh_authorized_keys:
+          - ${file("/home/regina/.ssh/id_rsa.pub")}
       runcmd:
         - apt update && apt upgrade -y
         - apt install -y docker.io
