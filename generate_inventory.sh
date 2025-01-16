@@ -13,13 +13,13 @@ all:
         master-jenkins:
           ansible_host: $MASTER_IP
           ansible_user: regina
-          ansible_ssh_private_key_file: /home/regina/.ssh/id_rsa.pub
+          ansible_ssh_private_key_file: /home/regina/.ssh/id_rsa
     nexus:
       hosts:
         nexus:
           ansible_host: $NEXUS_IP
           ansible_user: regina
-          ansible_ssh_private_key_file: /home/regina/.ssh/id_rsa.pub
+          ansible_ssh_private_key_file: /home/regina/.ssh/id_rsa
 EOF
 
 
