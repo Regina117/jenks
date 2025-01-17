@@ -53,9 +53,9 @@
         state: present
         shell: /bin/bash
 
-    - name: Install Java 11 on Nexus server
+    - name: Install Java 17 on Nexus server
       apt:
-        name: openjdk-11-jdk
+        name: openjdk-17-jdk
         state: present
         update_cache: yes
 
@@ -63,16 +63,19 @@
       blockinfile:
         path: /home/nexus/.bashrc
         block: |
-          export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-          export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          export PATH=$JAVA_HOME/bin:$PATH
         state: present
 
     - name: Apply JAVA_HOME and INSTALL4J_JAVA_HOME for current session
       shell: |
-        export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-        export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+        export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+        export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+        export PATH=$JAVA_HOME/bin:$PATH
         echo $JAVA_HOME
         echo $INSTALL4J_JAVA_HOME
+        echo $PATH
       args:
         executable: /bin/bash
 
@@ -141,9 +144,9 @@
           ExecStart=/opt/nexus/bin/nexus start
           ExecStop=/opt/nexus/bin/nexus stop
           Restart=on-failure
-          Environment=JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-          Environment=INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-          Environment=PATH=/usr/lib/jvm/java-11-openjdk-amd64/bin:$PATH
+          Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          Environment=INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          Environment=PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin:$PATH
 
           [Install]
           WantedBy=multi-user.target
@@ -156,4 +159,3 @@
         name: nexus
         state: started
         enabled: yes
-
