@@ -47,28 +47,35 @@
   hosts: nexus
   become: yes
   tasks:
+    - name: Ensure nexus user exists
+      user: 
+        name: nexus
+        state: present
+        shell: /bin/bash
+      become: yes  
+
     - name: Install Java 11 on Nexus server
       apt:
         name: openjdk-11-jdk
         state: present
         update_cache: yes
 
-    - name: Create Nexus user and set up permissions
-      user:
-        name: nexus
-        state: present
-        shell: /bin/bash
-        create_home: yes
-        home: /opt/nexus
-        system: yes
-      become: yes
+    # - name: Create Nexus user and set up permissions
+    #   user:
+    #     name: nexus
+    #     state: present
+    #     shell: /bin/bash
+    #     create_home: yes
+    #     home: /opt/nexus
+    #     system: yes
+    #   become: yes
 
     - name: Ensure proper permissions on Nexus directory
       file:
         path: /opt/nexus
+        state: directory
         owner: nexus
         group: nexus
-        recurse: yes
         mode: '0755'
       become: yes
 
