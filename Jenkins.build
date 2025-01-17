@@ -1,0 +1,6 @@
+REGISTRY_URL = '158.160.135.185:8123/repository/mydockerrepo'  
+IMAGE_NAME = 'builder'
+IMAGE_TAG = 'v1.0.1'
+FULL_IMAGE = "${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
+docker tag builder:latest ${FULL_IMAGE} || {echo "docker tag}
+docker push

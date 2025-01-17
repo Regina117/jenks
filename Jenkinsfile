@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = '158.160.156.100:8123/repository/mydockerrepo'  
+        DOCKER_REGISTRY = '158.160.135.185:8123/repository/mydockerrepo'  
         IMAGE_NAME = 'geoserver'
         IMAGE_TAG = 'v1.0.1'
         FULL_IMAGE = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"

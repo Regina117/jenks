@@ -1,0 +1,4 @@
+IMAGE_TAG="v1.0"
+FULL_IMAGE="${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
+docker pull ${FULL_IMAGE}
+docker run
