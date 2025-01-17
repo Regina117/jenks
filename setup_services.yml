@@ -59,6 +59,19 @@
         state: present
         update_cache: yes
 
+    - name: Set JAVA_HOME environment variable for nexus user
+      lineinfile:
+        path: /home/nexus/.bashrc
+        line: 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64'
+        state: present
+
+    - name: Apply JAVA_HOME for current session
+      shell: |
+        export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+        echo $JAVA_HOME
+      args:
+        executable: /bin/bash
+
     - name: Download Nexus
       get_url:
         url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
@@ -143,7 +156,7 @@
           ExecStop=/opt/nexus/bin/nexus stop
           Restart=on-failure
           Environment=JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-          Environment=PATH=$JAVA_HOME/bin:$PATH
+          Environment=PATH=/usr/lib/jvm/java-11-openjdk-amd64/bin:$PATH
 
           [Install]
           WantedBy=multi-user.target
