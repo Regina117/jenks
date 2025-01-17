@@ -17,41 +17,37 @@ def get_terraform_outputs():
 
 def generate_inventory(outputs):
     inventory = {
+        "_meta": {
+            "hostvars": {}
+        },
         "all": {
-            "hosts": [],
-            "children": {
-                "jenkins": {"hosts": []},
-                "nexus": {"hosts": []}
-            }
+            "children": [
+                "jenkins",
+                "nexus"
+            ]
+        },
+        "jenkins": {
+            "hosts": []
+        },
+        "nexus": {
+            "hosts": []
         }
     }
-    
 
     if "jenkins_ip" in outputs and outputs["jenkins_ip"]["value"]:
         jenkins_ip = outputs["jenkins_ip"]["value"]
-        inventory["all"]["hosts"].append(jenkins_ip)
-        inventory["all"]["children"]["jenkins"]["hosts"].append(jenkins_ip)
-        inventory["_meta"] = {
-            "hostvars": {
-                jenkins_ip: {
-                    "ansible_user": "root",
-                    "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
-                }
-            }
+        inventory["jenkins"]["hosts"].append(jenkins_ip)
+        inventory["_meta"]["hostvars"][jenkins_ip] = {
+            "ansible_user": "regina",
+            "ansible_ssh_private_key_file": "/home/regina/.ssh/id_rsa"
         }
 
-   
     if "nexus_ip" in outputs and outputs["nexus_ip"]["value"]:
         nexus_ip = outputs["nexus_ip"]["value"]
-        inventory["all"]["hosts"].append(nexus_ip)
-        inventory["all"]["children"]["nexus"]["hosts"].append(nexus_ip)
-        inventory["_meta"] = {
-            "hostvars": {
-                nexus_ip: {
-                    "ansible_user": "root",
-                    "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
-                }
-            }
+        inventory["nexus"]["hosts"].append(nexus_ip)
+        inventory["_meta"]["hostvars"][nexus_ip] = {
+            "ansible_user": "root",
+            "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
         }
 
     return inventory
@@ -60,6 +56,7 @@ if __name__ == "__main__":
     terraform_outputs = get_terraform_outputs()
     inventory = generate_inventory(terraform_outputs)
     print(json.dumps(inventory, indent=2))
+
 
 
 
