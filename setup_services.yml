@@ -1,11 +1,13 @@
 - name: Install and configure Jenkins and Nexus
   hosts: all
+  remote_user: root
   tasks:
     - name: Ensure Python is installed
       raw: sudo apt update && sudo apt install -y python3
 
 - name: Setup Jenkins on master
   hosts: jenkins
+  remote_user: root
   become: yes
   tasks:
     - name: Install Java and required packages on Jenkins server
@@ -28,6 +30,7 @@
 
 - name: Setup Nexus on nexus
   hosts: nexus
+  remote_user: root
   become: yes
   tasks:
     - name: Install Docker on Nexus server
