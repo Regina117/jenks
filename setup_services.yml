@@ -65,6 +65,9 @@
         url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
         dest: /tmp/nexus.tar.gz
         mode: '0644'
+        timeout: 300
+      retries: 3
+      delay: 10
 
     - name: Extract Nexus
       unarchive:
