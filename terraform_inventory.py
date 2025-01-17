@@ -17,6 +17,7 @@ def generate_inventory():
 
     inventory = {
         "all": {
+            "hosts": ["jenkins", "nexus"],
             "children": {
                 "jenkins": {
                     "hosts": ["jenkins"]
@@ -60,7 +61,7 @@ def main():
         try:
             host_details = get_host_details(host_name)
             print(json.dumps(host_details, indent=2))
-        except Exception as e:
+        except Exception:
             print(json.dumps({}))
     else:
         print(json.dumps({"_meta": {"hostvars": {}}}))
