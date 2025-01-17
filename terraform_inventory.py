@@ -48,7 +48,7 @@ def generate_inventory(outputs):
         inventory["all"]["children"]["nexus"]["hosts"].append(nexus_ip)
         inventory["_meta"] = {
             "hostvars": {
-                jenkins_ip: {
+                nexus_ip: {
                     "ansible_user": "regina",
                     "ansible_ssh_private_key_file": public_key_path
                 }
