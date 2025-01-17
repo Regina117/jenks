@@ -8,7 +8,7 @@
   hosts: jenkins
   become: yes
   tasks:
-    - name: Install Java 17 on Jenkins server
+    - name: Install Java 17 on jenkins server
       apt:
         name: openjdk-17-jdk
         state: present
@@ -29,7 +29,7 @@
         update_cache: yes
       become: yes
 
-    - name: Install Jenkins on Jenkins server
+    - name: Install Jenkins on jenkins server
       apt:
         name: jenkins
         state: present
@@ -59,16 +59,20 @@
         state: present
         update_cache: yes
 
-    - name: Set JAVA_HOME environment variable for nexus user
-      lineinfile:
+    - name: Set JAVA_HOME and INSTALL4J_JAVA_HOME environment variables for nexus user
+      blockinfile:
         path: /home/nexus/.bashrc
-        line: 'export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64'
+        block: |
+          export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+          export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
         state: present
 
-    - name: Apply JAVA_HOME for current session
+    - name: Apply JAVA_HOME and INSTALL4J_JAVA_HOME for current session
       shell: |
         export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+        export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
         echo $JAVA_HOME
+        echo $INSTALL4J_JAVA_HOME
       args:
         executable: /bin/bash
 
@@ -87,20 +91,7 @@
         dest: /opt/
         remote_src: yes
 
-    - name: Ensure Nexus directory is ready
-      shell: |
-        if [ -d /opt/nexus ]; then
-          if [ "$(ls -A /opt/nexus)" ]; then
-            echo "Clearing existing /opt/nexus directory"
-            rm -rf /opt/nexus/*
-          fi
-        else
-          mkdir -p /opt/nexus
-        fi
-      args:
-        executable: /bin/bash
-
-    - name: Move extracted Nexus directory
+    - name: Move extracted Nexus directory to /opt/nexus
       shell: |
         extracted_dir=$(ls -d /opt/nexus-*)
         if [ -n "$extracted_dir" ]; then
@@ -113,17 +104,7 @@
       args:
         executable: /bin/bash
 
-    - name: Verify Nexus binary exists
-      stat:
-        path: /opt/nexus/bin/nexus
-      register: nexus_bin_check
-
-    - name: Fail if Nexus binary is missing
-      fail:
-        msg: "Nexus binary file is missing at /opt/nexus/bin/nexus. Please check the extraction step."
-      when: not nexus_bin_check.stat.exists
-
-    - name: Set permissions for Nexus directories
+    - name: Ensure Nexus directories exist with correct permissions
       file:
         path: "{{ item }}"
         state: directory
@@ -149,13 +130,14 @@
           After=network.target
           
           [Service]
-          Type=simple
+          Type=forking
           User=nexus
           Group=nexus
           ExecStart=/opt/nexus/bin/nexus start
           ExecStop=/opt/nexus/bin/nexus stop
           Restart=on-failure
           Environment=JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+          Environment=INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
           Environment=PATH=/usr/lib/jvm/java-11-openjdk-amd64/bin:$PATH
 
           [Install]
