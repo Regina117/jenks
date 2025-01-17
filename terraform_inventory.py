@@ -34,8 +34,8 @@ def generate_inventory(outputs):
         inventory["_meta"] = {
             "hostvars": {
                 jenkins_ip: {
-                    "ansible_user": "regina",
-                    "ansible_ssh_private_key_file": "/home/regina/.ssh/id_rsa"
+                    "ansible_user": "root",
+                    "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
                 }
             }
         }
@@ -48,8 +48,8 @@ def generate_inventory(outputs):
         inventory["_meta"] = {
             "hostvars": {
                 nexus_ip: {
-                    "ansible_user": "regina",
-                    "ansible_ssh_key": "/home/regina/.ssh/id_rsa"
+                    "ansible_user": "root",
+                    "ansible_ssh_key": "/root/.ssh/id_rsa"
                 }
             }
         }
