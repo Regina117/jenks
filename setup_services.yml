@@ -52,7 +52,6 @@
         name: nexus
         state: present
         shell: /bin/bash
-      become: yes  
 
     - name: Install Java 11 on Nexus server
       apt:
@@ -74,16 +73,28 @@
         src: /tmp/nexus.tar.gz
         dest: /opt/
         remote_src: yes
-      become: yes
 
     - name: Ensure Nexus directory is renamed
       shell: |
         extracted_dir=$(ls -d /opt/nexus-*)
-        mv "$extracted_dir" /opt/nexus
+        if [ -n "$extracted_dir" ]; then
+          mv "$extracted_dir" /opt/nexus
+        else
+          echo "Nexus directory not found after extraction" >&2
+          exit 1
+        fi
       args:
         executable: /bin/bash
-      become: yes
-      when: ansible_facts['os_family'] == "Debian"
+
+    - name: Verify Nexus binary exists
+      stat:
+        path: /opt/nexus/bin/nexus
+      register: nexus_bin_check
+
+    - name: Fail if Nexus binary is missing
+      fail:
+        msg: "Nexus binary file is missing at /opt/nexus/bin/nexus. Please check the extraction step."
+      when: not nexus_bin_check.stat.exists
 
     - name: Set permissions for Nexus directories
       file:
@@ -92,7 +103,7 @@
         owner: nexus
         group: nexus
         recurse: yes
-      with_items:
+      loop:
         - /opt/nexus
         - /opt/sonatype-work
 
@@ -101,7 +112,6 @@
         path: /opt/nexus/bin/nexus
         regexp: '^#run_as_user=""'
         line: 'run_as_user="nexus"'
-      become: yes
 
     - name: Create Nexus service file
       copy:
@@ -123,15 +133,12 @@
 
           [Install]
           WantedBy=multi-user.target
-      become: yes
 
     - name: Reload systemd
       command: systemctl daemon-reload
-      become: yes
 
     - name: Start and enable Nexus service
       systemd:
         name: nexus
         state: started
         enabled: yes
-      become: yes
