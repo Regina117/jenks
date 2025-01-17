@@ -61,10 +61,23 @@
           INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
     - name: Reload environment variables
-      shell: . /etc/environment
-      become: yes
+      shell: source /etc/environment
       args:
         executable: /bin/bash
+
+    - name: Ensure Nexus user exists
+      user:
+        name: nexus
+        state: present
+        shell: /bin/bash
+
+    - name: Set permissions for Nexus directory
+      file:
+        path: /opt/nexus
+        state: directory
+        owner: nexus
+        group: nexus
+        recurse: yes
 
     - name: Create Nexus service file
       copy:
@@ -86,13 +99,24 @@
 
           [Install]
           WantedBy=multi-user.target
+      owner: root
+      group: root
+      mode: '0644'
 
-    - name: Reload systemd
+    - name: Reload systemd manager configuration
       command: systemctl daemon-reload
 
-    - name: Start and enable Nexus service
+    - name: Enable and start Nexus service
       systemd:
         name: nexus
         state: started
         enabled: yes
 
+    - name: Check Nexus service status
+      systemd:
+        name: nexus
+        register: nexus_status
+
+    - name: Debug service status
+      debug:
+        msg: "{{ nexus_status }}"
