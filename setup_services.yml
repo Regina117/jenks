@@ -60,23 +60,39 @@
         state: present
         update_cache: yes
 
-    # - name: Create Nexus user and set up permissions
-    #   user:
-    #     name: nexus
-    #     state: present
-    #     shell: /bin/bash
-    #     create_home: yes
-    #     home: /opt/nexus
-    #     system: yes
-    #   become: yes
+    - name: Download Nexus
+      get_url:
+        url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+        dest: /tmp/nexus.tar.gz
+        mode: '0644'
 
-    - name: Ensure proper permissions on Nexus directory
+    - name: Extract Nexus
+      unarchive:
+        src: /tmp/nexus.tar.gz
+        dest: /opt/
+        remote_src: yes
+      become: yes
+
+    - name: Rename Nexus directory
+      command: mv /opt/nexus-* /opt/nexus
+      become: yes
+
+    - name: Set permissions for Nexus directories
       file:
-        path: /opt/nexus
+        path: "{{ item }}"
         state: directory
         owner: nexus
         group: nexus
-        mode: '0755'
+        recurse: yes
+      with_items:
+        - /opt/nexus
+        - /opt/sonatype-work
+
+    - name: Update Nexus permissions script
+      lineinfile:
+        path: /opt/nexus/bin/nexus
+        regexp: '^#run_as_user=""'
+        line: 'run_as_user="nexus"'
       become: yes
 
     - name: Create Nexus service file
@@ -101,18 +117,15 @@
           WantedBy=multi-user.target
       become: yes
 
-    - name: Reload systemd and start Nexus service
+    - name: Reload systemd
+      command: systemctl daemon-reload
+      become: yes
+
+    - name: Start and enable Nexus service
       systemd:
         name: nexus
         state: started
         enabled: yes
-      become: yes
-      notify:
-        - Reload systemd
-
-  handlers:
-    - name: Reload systemd
-      command: systemctl daemon-reload
       become: yes
 
 

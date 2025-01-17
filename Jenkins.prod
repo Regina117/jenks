@@ -1,4 +1,26 @@
-IMAGE_TAG="v1.0"
-FULL_IMAGE="${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
-docker pull ${FULL_IMAGE}
-docker run
+pipeline {
+    agent any
+    environment {
+        DOCKER_IMAGE = "your-nexus-repo:port/jenks-app:latest"
+        PROD_SERVER = "user@prod-server-ip"
+    }
+    stages {
+        stage('Pull Docker Image') {
+            steps {
+                sh """
+                ssh $PROD_SERVER '
+                    docker pull $DOCKER_IMAGE &&
+                    docker stop jenks-app || true &&
+                    docker rm jenks-app || true &&
+                    docker run -d --name jenks-app -p 8080:8080 $DOCKER_IMAGE
+                '
+                """
+            }
+        }
+    }
+    post {
+        always {
+            echo "Deployment pipeline completed"
+        }
+    }
+}

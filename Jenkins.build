@@ -4,3 +4,41 @@ IMAGE_TAG = 'v1.0.1'
 FULL_IMAGE = "${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
 docker tag builder:latest ${FULL_IMAGE} || {echo "docker tag}
 docker push
+
+
+pipeline {
+    agent any
+    environment {
+        DOCKER_IMAGE = "your-nexus-repo:port/jenks-app:latest"
+        NEXUS_USERNAME = credentials('nexus-username')
+        NEXUS_PASSWORD = credentials('nexus-password')
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git 'https://github.com/Regina117/jenks.git'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build(DOCKER_IMAGE)
+                }
+            }
+        }
+        stage('Push to Nexus') {
+            steps {
+                script {
+                    docker.withRegistry("http://your-nexus-repo:port", 'nexus-credentials-id') {
+                        docker.image(DOCKER_IMAGE).push()
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs() 
+        }
+    }
+}
