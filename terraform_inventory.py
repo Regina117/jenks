@@ -25,6 +25,7 @@ def generate_inventory(outputs):
             }
         }
     }
+    private_key_path = "/home/regina/.ssh/id_rsa"
 
 
     if "jenkins_ip" in outputs and outputs["jenkins_ip"]["value"]:
@@ -34,8 +35,8 @@ def generate_inventory(outputs):
         inventory["_meta"] = {
             "hostvars": {
                 jenkins_ip: {
-                    "ansible_user": "root",
-                    "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
+                    "ansible_user": "regina",
+                    "ansible_ssh_private_key_file": private_key_path
                 }
             }
         }
@@ -48,8 +49,8 @@ def generate_inventory(outputs):
         inventory["_meta"] = {
             "hostvars": {
                 jenkins_ip: {
-                    "ansible_user": "root",
-                    "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
+                    "ansible_user": "regina",
+                    "ansible_ssh_private_key_file": private_key_path
                 }
             }
         }
