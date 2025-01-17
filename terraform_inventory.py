@@ -2,10 +2,13 @@
 
 import json
 import subprocess
+import sys
 
 def get_terraform_output(output_name):
     command = ["terraform", "output", "-raw", output_name]
     result = subprocess.run(command, capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(f"Failed to get Terraform output for {output_name}: {result.stderr.strip()}")
     return result.stdout.strip()
 
 def generate_inventory():
@@ -16,22 +19,24 @@ def generate_inventory():
         "all": {
             "children": {
                 "jenkins": {
-                    "hosts": {
-                        "jenkins": {
-                            "ansible_host": jenkins_ip,
-                            "ansible_user": "root",
-                            "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
-                        }
-                    }
+                    "hosts": ["jenkins"]
                 },
                 "nexus": {
-                    "hosts": {
-                        "nexus": {
-                            "ansible_host": nexus_ip,
-                            "ansible_user": "root",
-                            "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
-                        }
-                    }
+                    "hosts": ["nexus"]
+                }
+            }
+        },
+        "_meta": {
+            "hostvars": {
+                "jenkins": {
+                    "ansible_host": jenkins_ip,
+                    "ansible_user": "root",
+                    "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
+                },
+                "nexus": {
+                    "ansible_host": nexus_ip,
+                    "ansible_user": "root",
+                    "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
                 }
             }
         }
@@ -40,12 +45,16 @@ def generate_inventory():
     return inventory
 
 def main():
-    inventory = generate_inventory()
-    print(json.dumps(inventory, indent=2))
+    if len(sys.argv) > 1 and sys.argv[1] == "--list":
+        inventory = generate_inventory()
+        print(json.dumps(inventory, indent=2))
+    elif len(sys.argv) > 1 and sys.argv[1] == "--host":
+        print(json.dumps({}))
+    else:
+        print(json.dumps({}))
 
 if __name__ == "__main__":
     main()
-
 
 
 
