@@ -15,12 +15,12 @@ def generate_inventory():
     inventory = {
         "_meta": {
             "hostvars": {
-                "jenkins": {
+                jenkins_ip: {
                     "ansible_host": jenkins_ip,
                     "ansible_user": "root",
                     "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
                 },
-                "nexus": {
+                nexus_ip: {
                     "ansible_host": nexus_ip,
                     "ansible_user": "root",
                     "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
@@ -28,25 +28,20 @@ def generate_inventory():
             }
         },
         "all": {
-            "children": {
-                "jenkins": {
-                    "hosts": [jenkins_ip]
-                },
-                "nexus": {
-                    "hosts": [nexus_ip]
-                }
-            }
+            "children": ["jenkins", "nexus"]
+        },
+        "jenkins": {
+            "hosts": [jenkins_ip]
+        },
+        "nexus": {
+            "hosts": [nexus_ip]
         }
     }
 
     return inventory
 
 def main():
-    inventory = generate_inventory()
-    print(json.dumps(inventory, indent=2))
-
-if __name__ == "__main__":
-    main()
+    inventory = generate
 
 
 
