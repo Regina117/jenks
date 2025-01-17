@@ -43,91 +43,25 @@
         enabled: yes
       become: yes
 
-- name: Setup Nexus on nexus
+- name: Setup Nexus
   hosts: nexus
   become: yes
   tasks:
-    - name: Ensure nexus user exists
-      user: 
-        name: nexus
-        state: present
-        shell: /bin/bash
-
-    - name: Install Java 17 on Nexus server
+    - name: Install Java 17
       apt:
         name: openjdk-17-jdk
         state: present
         update_cache: yes
 
-    - name: Set JAVA_HOME and INSTALL4J_JAVA_HOME environment variables for nexus user
+    - name: Set environment variables for Nexus
       blockinfile:
-        path: /home/nexus/.bashrc
+        path: /etc/environment
         block: |
-          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-          export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-          export PATH=$JAVA_HOME/bin:$PATH
-        state: present
+          JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 
-    - name: Apply JAVA_HOME and INSTALL4J_JAVA_HOME for current session
-      shell: |
-        export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-        export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-        export PATH=$JAVA_HOME/bin:$PATH
-        echo $JAVA_HOME
-        echo $INSTALL4J_JAVA_HOME
-        echo $PATH
-      args:
-        executable: /bin/bash
-
-    - name: Download Nexus
-      get_url:
-        url: https://download.sonatype.com/nexus/3/latest-unix.tar.gz
-        dest: /tmp/nexus.tar.gz
-        mode: '0644'
-        timeout: 300
-      retries: 3
-      delay: 10
-
-    - name: Extract Nexus
-      unarchive:
-        src: /tmp/nexus.tar.gz
-        dest: /opt/
-        remote_src: yes
-
-    - name: Check if /opt/nexus directory exists
-      stat:
-        path: /opt/nexus
-      register: nexus_dir
-
-    - name: Rename Nexus directory to /opt/nexus
-      shell: |
-        extracted_dir=$(ls -d /opt/nexus-*)
-        if [ -n "$extracted_dir" ]; then
-          mv "$extracted_dir" /opt/nexus
-        else
-          echo "Nexus directory not found after extraction" >&2
-          exit 1
-        fi
-      args:
-        executable: /bin/bash
-      when: not nexus_dir.stat.exists
-
-    - name: Ensure Nexus directories exist with correct permissions
-      file:
-        path: "{{ item }}"
-        state: directory
-        owner: nexus
-        group: nexus
-        recurse: yes
-      loop:
-        - /opt/nexus
-        - /opt/sonatype-work
-
-    - name: Update Nexus permissions script
-      lineinfile:
-        path: /opt/nexus/bin/nexus
-        regexp: '^#run_as_user=""'
-        line: 'run_as_user="nexus"'
+    - name: Reload environment variables
+      shell: source /etc/environment
 
     - name: Create Nexus service file
       copy:
@@ -136,7 +70,7 @@
           [Unit]
           Description=Nexus Repository Manager
           After=network.target
-          
+
           [Service]
           Type=forking
           User=nexus
@@ -146,7 +80,6 @@
           Restart=on-failure
           Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
           Environment=INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-          Environment=PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin:$PATH
 
           [Install]
           WantedBy=multi-user.target
@@ -159,3 +92,4 @@
         name: nexus
         state: started
         enabled: yes
+
