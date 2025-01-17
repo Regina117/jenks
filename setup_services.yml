@@ -73,9 +73,14 @@
         remote_src: yes
       become: yes
 
-    - name: Rename Nexus directory
-      command: mv /opt/nexus-* /opt/nexus
+    - name: Ensure Nexus directory is renamed
+      shell: |
+        extracted_dir=$(ls -d /opt/nexus-*)
+        mv "$extracted_dir" /opt/nexus
+      args:
+        executable: /bin/bash
       become: yes
+      when: ansible_facts['os_family'] == "Debian"
 
     - name: Set permissions for Nexus directories
       file:
@@ -127,6 +132,3 @@
         state: started
         enabled: yes
       become: yes
-
-
-
