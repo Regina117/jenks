@@ -8,41 +8,77 @@
   hosts: jenkins
   become: yes
   tasks:
-    - name: Install Java and required packages on Jenkins server
+    - name: Install Java 17 on Jenkins server
       apt:
-        name: "{{ item }}"
+        name: openjdk-17-jdk
         state: present
         update_cache: yes
-      loop:
-        - openjdk-11-jdk
-        - maven
-        - docker.io
-        - jenkins
-        - git
 
-    - name: Enable and start Jenkins
+    - name: Add Jenkins repository key
+      shell: |
+        curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+      become: yes
+
+    - name: Add Jenkins repository to sources list
+      shell: |
+        echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+      become: yes
+
+    - name: Update apt repository cache
+      apt:
+        update_cache: yes
+      become: yes
+
+    - name: Install Jenkins on Jenkins server
+      apt:
+        name: jenkins
+        state: present
+        update_cache: yes
+      become: yes
+
+    - name: Start and enable Jenkins service
       systemd:
         name: jenkins
         state: started
         enabled: yes
+      become: yes
 
 - name: Setup Nexus on nexus
   hosts: nexus
   become: yes
   tasks:
-    - name: Install Docker on Nexus server
+    - name: Install Java 11 on Nexus server
       apt:
-        name: docker.io
+        name: openjdk-11-jdk
         state: present
         update_cache: yes
 
-    - name: Run Nexus container
-      docker_container:
+    - name: Create Nexus service file
+      copy:
+        dest: /etc/systemd/system/nexus.service
+        content: |
+          [Unit]
+          Description=Nexus Repository Manager
+          After=network.target
+          
+          [Service]
+          Type=simple
+          User=nexus
+          ExecStart=/opt/nexus/bin/nexus start
+          ExecStop=/opt/nexus/bin/nexus stop
+          Restart=on-failure
+          Environment=JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+          Environment=PATH=$JAVA_HOME/bin:$PATH
+
+          [Install]
+          WantedBy=multi-user.target
+      become: yes
+
+    - name: Enable and start Nexus service
+      systemd:
         name: nexus
-        image: sonatype/nexus3
         state: started
-        ports:
-          - "8081:8081"
-        restart_policy: always
+        enabled: yes
+      become: yes
 
 
