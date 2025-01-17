@@ -53,6 +53,25 @@
         state: present
         update_cache: yes
 
+    - name: Create Nexus user and set up permissions
+      user:
+        name: nexus
+        state: present
+        shell: /bin/bash
+        create_home: yes
+        home: /opt/nexus
+        system: yes
+      become: yes
+
+    - name: Ensure proper permissions on Nexus directory
+      file:
+        path: /opt/nexus
+        owner: nexus
+        group: nexus
+        recurse: yes
+        mode: '0755'
+      become: yes
+
     - name: Create Nexus service file
       copy:
         dest: /etc/systemd/system/nexus.service
@@ -64,6 +83,7 @@
           [Service]
           Type=simple
           User=nexus
+          Group=nexus
           ExecStart=/opt/nexus/bin/nexus start
           ExecStop=/opt/nexus/bin/nexus stop
           Restart=on-failure
@@ -74,11 +94,19 @@
           WantedBy=multi-user.target
       become: yes
 
-    - name: Enable and start Nexus service
+    - name: Reload systemd and start Nexus service
       systemd:
         name: nexus
         state: started
         enabled: yes
       become: yes
+      notify:
+        - Reload systemd
+
+  handlers:
+    - name: Reload systemd
+      command: systemctl daemon-reload
+      become: yes
+
 
 
