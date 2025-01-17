@@ -38,8 +38,8 @@ def generate_inventory(outputs):
         jenkins_ip = outputs["jenkins_ip"]["value"]
         inventory["jenkins"]["hosts"].append(jenkins_ip)
         inventory["_meta"]["hostvars"][jenkins_ip] = {
-            "ansible_user": "regina",
-            "ansible_ssh_private_key_file": "/home/regina/.ssh/id_rsa"
+            "ansible_user": "root",
+            "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
         }
 
     if "nexus_ip" in outputs and outputs["nexus_ip"]["value"]:
