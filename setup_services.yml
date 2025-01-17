@@ -66,7 +66,15 @@
           export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
           export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
         state: present
-      notify: Reload Nexus user environment
+
+    - name: Apply JAVA_HOME and INSTALL4J_JAVA_HOME for current session
+      shell: |
+        export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+        export INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+        echo $JAVA_HOME
+        echo $INSTALL4J_JAVA_HOME
+      args:
+        executable: /bin/bash
 
     - name: Download Nexus
       get_url:
@@ -83,6 +91,11 @@
         dest: /opt/
         remote_src: yes
 
+    - name: Check if /opt/nexus directory exists
+      stat:
+        path: /opt/nexus
+      register: nexus_dir
+
     - name: Rename Nexus directory to /opt/nexus
       shell: |
         extracted_dir=$(ls -d /opt/nexus-*)
@@ -94,7 +107,7 @@
         fi
       args:
         executable: /bin/bash
-      creates: /opt/nexus
+      when: not nexus_dir.stat.exists
 
     - name: Ensure Nexus directories exist with correct permissions
       file:
@@ -144,6 +157,3 @@
         state: started
         enabled: yes
 
-  handlers:
-    - name: Reload Nexus user environment
-      shell: su - nexus -c "source ~/.bashrc"
