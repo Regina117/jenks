@@ -44,17 +44,30 @@ def generate_inventory():
 
     return inventory
 
+def get_host_details(host_name):
+    inventory = generate_inventory()
+    return inventory["_meta"]["hostvars"].get(host_name, {})
+
 def main():
     if len(sys.argv) > 1 and sys.argv[1] == "--list":
-        inventory = generate_inventory()
-        print(json.dumps(inventory, indent=2))
-    elif len(sys.argv) > 1 and sys.argv[1] == "--host":
-        print(json.dumps({}))
+        try:
+            inventory = generate_inventory()
+            print(json.dumps(inventory, indent=2))
+        except Exception as e:
+            print(json.dumps({"_meta": {"hostvars": {}}}))
+    elif len(sys.argv) > 2 and sys.argv[1] == "--host":
+        host_name = sys.argv[2]
+        try:
+            host_details = get_host_details(host_name)
+            print(json.dumps(host_details, indent=2))
+        except Exception as e:
+            print(json.dumps({}))
     else:
-        print(json.dumps({}))
+        print(json.dumps({"_meta": {"hostvars": {}}}))
 
 if __name__ == "__main__":
     main()
+
 
 
 
