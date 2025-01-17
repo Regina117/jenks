@@ -99,7 +99,13 @@
 
           [Install]
           WantedBy=multi-user.target
-      mode: '0644'
+
+    - name: Set permissions for Nexus service file
+      file:
+        path: /etc/systemd/system/nexus.service
+        mode: '0644'
+        owner: root
+        group: root
 
     - name: Reload systemd manager configuration
       command: systemctl daemon-reload
