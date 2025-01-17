@@ -26,15 +26,17 @@ def generate_inventory(outputs):
         }
     }
 
-    if "jenkins_ip" in outputs:
+
+    if "jenkins_ip" in outputs and outputs["jenkins_ip"]["value"]:
         jenkins_ip = outputs["jenkins_ip"]["value"]
         inventory["all"]["hosts"].append(jenkins_ip)
-        inventory["jenkins"]["hosts"].append(jenkins_ip)
+        inventory["all"]["children"]["jenkins"]["hosts"].append(jenkins_ip)
 
-    if "nexus_ip" in outputs:
+   
+    if "nexus_ip" in outputs and outputs["nexus_ip"]["value"]:
         nexus_ip = outputs["nexus_ip"]["value"]
         inventory["all"]["hosts"].append(nexus_ip)
-        inventory["nexus"]["hosts"].append(nexus_ip)
+        inventory["all"]["children"]["nexus"]["hosts"].append(nexus_ip)
 
     return inventory
 
