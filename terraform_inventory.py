@@ -44,11 +44,10 @@ def generate_inventory():
 
     return inventory
 
-inventory = generate_inventory()
-print(json.dumps(inventory, indent=2))
-
 if __name__ == "__main__":
-    main()
+    inventory = generate_inventory()
+    print(json.dumps(inventory, indent=2))
+
 
 
 
