@@ -74,11 +74,25 @@
         dest: /opt/
         remote_src: yes
 
-    - name: Ensure Nexus directory is renamed
+    - name: Ensure Nexus directory is ready
+      shell: |
+        if [ -d /opt/nexus ]; then
+          if [ "$(ls -A /opt/nexus)" ]; then
+            echo "Clearing existing /opt/nexus directory"
+            rm -rf /opt/nexus/*
+          fi
+        else
+          mkdir -p /opt/nexus
+        fi
+      args:
+        executable: /bin/bash
+
+    - name: Move extracted Nexus directory
       shell: |
         extracted_dir=$(ls -d /opt/nexus-*)
         if [ -n "$extracted_dir" ]; then
-          mv "$extracted_dir" /opt/nexus
+          mv "$extracted_dir"/* /opt/nexus/
+          rm -rf "$extracted_dir"
         else
           echo "Nexus directory not found after extraction" >&2
           exit 1
