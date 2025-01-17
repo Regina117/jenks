@@ -14,8 +14,8 @@ provider "yandex" {
   zone      = "ru-central1-d"
 }
 
-resource "yandex_compute_instance" "master" {
-  name        = "master-jenkins"
+resource "yandex_compute_instance" "jenkins" {
+  name        = "jenkins"
   platform_id = "standard-v2" 
   resources {
     cores  = 8
@@ -51,8 +51,8 @@ resource "yandex_compute_instance" "master" {
   }
 }
 
-resource "yandex_compute_instance" "build_node" {
-  name        = "build-node"
+resource "yandex_compute_instance" "build" {
+  name        = "build"
   platform_id = "standard-v2"
   resources {
     cores  = 4
@@ -86,8 +86,8 @@ resource "yandex_compute_instance" "build_node" {
   }
 }
 
-resource "yandex_compute_instance" "prod_node" {
-  name        = "prod-node"
+resource "yandex_compute_instance" "prod" {
+  name        = "prod"
   platform_id = "standard-v2"
   resources {
     cores  = 4
@@ -162,16 +162,16 @@ variable "yc_cloud_id" {}
 variable "yc_folder_id" {}
 variable "subnet_id" {}
 
-output "master_ip" {
-  value = yandex_compute_instance.master.network_interface[0].nat_ip_address
+output "jenkins_ip" {
+  value = yandex_compute_instance.jenkins.network_interface[0].nat_ip_address
 }
 
-output "build_nodes_ips" {
-  value = yandex_compute_instance.build_node[*].network_interface[0].nat_ip_address
+output "build_ip" {
+  value = yandex_compute_instance.build.network_interface[0].nat_ip_address
 }
 
-output "prod_node_ip" {
-  value = yandex_compute_instance.prod_node.network_interface[0].nat_ip_address
+output "prod_ip" {
+  value = yandex_compute_instance.prod.network_interface[0].nat_ip_address
 }
 
 output "nexus_ip" {

@@ -45,3 +45,5 @@ src/release/installer/win/target/
 
 # Eclipse stuff
 src/web/app/.temp-Start*
+
+.tfvars
