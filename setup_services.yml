@@ -1,3 +1,9 @@
+- name: Install and configure Jenkins and Nexus
+  hosts: all
+  tasks:
+    - name: Ensure Python is installed
+      raw: sudo apt update && sudo apt install -y python3
+
 - name: Setup Jenkins on master
   hosts: jenkins
   become: yes
