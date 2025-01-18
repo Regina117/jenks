@@ -43,13 +43,13 @@
         enabled: yes
       become: yes
 
----
+
 - name: Install and configure Nexus
-  hosts: all
+  hosts: nexus
   become: true
 
   vars:
-    nexus_version: "latest-unix"
+    nexus_version: "nexus-3.76.0-03"
     nexus_url: "https://download.sonatype.com/nexus/3/latest-unix.tar.gz"
     nexus_install_dir: "/opt"
     nexus_user: "nexus"
@@ -76,7 +76,7 @@
         remote_src: yes
 
     - name: Rename Nexus directory
-      command: mv "{{ nexus_install_dir }}/nexus-3.*" "{{ nexus_install_dir }}/nexus"
+      command: mv "{{ nexus_install_dir }}/{{ nexus_version }}" "{{ nexus_install_dir }}/nexus"
       args:
         creates: "{{ nexus_install_dir }}/nexus"
 
