@@ -43,84 +43,112 @@
         enabled: yes
       become: yes
 
-- name: Setup Nexus
-  hosts: nexus
-  become: yes
+---
+- name: Install and configure Nexus
+  hosts: all
+  become: true
+
+  vars:
+    nexus_version: "latest-unix"
+    nexus_url: "https://download.sonatype.com/nexus/3/latest-unix.tar.gz"
+    nexus_install_dir: "/opt"
+    nexus_user: "nexus"
+
   tasks:
-    - name: Install Java 17
+    - name: Update apt cache
       apt:
-        name: openjdk-17-jdk
-        state: present
         update_cache: yes
 
-    - name: Set environment variables for Nexus
-      blockinfile:
-        path: /etc/environment
-        block: |
-          JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-          INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-
-    - name: Reload environment variables
-      shell: source /etc/environment
-      args:
-        executable: /bin/bash
-
-    - name: Ensure Nexus user exists
-      user:
-        name: nexus
+    - name: Install OpenJDK 8
+      apt:
+        name: openjdk-8-jre-headless
         state: present
+
+    - name: Download Nexus
+      get_url:
+        url: "{{ nexus_url }}"
+        dest: "{{ nexus_install_dir }}/{{ nexus_version }}.tar.gz"
+
+    - name: Extract Nexus archive
+      unarchive:
+        src: "{{ nexus_install_dir }}/{{ nexus_version }}.tar.gz"
+        dest: "{{ nexus_install_dir }}"
+        remote_src: yes
+
+    - name: Rename Nexus directory
+      command: mv "{{ nexus_install_dir }}/nexus-3.*" "{{ nexus_install_dir }}/nexus"
+      args:
+        creates: "{{ nexus_install_dir }}/nexus"
+
+    - name: Add Nexus user
+      user:
+        name: "{{ nexus_user }}"
+        home: "{{ nexus_install_dir }}/nexus"
         shell: /bin/bash
+        create_home: no
 
-    - name: Set permissions for Nexus directory
+    - name: Allow Nexus user passwordless sudo
+      lineinfile:
+        path: /etc/sudoers
+        line: "{{ nexus_user }} ALL=(ALL) NOPASSWD: ALL"
+        validate: "/usr/sbin/visudo -cf %s"
+
+    - name: Change ownership of Nexus directories
       file:
-        path: /opt/nexus
-        state: directory
-        owner: nexus
-        group: nexus
+        path: "{{ item }}"
+        owner: "{{ nexus_user }}"
+        group: "{{ nexus_user }}"
         recurse: yes
+      loop:
+        - "{{ nexus_install_dir }}/nexus"
+        - "{{ nexus_install_dir }}/sonatype-work"
 
-    - name: Create Nexus service file
+    - name: Configure Nexus to run as nexus user
+      lineinfile:
+        path: "{{ nexus_install_dir }}/nexus/bin/nexus.rc"
+        line: "run_as_user={{ nexus_user }}"
+
+    - name: Configure Nexus JVM options
+      blockinfile:
+        path: "{{ nexus_install_dir }}/nexus/bin/nexus.vmoptions"
+        block: |
+          -XX:MaxDirectMemorySize=1024m
+
+    - name: Create Nexus systemd service
       copy:
         dest: /etc/systemd/system/nexus.service
         content: |
           [Unit]
-          Description=Nexus Repository Manager
+          Description=nexus service
           After=network.target
 
           [Service]
           Type=forking
-          User=nexus
-          Group=nexus
-          ExecStart=/opt/nexus/bin/nexus start
-          ExecStop=/opt/nexus/bin/nexus stop
-          Restart=on-failure
-          Environment=JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
-          Environment=INSTALL4J_JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          LimitNOFILE=65536
+          ExecStart={{ nexus_install_dir }}/nexus/bin/nexus start
+          ExecStop={{ nexus_install_dir }}/nexus/bin/nexus stop
+          User={{ nexus_user }}
+          Restart=on-abort
 
           [Install]
           WantedBy=multi-user.target
 
-    - name: Set permissions for Nexus service file
-      file:
-        path: /etc/systemd/system/nexus.service
-        mode: '0644'
-        owner: root
-        group: root
-
-    - name: Reload systemd manager configuration
+    - name: Reload systemd daemon
       command: systemctl daemon-reload
 
-    - name: Enable and start Nexus service
+    - name: Enable Nexus service
+      systemd:
+        name: nexus
+        enabled: yes
+
+    - name: Start Nexus service
+      systemd:
+        name: nexus
+        state: started
+
+    - name: Check Nexus service status
       systemd:
         name: nexus
         state: started
         enabled: yes
 
-    - name: Check Nexus service status
-      systemd:
-        name: nexus
-        register: nexus_status
-
-    - name: Debug service status
-      debug:
-        msg: "{{ nexus_status }}"
