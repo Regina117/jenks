@@ -68,7 +68,7 @@
       apt:
         name: 
         - docker.io
-        - - docker-compose
+        - docker-compose
         state: present
 
     - name: Ensure Docker service is running
