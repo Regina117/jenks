@@ -1,4 +1,5 @@
 FROM maven:latest as builder
+RUN apt-get update && apt-get install -y git
 WORKDIR /app
 RUN git clone https://github.com/Regina117/jenks.git /app
 WORKDIR /app/src
