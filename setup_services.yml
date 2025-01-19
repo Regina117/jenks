@@ -63,6 +63,19 @@
       apt:
         name: openjdk-8-jre-headless
         state: present
+        
+    - name: Install docker
+      apt:
+        name: 
+        - docker.io
+        - - docker-compose
+        state: present
+
+    - name: Ensure Docker service is running
+      systemd:
+        name: docker
+        state: started
+        enabled: yes    
 
     - name: Download Nexus
       get_url:
