@@ -1,0 +1,69 @@
+pipeline {
+    agent {
+        docker {
+            image 'maven:latest'
+            args '-u 1000:1000 -v /app:/app'
+        }
+    }
+    environment {
+        REGISTRY_URL = 'http://51.250.41.36:8123/repository/mydockerrepo'
+        IMAGE_NAME = 'geoserver'
+        IMAGE_TAG = 'v1.0'
+        FULL_IMAGE = "${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG}"
+        GITHUB_REPO_URL = 'https://github.com/Regina117/jenks.git'
+        NEXUS_CREDENTIALS_ID = 'nexusadmin'  // ID учетных данных
+        BRANCH_NAME = 'main'
+    }
+    stages {
+        stage('Setup Environment') {
+            steps {
+                sh '''
+                git --version || (apt-get update && apt-get install -y git)
+                mkdir -p /app
+                chown -R 1000:1000 /app
+                chmod -R 775 /app
+                '''
+            }
+        }
+        stage('Clone Repository') {
+            steps {
+                sh '''
+                git clone -b ${BRANCH_NAME} ${GITHUB_REPO_URL} /app
+                '''
+            }
+        }
+        stage('Build Maven Project') {
+            steps {
+                dir('/app/src') {
+                    sh '''
+                    mvn clean package -DskipTests
+                    '''
+                }
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                dir('/app') {
+                    sh '''
+                    docker build -t ${FULL_IMAGE} .
+                    '''
+                }
+            }
+        }
+        stage('Push Docker Image to Nexus') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: "${NEXUS_CREDENTIALS_ID}", usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                    sh '''
+                    echo "${NEXUS_PASS}" | docker login ${REGISTRY_URL} --username ${NEXUS_USER} --password-stdin
+                    docker push ${FULL_IMAGE}
+                    '''
+                }
+            }
+        }
+    }
+    post {
+        always {
+            echo 'Pipeline completed.'
+        }
+    }
+}
