@@ -1,0 +1,71 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_BUILDKIT = '1' 
+        REGISTRY_URL = '51.250.41.36:8123/repository/mydockerrepo'
+        IMAGE_NAME = "geoserver"
+        IMAGE_TAG = "v1.0.0"
+        NEXUS_CREDENTIALS_ID = 'nexusadmin' 
+        BRANCH_NAME = "main"
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                checkout scm: [
+                    $class: 'GitSCM',
+                    branches: [[name: "*/${BRANCH_NAME}"]],
+                    userRemoteConfigs: [[url: 'https://github.com/Regina117/jenks.git']]
+                ]
+            }
+        }
+
+        stage('Login to Docker Registry') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(
+                        credentialsId: "${NEXUS_CREDENTIALS_ID}",
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
+                    )]) {
+                        sh '''
+                            echo $DOCKER_PASSWORD | docker login ${REGISTRY_URL} --username $DOCKER_USERNAME --password-stdin
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG}")
+                }
+            }
+        }
+
+        stage('Push to Nexus') {
+            steps {
+                script {
+                    docker.withRegistry("http://${REGISTRY_URL}", "${NEXUS_CREDENTIALS_ID}") {
+                        docker.image("${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG}").push()
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            echo "Pipeline executed successfully! Image ${REGISTRY_URL}/${IMAGE_NAME}:${IMAGE_TAG} pushed to Nexus."
+        }
+        failure {
+            echo "Pipeline failed!"
+        }
+    }
+}
+
