@@ -68,7 +68,7 @@ resource "yandex_compute_instance" "prod" {
     nat       = true
   }
 
-   metadata = {
+  metadata = {
     ssh-keys= "regina:${file("/home/regina/.ssh/id_rsa.pub")}"
     user-data = <<-EOT
       #cloud-config
