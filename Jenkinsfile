@@ -2,15 +2,14 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = '51.250.41.36:8123/repository/mydockerrepo'  
+        DOCKER_REGISTRY = '158.160.140.97:8123/repository/mydockerrepo'
         IMAGE_NAME = 'geoserver'
         IMAGE_TAG = 'v1.0.1'
         FULL_IMAGE = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
         REPO_URL = 'https://github.com/Regina117/jenks.git'
-        DEPLOY_SERVER = '84.252.133.58'
-        SSH_KEY_PATH = '/root/.ssh/id_rsa' 
+        DEPLOY_SERVER = '158.160.156.175'        
         NEXUS_CREDENTIALS_ID = 'nexusadmin'
-        NEXUS_SERVER = 'nexus'
+        PROD_CREDENTIALS_ID = 'prod'
     }
 
     stages {
@@ -68,7 +67,7 @@ pipeline {
         stage('Deploy to Tomcat') {
             steps {
                 script {
-                    deploy adapters: [tomcat9(credentialsId: 'prod', path: '', url: 'http://84.252.133.58:8080/')], contextPath: 'geoserver', war: '**/*.war'
+                    deploy adapters: [tomcat9(credentialsId: 'prod', path: '', url: 'http://158.160.156.175:8080/')], contextPath: 'geoserver', war: '**/*.war'
                 }
             }
         }
@@ -76,19 +75,20 @@ pipeline {
         stage('Run Docker on slave') {
             steps {
                 script {
-                    sshKeyScan = sh(script: "ssh-keyscan -H ${DEPLOY_SERVER}", returnStdout: true).trim()
-                    writeFile file: "${HOME}/.ssh/id_rsa", text: sshKeyScan
-                    
-                    withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
-                        sh '''
-                        ssh ${DEPLOY_SERVER} << EOF
+                    sh """
+                      ssh-keyscan -H ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
+                    """
+                    withCredentials([usernamePassword(credentialsId: PROD_CREDENTIALS_ID, usernameVariable: 'PROD_USER', passwordVariable: 'PROD_PASS')]) {
+                        sh """
+                        ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} << EOF
+                            set -ex
                             sudo docker login ${DOCKER_REGISTRY} -u ${NEXUS_USER} -p ${NEXUS_PASS}
                             sudo docker pull ${FULL_IMAGE}
                             sudo docker stop ${IMAGE_NAME} || true
                             sudo docker rm ${IMAGE_NAME} || true
                             sudo docker run -d --name ${IMAGE_NAME} -p 8080:80 ${FULL_IMAGE}
                         EOF
-                        '''
+                        """
                     }
                 }
             }
