@@ -43,10 +43,9 @@ resource "yandex_compute_instance" "jenkins" {
         ssh_authorized_keys:
           - ${file("/home/regina/.ssh/id_rsa.pub")}
       runcmd:
-        - apt update && apt upgrade -y
-        - apt install -y openjdk-11-jdk maven docker.io
-        - apt install -y jenkins ansible
-        - systemctl enable jenkins && systemctl start jenkins
+        - apt update && apt install -y openssh-server
+        - systemctl enable ssh
+        - systemctl start ssh
     EOT
   }
 }
@@ -80,8 +79,9 @@ resource "yandex_compute_instance" "prod" {
         ssh_authorized_keys:
           - ${file("/home/regina/.ssh/id_rsa.pub")}
       runcmd:
-        - apt update && apt upgrade -y
-        - apt install -y openjdk-11-jdk
+        - apt update && apt install -y openssh-server
+        - systemctl enable ssh
+        - systemctl start ssh
     EOT
   }
 }
@@ -115,9 +115,9 @@ resource "yandex_compute_instance" "nexus" {
         ssh_authorized_keys:
           - ${file("/home/regina/.ssh/id_rsa.pub")}
       runcmd:
-        - apt update && apt upgrade -y
-        - apt install -y docker.io
-        - docker run -d -p 8081:8081 --name nexus sonatype/nexus3
+        - apt update && apt install -y openssh-server
+        - systemctl enable ssh
+        - systemctl start ssh
     EOT
   }
 }

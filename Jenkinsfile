@@ -42,10 +42,12 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh '''
-                    echo "admin" | docker login ${DOCKER_REGISTRY} -u admin --password-stdin || { echo "Docker login failed"; exit 1; }
-                    docker build -t ${FULL_IMAGE} . || { echo "Docker build failed"; exit 1; }
-                    '''
+                    withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                        sh '''
+                        echo "${NEXUS_PASS}" | docker login ${DOCKER_REGISTRY} -u ${NEXUS_USER} --password-stdin || { echo "Docker login failed"; exit 1; }
+                        docker build -t ${FULL_IMAGE} . || { echo "Docker build failed"; exit 1; }
+                        '''
+                    }
                 }
             }
         }
@@ -53,9 +55,12 @@ pipeline {
         stage('Push Docker Image to Nexus') {
             steps {
                 script {
-                    sh '''
-                    docker push ${FULL_IMAGE} || { echo "Docker push failed"; exit 1; }
-                    '''
+                    withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                        sh '''
+                        echo "${NEXUS_PASS}" | docker login ${DOCKER_REGISTRY} -u ${NEXUS_USER} --password-stdin || { echo "Docker push failed"; exit 1; }
+                        docker push ${FULL_IMAGE} || { echo "Docker push failed"; exit 1; }
+                        '''
+                    }
                 }
             }
         }
@@ -71,16 +76,20 @@ pipeline {
         stage('Run Docker on slave') {
             steps {
                 script {
-                    sh '''
-                    ssh-keyscan -H ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
-                    ssh root@${DEPLOY_SERVER} << EOF
-                        sudo docker login ${DOCKER_REGISTRY} -u admin -p "Dm59JTErVdXaKaN"
-                        sudo docker pull ${FULL_IMAGE}
-                        sudo docker stop ${IMAGE_NAME} || true
-                        sudo docker rm ${IMAGE_NAME} || true
-                        sudo docker run -d --name ${IMAGE_NAME} -p 8080:80 ${FULL_IMAGE}
-                    EOF
-                    '''
+                    sshKeyScan = sh(script: "ssh-keyscan -H ${DEPLOY_SERVER}", returnStdout: true).trim()
+                    writeFile file: "${HOME}/.ssh/id_rsa", text: sshKeyScan
+                    
+                    withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
+                        sh '''
+                        ssh ${DEPLOY_SERVER} << EOF
+                            sudo docker login ${DOCKER_REGISTRY} -u ${NEXUS_USER} -p ${NEXUS_PASS}
+                            sudo docker pull ${FULL_IMAGE}
+                            sudo docker stop ${IMAGE_NAME} || true
+                            sudo docker rm ${IMAGE_NAME} || true
+                            sudo docker run -d --name ${IMAGE_NAME} -p 8080:80 ${FULL_IMAGE}
+                        EOF
+                        '''
+                    }
                 }
             }
         }
