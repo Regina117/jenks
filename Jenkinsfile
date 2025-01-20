@@ -78,7 +78,7 @@ pipeline {
                     sh """
                       ssh-keyscan -H ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
                     """
-                    withCredentials([usernameColonPassword(credentialsId: 'prod', variable: 'prod')]) {
+                   withCredentials([usernameColonPassword(credentialsId: PROD_CREDENTIALS_ID, variable: 'PROD')]) {
                         sh """
                         ssh -o StrictHostKeyChecking=no ${DEPLOY_SERVER} << EOF
                             set -ex
