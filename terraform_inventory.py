@@ -23,7 +23,8 @@ def generate_inventory(outputs):
         "all": {
             "children": [
                 "jenkins",
-                "nexus"
+                "nexus",
+                "prod"
             ]
         },
         "jenkins": {
@@ -31,7 +32,10 @@ def generate_inventory(outputs):
         },
         "nexus": {
             "hosts": []
-        }
+        },
+        "prod": {
+            "hosts": []
+        },
     }
 
     if "jenkins_ip" in outputs and outputs["jenkins_ip"]["value"]:
@@ -49,6 +53,15 @@ def generate_inventory(outputs):
             "ansible_user": "root",
             "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
         }
+        
+    if "prod_ip" in outputs and outputs["prod_ip"]["value"]:
+        prod_ip = outputs["prod_ip"]["value"]
+        inventory["prod"]["hosts"].append(prod_ip)
+        inventory["_meta"]["hostvars"][prod_ip] = {
+            "ansible_user": "root",
+            "ansible_ssh_private_key_file": "/root/.ssh/id_rsa"
+        }
+        
 
     return inventory
 

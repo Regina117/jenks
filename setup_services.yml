@@ -58,6 +58,7 @@
     - name: Update apt cache
       apt:
         update_cache: yes
+        cache_valid_time: 3600 
 
     - name: Install OpenJDK 8
       apt:
@@ -164,4 +165,39 @@
         name: nexus
         state: started
         enabled: yes
+
+- name: Install and configure Prod
+  hosts: prod
+  become: true
+  
+  tasks: 
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600 
+          
+    - name: Install app
+      apt:
+        name: 
+        - openjdk-11-jdk
+        - docker.io
+        - tomcat9
+        - tomcat9-admin
+        state: present
+        update_cache: yes
+
+    - name: Ensure Docker service is running
+      systemd:
+        name: docker
+        state: started
+        enabled: yes     
+
+    - name: Ensure tomcat service is running
+      systemd:
+        name: tomcat9
+        state: started
+        enabled: yes        
+
+
+
 
