@@ -78,8 +78,7 @@ pipeline {
                     sh """
                       ssh-keyscan -H ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
                     """
-                    withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS'),
-                             usernamePassword(credentialsId: PROD_CREDENTIALS_ID, usernameVariable: 'PROD_USER', passwordVariable: 'PROD_PASS')]) {
+                    withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
                         sh """
                          ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/id_rsa 158.160.156.175 << EOF
                             set -ex
