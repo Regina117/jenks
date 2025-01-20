@@ -7,7 +7,7 @@ pipeline {
         IMAGE_TAG = 'v1.0.1'
         FULL_IMAGE = "${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}"
         REPO_URL = 'https://github.com/Regina117/jenks.git'
-        DEPLOY_SERVER = '158.160.156.175'        
+        DEPLOY_SERVER = '158.160.156.175'
         NEXUS_CREDENTIALS_ID = 'nexusadmin'
         PROD_CREDENTIALS_ID = 'prod'
     }
@@ -75,18 +75,16 @@ pipeline {
         stage('Run Docker on slave') {
             steps {
                 script {
-                    sh """
-                      ssh-keyscan -H ${DEPLOY_SERVER} >> ~/.ssh/known_hosts
-                    """
+                    sh 'ssh-keyscan -H 158.160.156.175 >> ~/.ssh/known_hosts'
                     withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS')]) {
                         sh """
-                         ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/id_rsa 158.160.156.175 << EOF
-                            set -ex
-                            sudo docker login ${DOCKER_REGISTRY} -u ${NEXUS_USER} -p ${NEXUS_PASS}
-                            sudo docker pull ${FULL_IMAGE}
-                            sudo docker stop ${IMAGE_NAME} || true
-                            sudo docker rm ${IMAGE_NAME} || true
-                            sudo docker run -d --name ${IMAGE_NAME} -p 8080:80 ${FULL_IMAGE}
+                         ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/id_rsa jenkins@158.160.156.175 << EOF
+                set -ex
+                sudo docker login 158.160.140.97:8123/repository/mydockerrepo -u ${NEXUS_USER} -p ${NEXUS_PASS}
+                sudo docker pull ${FULL_IMAGE}
+                sudo docker stop geoserver || true
+                sudo docker rm geoserver || true
+                sudo docker run -d --name geoserver -p 8080:80 ${FULL_IMAGE}
                         EOF
                         """
                     }
@@ -104,6 +102,3 @@ pipeline {
         }
     }
 }
-
-
-
