@@ -81,7 +81,7 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: NEXUS_CREDENTIALS_ID, usernameVariable: 'NEXUS_USER', passwordVariable: 'NEXUS_PASS'),
                              usernamePassword(credentialsId: PROD_CREDENTIALS_ID, usernameVariable: 'PROD_USER', passwordVariable: 'PROD_PASS')]) {
                         sh """
-                         ssh -vvv -i /var/lib/jenkins/.ssh/id_rsa -o StrictHostKeyChecking=no ${DEPLOY_SERVER} << EOF
+                         ssh -o StrictHostKeyChecking=no -i /var/lib/jenkins/.ssh/id_rsa 158.160.156.175 << EOF
                             set -ex
                             sudo docker login ${DOCKER_REGISTRY} -u ${NEXUS_USER} -p ${NEXUS_PASS}
                             sudo docker pull ${FULL_IMAGE}
